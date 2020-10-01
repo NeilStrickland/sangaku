@@ -1,0 +1,14 @@
+Edit existing uploads
+Copy feedback given to other students
+Upload by email
+Pages to list modules, tutorial groups, problem sheets, sessions etc
+Block access before start time, count down
+Different view after end of session
+PDF download for completed session
+Mark sessions as provisional/confirmed
+Automatic compilation of LaTeX
+Proper sizing of iframes on creation
+Student photos
+Show solutions to tutors
+Option to show solutions to students
+Option to allow access to the wrong group

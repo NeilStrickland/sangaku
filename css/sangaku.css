@@ -1,0 +1,219 @@
+body {
+    font-family: georgia, sans-serif;
+    width: 700px;
+}
+
+table.edged { 
+ border-collapse: collapse;
+}
+
+table.edged td {
+ padding: 3px 0.5em;
+ margin-left: 3px;
+ border: 1px solid #CCCCCC; 
+}
+
+td.command {
+ font-weight: bold;
+ font-size: 12px;
+ text-decoration: none;
+ padding: 3px 0.5em;
+ margin-left: 3px;
+ border: 1px solid #778;
+ background: #DDE;
+}
+
+td.command a:link { 
+ color: #448;
+ text-decoration: none;
+}  
+
+td.command:hover { 
+ color: #000;
+ background: #AAE;
+ border-color: #227;   
+ cursor: pointer;
+}
+
+h3, h4 {
+    display : inline;
+}
+
+div.control {
+    margin-top: 5px;
+    margin-bottom: 5px;
+    display : flex;
+}
+
+div.upload_block_button {
+    flex : 0 0 50%;
+    padding : 3px;
+    min-height: 20px;
+    background: #AAffAA;
+    border: 1px solid #44AA44;
+    border-radius: 4px;
+}
+
+button.upload_edit {
+    display : none;
+}
+
+div.upload_block_button:hover {
+    cursor : pointer;
+    background: #44AA44;
+}
+
+div.stepper_container {
+    flex : 1;
+}
+
+div.stepper_option {
+    flex : 1;
+    padding : 3px;
+    min-height: 20px;
+    background: #AAAAff;
+    border: 1px solid #4444AA;
+    border-radius: 4px;
+}
+
+div.stepper_option_active {
+    cursor : pointer;
+    flex : 1;
+    padding : 3px;
+    min-height: 20px;
+    background: #CCCCFF;
+    border: 1px solid #4444AA;
+    border-radius: 4px;
+}
+
+div.tab {
+    overflow : hidden;
+    border : 1px solid #CCC;
+    background-color : #F1F1F1;
+}
+
+div.tab button {
+    background-color: inherit;
+    float: left;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 8px 8px;
+    transition: 0.3s;
+}
+
+div.tab button:hover {
+    background-color: #DDD;
+}
+
+div.tab button.active {
+    background-color: #CCC;
+}
+
+div.tabcontent {
+    display: none;
+    padding: 6px 12px;
+    border: 1px solid #CCC;
+    border-top: none;
+}
+
+td.status {
+    min-width : 80px;
+    height : 30px;
+}
+
+div.explain_status {
+    position : absolute;
+    left : 0px;
+    top : 30px;
+    width : 100px;
+    z-index : 1;
+    background : #CCC;
+    padding : 3px;
+    border-radius : 3px;
+}
+
+span.work_icon:hover {
+    cursor: pointer;
+}
+
+div.review {
+    border : 1px solid black;
+    border-radius : 3px;
+    padding: 3px;
+    width : 98%;
+}
+
+td.item_header {
+    min-width: 80px;
+    min-height: 30px;
+}
+
+div.item_review_header {
+    width: 100%;
+    background: #DDDDEE;
+    padding: 4px;
+    margin: 2px;
+    border: 1px solid #888899;
+    border-radius: 4px;
+    position: relative;
+}
+
+img.toggler:hover {
+    cursor: pointer;
+}
+
+div.item_review_status {
+    display: inline-block;
+    position: absolute;
+    right: 30px;
+}
+
+div.item_review_work_icon {
+    display: inline-block;
+    position: absolute;
+    right: 5px;
+}
+
+div.upload_label {
+    width : 98%;
+    margin: 2px;
+    padding: 3px;
+    border: 1px solid blue;
+    border-radius: 3px;
+    position: relative;
+}
+
+div.upload_time_label {
+    display : inline-block;
+    padding-right: 4px;
+}
+
+div.upload_teacher_label {
+    display : inline-block;
+}
+
+div.upload_buttons {
+    display : inline-block;
+    position: absolute;
+    right: 5px;
+}
+
+div.notifier {
+    display : none;
+    position : fixed;
+    left : 440px;
+    top : 5px;
+    width : 240px;
+    min-height : 80px;
+    padding: 3px;
+    border: 2px solid orange;
+    border-radius: 3px;
+    z-index : 1;
+    background : #F8D568;
+    opacity : 1;
+}
+
+div.notifier:hover {
+    cursor : crosshair;
+}
