@@ -2,6 +2,7 @@ z*
 .vscode/
 scratch/
 vendor/
+composer.lock
 js/ckeditor/
 js/qrcodejs/
 js/scratch/
