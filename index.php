@@ -22,7 +22,20 @@ if (count($user->current_sessions) == 0 &&
  exit;
 }
 
-echo $sangaku->nav->header('Sessions');
+$style = <<<CSS
+td.module_code { width: 60px; vertical-align : top; }
+td.group_name { width: 60px;  vertical-align : top; }
+td.sheet_name { width: 300px;  vertical-align : top; }
+td.session_link { width : 100px; }
+
+CSS
+ ;
+
+echo $sangaku->nav->header(
+'Sessions',
+array('widgets' => array('mathjax'),
+      'inline_style' => $style)
+);
 
 echo <<<HTML
 <h1>Sangaku sessions</h1>
@@ -43,22 +56,22 @@ HTML;
    $t = (time() < $s->start_timestamp()) ? 'On soon' : 'On now';
    $url = $s->url();
    $x = <<<HTML
-  <td style="width:140px" class="command" onclick="location='{$url}'">$t</td>
+  <td class="command session_link" onclick="location='{$url}'">$t</td>
 
 HTML;
   } else {
    $t = date('D j/n H:i',$s->start_timestamp());
    $x = <<<HTML
-  <td style="width:140px">$t</td>
+  <td class="session_link">$t</td>
 
 HTML;
   }
   
   echo <<<HTML
  <tr>
-  <td style="width:60px">{$s->module_code}</td>
-  <td style="width:60px">{$s->tutorial_group_name}</td>
-  <td style="width:300px">{$s->problem_sheet_title}</td>
+  <td class="module_code">{$s->module_code}</td>
+  <td class="group_name">{$s->tutorial_group_name}</td>
+  <td class="sheet_name">{$s->problem_sheet_title}</td>
 $x
  </tr>
 
@@ -68,10 +81,10 @@ HTML;
  foreach($user->unlimited_sessions as $s) {
   echo <<<HTML
  <tr>
-  <td>{$s->module_code}</td>
-  <td>{$s->tutorial_group_name}</td>
-  <td>{$s->problem_sheet_title}</td>
-  <td style="width:100px">&nbsp;</td>
+  <td class="module_code">{$s->module_code}</td>
+  <td class="group_name">{$s->tutorial_group_name}</td>
+  <td class="sheet_name">{$s->problem_sheet_title}</td>
+  <td class="session_link">&nbsp;</td>
  </tr>
 
 HTML;
@@ -111,9 +124,9 @@ HTML;
   
   echo <<<HTML
  <tr>
-  <td style="width:60px">{$s->module_code}</td>
-  <td style="width:60px">{$s->tutorial_group_name}</td>
-  <td style="width:300px">{$s->problem_sheet_title}</td>
+  <td class="module_code">{$s->module_code}</td>
+  <td class="group_name">{$s->tutorial_group_name}</td>
+  <td class="sheet_name">{$s->problem_sheet_title}</td>
 $x
  </tr>
 
@@ -123,10 +136,10 @@ HTML;
  foreach($user->unlimited_teacher_sessions as $s) {
   echo <<<HTML
  <tr>
-  <td>{$s->module_code}</td>
-  <td>{$s->tutorial_group_name}</td>
-  <td>{$s->problem_sheet_title}</td>
-  <td style="width:100px">&nbsp;</td>
+  <td class="module_code">{$s->module_code}</td>
+  <td class="group_name">{$s->tutorial_group_name}</td>
+  <td class="sheet_name">{$s->problem_sheet_title}</td>
+  <td class="session_link">&nbsp;</td>
  </tr>
 
 HTML;

@@ -1,0 +1,44 @@
+[
+    {
+        "name": "xemlock/php-latex",
+        "version": "dev-master",
+        "version_normalized": "9999999-dev",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/xemlock/php-latex.git",
+            "reference": "5b1a3d2d6767303671049efb6de42dc1a3a8ba86"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/xemlock/php-latex/zipball/5b1a3d2d6767303671049efb6de42dc1a3a8ba86",
+            "reference": "5b1a3d2d6767303671049efb6de42dc1a3a8ba86",
+            "shasum": ""
+        },
+        "require": {
+            "ext-dom": "*",
+            "php": ">=5.3.0"
+        },
+        "require-dev": {
+            "phpunit/phpunit": "5.*"
+        },
+        "time": "2020-09-20T20:56:30+00:00",
+        "type": "library",
+        "installation-source": "source",
+        "autoload": {
+            "psr-0": {
+                "PhpLatex_": "library"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "xemlock",
+                "email": "xemlock@gmail.com"
+            }
+        ],
+        "description": "LaTeX parser and renderer"
+    }
+]

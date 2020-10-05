@@ -7,6 +7,8 @@ $sangaku->add_table(
   array(		
   'id' => array('type' => 'integer','notnull' => 'true'),
   'module_id' => array('type' => 'integer','link' => 'module'),
+  'semester' => array('type' => 'integer'),
+  'week_number' => array('type' => 'integer'),
   'title' => array('type' => 'text'),
   'intro' => array('type' => 'text'),
   'latex_source' => array('type' => 'text')
@@ -16,6 +18,8 @@ $sangaku->add_table(
 SELECT
  x.id,
  x.module_id,
+ x.semester,
+ x.week_number,
  x.title,
  x.intro,
  x.latex_source

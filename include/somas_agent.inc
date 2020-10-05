@@ -11,6 +11,14 @@ class somas_agent {
  static $engl1_moids = array();
  static $engl1_moids_string = '';
  
+ function __construct() {
+  $w = array();
+  foreach(somas_agent::$engl1_codes as $c) { $w[] = "'{$c}'"; }
+  $w = implode(',',$w);
+
+  somas_agent::$engl1_codes_string = $w;
+ }
+
  function connect() {
   $db_pass = trim(file_get_contents('/var/sangaku/somas_cred.txt'));
 
@@ -26,12 +34,28 @@ class somas_agent {
   }
  }
 
- function fetch_engl1_modules() {
-  $w = array();
-  foreach(somas_agent::$engl1_codes as $c) { $w[] = "'{$c}'"; }
-  $w = implode(',',$w);
+ function get_all($q) {
+  $result = $this->db->query($q);
 
-  somas_agent::$engl1_codes_string = $w;
+  if ($result === false) {
+   $msg = "MySQL error: " . mysqli_error($this->db) . '<br/>' . 
+        "Query: $q<br/>";
+   trigger_error($msg);
+
+   exit;
+  }
+
+  $rows = array();
+
+  while($x = mysqli_fetch_object($result)) {
+   $rows[] = $x;
+  }
+
+  return $rows;
+ }
+ 
+ function fetch_engl1_modules() {
+  $w = somas_agent::$engl1_codes_string;
   
   $q = <<<SQL
 SELECT
@@ -45,21 +69,13 @@ WHERE o.session=2020
 ORDER BY o.module_code
 SQL;
 
-  $result = $this->db->query($q);
-
-  if ($result === false) {
-   $msg = "MySQL error: " . mysqli_error($this->db) . '<br/>' . 
-        "Query: $q<br/>";
-   trigger_error($msg);
-
-   exit;
-  }
+  $xx = $this->get_all($q);
 
   somas_agent::$engl1_modules = array();
 
   $w = array();
   
-  while($x = mysqli_fetch_object($result)) {
+  foreach($xx as $x) {
    somas_agent::$engl1_modules[$x->somas_moid] = $x;
    somas_agent::$engl1_moids[] = $x->somas_moid;
    $w[] = "'{$x->somas_moid}'";
@@ -72,7 +88,8 @@ SQL;
   global $sangaku;
 
   $modules = $sangaku->load_where_indexed('modules','1','code');
-
+  $w = somas_agent::$engl1_codes_string;
+  
   $q = <<<SQL
 SELECT 
 x.id AS somas_moid,
@@ -81,22 +98,14 @@ m.title AS title
 FROM tbl_module_occurrences x
  LEFT JOIN tbl_modules m ON x.module_code=m.code
 WHERE x.session=2020
- AND m.credit_level <= 2
+AND m.credit_level <= 2
+AND x.module_code NOT IN ($w)
 SQL;
 
-  $result = $this->db->query($q);
-
-  if ($result === false) {
-   $msg = "MySQL error: " . mysqli_error($this->db) . '<br/>' . 
-        "Query: $q<br/>";
-   trigger_error($msg);
-
-   exit;
-  }
-
+  $xx = $this->get_all($q);
   $changes = array();
-  
-  while($x = mysqli_fetch_object($result)) {
+
+  foreach($xx as $x) {
    $needs_update = false;
    if (isset($modules[$x->code])) {
     $m = $modules[$x->code];
@@ -126,6 +135,8 @@ SQL;
   global $sangaku;
 
   $modules = $sangaku->load_where_indexed('modules','1','somas_moid');
+  $modules_by_code = make_index($modules,'code');
+  
   foreach($modules as $m) {
    $m->load_tutorial_groups();
    $m->tgbsi = make_index($m->tutorial_groups,'somas_id');
@@ -152,23 +163,20 @@ AND (o.semester = '1' OR (o.semester = 'Year' AND (g.semester = '1' OR g.semeste
 ORDER BY m.code,g.tutorial_group
 SQL;
 
-  $result = $this->db->query($q);
-
-  if ($result === false) {
-   $msg = "MySQL error: " . mysqli_error($this->db) . '<br/>' . 
-        "Query: $q<br/>";
-   trigger_error($msg);
-
-   exit;
-  }
+  $xx = $this->get_all($q);
 
   $changes = array();
   
-  while($x = mysqli_fetch_object($result)) {
+  foreach($xx as $x) {
    $needs_update = false;
 
-   if (! isset($modules[$x->moid])) { continue; }
-   $m = $modules[$x->moid];
+   if (in_array($x->moid,somas_agent::$engl1_moids)) {
+    $m = $modules_by_code['EngL1'];
+   } elseif (isset($modules[$x->moid])) {
+    $m = $modules[$x->moid];
+   } else {
+    continue;
+   }
    
    if (isset($m->tgbsi[$x->somas_id])) {
     $y = $m->tgbsi[$x->somas_id];
@@ -196,82 +204,6 @@ SQL;
   return $changes;
  }
 
- function fetch_engl1_groups() {
-  global $sangaku;
-
-  if (! somas_agent::$engl1_modules) {
-   somas_agent::fetch_engl1_modules();
-  }
-  
-  $engl1 = $sangaku->load_where('modules',"code='EngL1'")[0];
-  $engl1->load_tutorial_groups();
-  $engl1->tgbsi = make_index($engl1->tutorial_groups,'somas_id');
-
-  $w = somas_agent::$engl1_codes_string;
-  
-  $q = <<<SQL
-SELECT 
- g.id AS somas_id,
- o.module_code,
- g.tutorial_group,
- teacher_id,
- assistant_id,
- day_number,
- time_slot_id AS hour,
- week_parity 
-FROM `tbl_teaching_events` g 
- LEFT JOIN tbl_module_occurrences o ON g.module_occurrence_id=o.id
-  LEFT JOIN tbl_modules m ON o.module_code=m.code
-WHERE o.session=2020
-AND o.module_code IN ($w)
-AND g.type IN ('tutorial','lab session')
-AND g.room_id=451
-AND (o.semester = '1' OR (o.semester = 'Year' AND (g.semester = '1' OR g.semester = 'Year')))
-ORDER BY m.code,g.tutorial_group
-SQL;
-
-  $result = $this->db->query($q);
-
-  if ($result === false) {
-   $msg = "MySQL error: " . mysqli_error($this->db) . '<br/>' . 
-        "Query: $q<br/>";
-   trigger_error($msg);
-
-   exit;
-  }
-
-  $changes = array();
-  
-  while($x = mysqli_fetch_object($result)) {
-   $x->name = $x->module_code . substr($x->tutorial_group,1);
-   $needs_update = false;
-
-   if (isset($engl1->tgbsi[$x->somas_id])) {
-    $y = $engl1->tgbsi[$x->somas_id];
-   } else {
-    $y = $sangaku->new_object('tutorial_group');
-    $y->somas_id = $x->somas_id;
-    $needs_update = true;
-   }
-
-   $y->module_id = $engl1->id;
-   $needs_update = true;
-   
-   foreach (array('name','day_number','hour','week_parity') as $k) {
-    if ($y->$k != $x->$k) {
-     $y->$k = $x->$k;
-     $needs_update = true;
-    }
-   }
-
-   if ($needs_update) {
-    $y->save();
-    $changes[] = $y;
-   }
-  }
-
-  return $changes;
- }
 
  function fetch_students() {
   global $sangaku;
@@ -309,19 +241,11 @@ WHERE EXISTS (
 )
 SQL;
 
-  $result = $this->db->query($q);
-
-  if ($result === false) {
-   $msg = "MySQL error: " . mysqli_error($this->db) . '<br/>' . 
-        "Query: $q<br/>";
-   trigger_error($msg);
-
-   exit;
-  }
+  $xx = $this->get_all($q);
 
   $changes = array();
-  
-  while($x = mysqli_fetch_object($result)) {
+
+  foreach($xx as $x) {
    if (strtolower($x->username) == 'no data' || ! $x->username) { continue; }
    
    $x->status = 'student';
@@ -398,19 +322,11 @@ FROM tbl_registrations r
 WHERE r.module_occurrence_id IN ($moids)
 SQL;
 
-  $result = $this->db->query($q);
-
-  if ($result === false) {
-   $msg = "MySQL error: " . mysqli_error($this->db) . '<br/>' . 
-        "Query: $q<br/>";
-   trigger_error($msg);
-
-   exit;
-  }
+  $xx = $this->get_all($q);
 
   $changes = array();
-  
-  while($x = mysqli_fetch_object($result)) {
+
+  foreach($xx as $x) {
    if (in_array($x->somas_moid,somas_agent::$engl1_moids)) {
     $x->module_code='EngL1';
    }
@@ -488,19 +404,11 @@ FROM tbl_tutorial_group_memberships x
 WHERE x.event_id IN ($ids)
 SQL;
 
-  $result = $this->db->query($q);
-
-  if ($result === false) {
-   $msg = "MySQL error: " . mysqli_error($this->db) . '<br/>' . 
-        "Query: $q<br/>";
-   trigger_error($msg);
-
-   exit;
-  }
+  $xx = $this->get_all($q);
 
   $changes = array();
   
-  while($x = mysqli_fetch_object($result)) {
+  foreach($xx as $x) {
    $g = $tutorial_groups[$x->somas_event_id];
    $x->tutorial_group = $g;
    $x->tutorial_group_id = $g->id;
@@ -542,6 +450,145 @@ SQL;
   }
 
   return $changes;
+ }
+
+ function fetch_teachers() {
+  global $sangaku;
+  
+  $q = <<<SQL
+SELECT *
+FROM view_sangaku_teachers x
+SQL;
+
+  $xx = $this->get_all($q);
+
+  $people_by_somas_id = array();
+  
+  foreach($xx as $x) {
+   $people_by_somas_id[$x->somas_person_id] = $x;
+  }
+
+  $tutorial_groups =
+   $sangaku->load_where_indexed('tutorial_groups','1','somas_id');
+
+  $teachers =
+   $sangaku->load_where_indexed('users',"x.status='teacher'",'somas_person_id');
+
+  foreach($tutorial_groups as $g) {
+   $g->load_teachers();
+   $g->teacher_links_by_somas_person_id =
+    make_index($g->teacher_links,'somas_person_id');
+   foreach($g->teacher_links as $l) {
+    $l->is_confirmed = false;
+   }
+  }
+
+  $modules_by_code = $sangaku->load_where_indexed('modules','1','code');
+  $modules_by_somas_id =
+   make_index($modules_by_code,'somas_moid');
+
+  $moids = array();
+  
+  foreach($modules_by_code as $m) {
+   $m->load_tutorial_groups();
+   
+   $m->lecturers = array();
+   
+   if ($m->somas_moid) {
+    $moids[] = "{$m->somas_moid}";
+   }
+  }
+  
+  $moids = implode(',',$moids) . ',' .
+         somas_agent::$engl1_moids_string;
+
+  $q = <<<SQL
+SELECT 
+ o.id AS somas_moid,
+ o.module_code AS module_code,
+ p.id AS somas_person_id,
+ p.user_name AS username
+FROM tbl_module_occurrences o 
+ LEFT JOIN tbl_people p ON (o.lecturer_id=p.id OR
+                            o.spring_lecturer_id=p.id OR 
+                            o.extra_lecturer_id=p.id) 
+WHERE o.id IN ($moids)
+SQL;
+
+  $xx = $this->get_all($q);
+
+  foreach($xx as $x) {
+   if (isset($modules_by_somas_id[$x->somas_moid])) {
+    $m = $modules_by_somas_id[$x->somas_moid];
+   } elseif (in_array($x->module_code,somas_agent::$engl1_codes)) {
+    $m = $modules_by_code['EngL1'];
+   }
+   
+   if ((! isset($teachers[$x->somas_person_id])) &&
+       isset($people_by_somas_id[$x->somas_person_id])) {
+    $p0 = $people_by_somas_id[$x->somas_person_id];
+    $p = $this->add_user($p0);
+    $teachers[$x->somas_person_id] = $p;
+   }
+
+    foreach($m->tutorial_groups as $g) {
+    $g->add_teacher_by_username($x->username);
+   }
+  }
+
+  $q = <<<SQL
+SELECT 
+ e.id AS somas_id,
+ e.teacher_id,
+ e.assistant_id 
+FROM tbl_teaching_events e
+SQL;
+
+  $xx = $this->get_all($q);
+
+  foreach($xx as $x) {
+   if (! isset($tutorial_groups[$x->somas_id])) { continue; }
+
+   $g = $tutorial_groups[$x->somas_id];
+
+   if (! $g) { continue; }
+   
+   if ($x->teacher_id) {
+    if ((! isset($teachers[$x->teacher_id])) && isset($people_by_somas_id[$x->teacher_id])) {
+     $p0 = $people_by_somas_id[$x->teacher_id];
+     $p = $this->add_user($p0);
+     $teachers[$x->teacher_id] = $p;
+    }
+    
+    $g->add_teacher_by_somas_id($x->teacher_id);
+   }
+   
+   if ($x->assistant_id) {
+    if ((! isset($teachers[$x->assistant_id])) && isset($people_by_somas_id[$x->assistant_id])) {
+     $p0 = $people_by_somas_id[$x->assistant_id];
+     $p = $this->add_user($p0);
+     $teachers[$x->assistant_id] = $p;
+    }
+
+    $g->add_teacher_by_somas_id($x->assistant_id);
+   }
+  }
+ }
+
+ function add_user($p0) {
+  global $sangaku;
+  
+  $p = $sangaku->new_object('user');
+  $p->somas_student_id = null;
+  $p->somas_person_id = $p0->somas_person_id;
+  $p->username = $p0->username;
+  $p->gmail_name = $p0->gmail_name;
+  $p->forename = $p0->forename;
+  $p->surname = $p0->surname;
+  $p->status = $p0->status;
+  $p->save();
+  $p->load();
+  return $p;
  }
 }
 

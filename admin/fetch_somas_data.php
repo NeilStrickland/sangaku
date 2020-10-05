@@ -6,6 +6,7 @@ require_once('../include/somas_agent.inc');
 $a = new somas_agent();
 $a->connect();
 
+$a->fetch_engl1_modules();
 $module_changes = $a->fetch_modules();
 echo "Changed modules:<br/>";
 foreach($module_changes as $m) {
@@ -16,15 +17,6 @@ echo "<br/><br/>" . PHP_EOL;
 
 $group_changes = $a->fetch_groups();
 echo "Changed groups:<br/>";
-foreach($group_changes as $g) {
- $g->load();
- echo "{$g->module_code} ({$g->name})<br/>" . PHP_EOL;
-}
-
-echo "<br/><br/>" . PHP_EOL;
-
-$engl1_group_changes = $a->fetch_engl1_groups();
-echo "Changed EngL1 groups:<br/>";
 foreach($group_changes as $g) {
  $g->load();
  echo "{$g->module_code} ({$g->name})<br/>" . PHP_EOL;
@@ -69,3 +61,4 @@ HTML;
  }
 }
 
+$a->fetch_teachers();

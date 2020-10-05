@@ -10,8 +10,12 @@ table.edged {
 table.edged td {
  padding: 3px 0.5em;
  margin-left: 3px;
- border: 1px solid #CCCCCC; 
+ border: 1px solid #CCCCCC;
+ vertical-align: top;
 }
+
+tr.spacer { height: 1px; }
+tr.spacer td {  border: none; }
 
 td.command {
  font-weight: bold;
