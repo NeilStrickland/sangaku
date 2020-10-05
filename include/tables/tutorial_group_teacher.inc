@@ -12,6 +12,8 @@ $sangaku->add_table(
  array(
   'tutorial_group_name' => array('type' => 'text'),
   'module_code' => array('type' => 'text'),
+  'somas_person_id' => array('type' => 'integer'),
+  'somas_event_id' => array('type' => 'integer'),
   'username' => array('type' => 'text'), 
   'surname' => array('type' => 'text'), 
   'forename' => array('type' => 'text')
@@ -21,8 +23,10 @@ SELECT
  x.id,
  x.tutorial_group_id,
  g.name AS tutorial_group_name,
+ g.somas_id AS somas_event_id,
  m.code AS module_code,
  x.teacher_id,
+ s.somas_person_id,
  s.username,
  s.surname,
  s.forename

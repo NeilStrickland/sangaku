@@ -45,6 +45,32 @@ class tutorial_group extends frog_object {
   parent::__construct($sangaku,'tutorial_group',$id,$with_defaults);
  }
 
+ function day_letter() {
+  if ($this->day_number) {
+   return array('','M','T','W','R','F','','')[$this->day_number];
+  } else {
+   return '';
+  }
+ }
+ 
+ function day_name() {
+  if ($this->day_number) {
+   return array('Sun','Mon','Tue','Wed','Thu','Fri','Sat','Sun')[$this->day_number];
+  } else {
+   return '';
+  }
+ }
+
+ function week_parity_long() {
+  if ($this->week_parity == 'e') {
+   return 'even';
+  } elseif  ($this->week_parity == 'o') {
+   return 'odd';
+  } else {
+   return '';
+  }
+ }
+ 
  function load_teachers() {
   global $sangaku;
 
@@ -171,6 +197,17 @@ class tutorial_group extends frog_object {
   }
   
   $w = "x.username='{$username}' AND x.status='teacher'";
+  $ss = $sangaku->load_where('user',$w);
+  if (! $ss) { return false; }
+
+  $s = $ss[0];
+  return $this->add_teacher_by_id($s->id);
+ }
+
+ function add_teacher_by_somas_id($somas_id) {
+  global $sangaku;
+
+  $w = "x.somas_person_id=" . ((int) $somas_id) . " AND x.status='teacher'";
   $ss = $sangaku->load_where('user',$w);
   if (! $ss) { return false; }
 

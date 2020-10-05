@@ -16,7 +16,7 @@ class sangaku_navigator extends frog_navigator {
   $this->scripts_base_dir = dirname(__DIR__) . '/js';
   $this->styles_base_dir  = dirname(__DIR__) . '/css';
   
-  $this->standard_scripts = array('sangaku','objects_auto');
+  $this->standard_scripts = array('objects_auto','sangaku');
   $this->standard_styles  = array('sangaku');
  }
 

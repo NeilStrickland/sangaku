@@ -38,7 +38,7 @@ class sangaku_class extends frog {
     return $params;
    }
   } else {
-   $session_id = 371;
+   $session_id = 372;
   }
 
   $session = $sangaku->load('session',$session_id);
@@ -79,5 +79,29 @@ class sangaku_class extends frog {
   $params->item_id = $item ? $item->id : null;  
 
   return $params;
+ }
+
+ function get_date_info() {
+  $this->date_info = 
+   json_decode(file_get_contents('https://maths.shef.ac.uk/maths/date_info.php'));
+ }
+
+ function week_number($t = 0) {
+  if (! $t) { $t = time(); }
+
+  if (! isset($this->date_info)) { $this->get_date_info(); }
+
+  $d = $this->date_info;
+
+  for ($i = 1; $i <= 2; $i++) {
+   for ($j = 0; $j <= 12; $j++) {
+    $t0 = $d->week_start_time[$i][$j];
+    if ($t0 <= $t && $t < $t0 + 7 * 24 * 3600) {
+     return array($i,$j);
+    }
+   }
+  }
+
+  return false;
  }
 }
