@@ -15,7 +15,7 @@ $sangaku->add_table(
   'latex_source' => array('type' => 'text')
  ),
  array(
-  'module_code' => array('type' => ''text)
+  'module_code' => array('type' => 'text')
  ),
  <<<SQL
 SELECT
