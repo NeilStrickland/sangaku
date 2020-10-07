@@ -23,21 +23,15 @@ class sangaku_auth extends frog_auth {
 
   $u = $params->user;
 
-  if ($u->username == 'mdb18egs') {
-   $x = new stdClass();
-   
-   if ($params->password == $u->username) {
-    $x->ok = true;
-    $x->error = '';
-   } else {
-    $x->ok = false;
-    $x->error = 'password incorrect';
-   }
+  $x = $this->ldap_check_password($u->username,$params->password);
+  if ($x->ok) { return $x; }
 
+  $y = $this->ldap_check_password($u->username,$params->password);
+  if ($y->ok) {
+   return $y;
+  } else {
    return $x;
   }
-
-  return $this->ldap_check_password($u->username,$params->password);
  }
 }
 

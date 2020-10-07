@@ -90,7 +90,7 @@ class tutorial_group extends frog_object {
   return($this->teachers);
  }
 
- function load_students() {
+ function load_students($include_fake = 1) {
   global $sangaku;
 
   $this->student_links =
@@ -107,6 +107,14 @@ class tutorial_group extends frog_object {
    }
    $this->students[] = $student;
    $this->students_by_username[$student->username] = $student;
+  }
+
+  if ($include_fake) {
+   $students = $sangaku->load_where('user',"x.username LIKE('fake%')");
+   foreach($students as $student) {
+    $this->students[] = $student;
+    $this->students_by_username[$student->username] = $student;
+   }
   }
 
   return($this->students);
@@ -136,6 +144,28 @@ class tutorial_group extends frog_object {
    }
   }
 
+  $this->sessions_by_semester = array(1 => array(),2 => array());
+  $this->sessions_by_week = array(1 => array(),2 => array());
+  for ($i = 1; $i <= 2; $i++) {
+   for ($j = 0; $j <= 12; $j++) {
+    $this->sessions_by_week[$i][$j] = array();
+   }
+  }
+
+  foreach($this->sessions as $s) {
+   $s->start_timestamp = strtotime($s->start_time);
+   $w = $sangaku->week_number($s->start_timestamp);
+   if ($w == false) {
+    $s->semester = null;
+    $s->week_number = null;
+   } else {
+    $s->semester = $w[0];
+    $s->week_number = $w[1];
+    $this->sessions_by_semester[$w[0]][] = $s;
+    $this->sessions_by_week[$w[0]][$w[1]][] = $s;
+   }
+  }
+  
   return $this->sessions;
  }
  

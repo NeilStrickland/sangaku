@@ -27,6 +27,7 @@ function get_params() {
 function select_session_page($params) {
  echo "Not yet implemented";
 
+ pre_print($params); exit;
  echo "<pre>";
  echo "session_id: " . $params->session_id . PHP_EOL; 
  echo "session: " . $params->session->id . PHP_EOL; 
@@ -44,7 +45,9 @@ function select_session_page($params) {
 //////////////////////////////////////////////////////////////////////
 
 function show_questions_page($params) {
- global $user;
+ global $sangaku,$user;
+
+ $b = $sangaku->nav->top_menu(); 
 
  if (! $params->item_id) { $params->item_id = 0; }
  
@@ -66,6 +69,8 @@ function show_questions_page($params) {
   <link rel="stylesheet" href="css/sangaku.css">
  </head>
  <body>
+$b
+ <br/>
   <script>
    var v = Object.create(sangaku.tutor_sheet_viewer);
    v.init({$params->session_id},{$params->student_id},{$params->item_id},{$user->id});

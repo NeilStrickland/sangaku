@@ -443,7 +443,7 @@ sangaku.upload.create_dom = function() {
  this.buttons_div.appendChild(this.edit_button);
  
  var t = this.mime_type;
- if (t.length >= 6 && t.substring(0,6) == 'image/') {
+ if (t && t.length >= 6 && t.substring(0,6) == 'image/') {
   var img = document.createElement('img');
   img.className = 'upload';
   img.src = this.url();

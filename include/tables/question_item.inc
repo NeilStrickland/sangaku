@@ -31,7 +31,7 @@ SELECT
  x.solution
 FROM tbl_question_items x
 WHERE %s
- ORDER BY x.problem_sheet_id,x.full_header
+ ORDER BY x.problem_sheet_id,x.id
  
 SQL
 );

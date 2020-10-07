@@ -2,7 +2,6 @@ Edit existing uploads
 Copy feedback given to other students
 Upload by email
 Pages to list modules, tutorial groups, problem sheets, sessions etc
-Block access before start time, count down
 Different view after end of session
 PDF download for completed session
 Mark sessions as provisional/confirmed
@@ -12,3 +11,11 @@ Student photos
 Show solutions to tutors
 Option to show solutions to students
 Option to allow access to the wrong group
+Button to rotate uploaded images
+Allow tutors to reset student status
+Communication betwen tutors
+Display count of participants
+Display elapsed time
+
+Done:
+Block access before start time, count down

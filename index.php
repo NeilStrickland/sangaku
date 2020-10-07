@@ -37,6 +37,8 @@ array('widgets' => array('mathjax'),
       'inline_style' => $style)
 );
 
+echo $sangaku->nav->top_menu();
+
 echo <<<HTML
 <h1>Sangaku sessions</h1>
 <br/><br/>
@@ -51,6 +53,8 @@ You are registered for the following sessions:
 
 HTML;
 
+ echo $sangaku->html->spacer_row(60,60,300,140);
+ 
  foreach($user->future_sessions as $s) {
   if ($s->is_current()) {
    $t = (time() < $s->start_timestamp()) ? 'On soon' : 'On now';
@@ -63,6 +67,11 @@ HTML;
    $t = date('D j/n H:i',$s->start_timestamp());
    $x = <<<HTML
   <td class="session_link">$t</td>
+
+HTML;
+   $url = $s->url();
+   $x = <<<HTML
+  <td class="command session_link" onclick="location='{$url}'">$t</td>
 
 HTML;
   }
@@ -118,6 +127,11 @@ HTML;
    $t = date('D j/n H:i',$s->start_timestamp());
    $x = <<<HTML
   <td style="width:140px">$t</td>
+
+HTML;
+   $url = $s->teacher_url();
+   $x = <<<HTML
+  <td style="width:140px" class="command" onclick="location='{$url}'">$t</td>
 
 HTML;
   }

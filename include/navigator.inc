@@ -53,7 +53,8 @@ class sangaku_navigator extends frog_navigator {
 
 </script>
 
-JS;
+JS
+          ;
 
  if ($p->requested_url) {
   $url = htmlentities($p->requested_url);
@@ -87,7 +88,8 @@ and many things will not work when Javascript is turned off.
 
 <h1>Sangaku Login Page</h1>
 
-HTML;
+HTML
+  ;
 
  echo <<<HTML
 <form name="login_form" method="POST" action="$action">
@@ -115,26 +117,89 @@ like <code>sm1js</code>) and password.
 </div>
 </form>
 
-HTML;
+HTML
+  ;
 
  if ($p->login_error) {
 
   echo <<<HTML
 <p style="width:600px">
  <span style="color: red">
- Your user name and password were not found ({$p->login_error}).  
+ Your user name and password were not found.
  </span>
+ <br/>
+ All SoMaS staff and 
+ postgraduates, and all students taking SoMaS modules,
+ should be able to log in.  If you are in one of these categories, 
+ and are sure that you have entered your user name and password 
+ correctly, then you should contact Neil Strickland
+ (<a href="mailto:N.P.Strickland@sheffield.ac.uk">N.P.Strickland@sheffield.ac.uk</a>).
 </p>
 <hr/>
 
-HTML;
+HTML
+   ;
  }
 
  echo <<<HTML
 </body>
 </html>
 
-HTML;
+HTML
+  ;
  
+ }
+
+ function top_menu() {
+  global $user;
+  
+  $html = "<div class=\"topmenu\">";
+
+  $html .= <<<HTML
+<button onclick="window.open('/sangaku/logout.php')">Logout</button>
+
+HTML
+        ;
+
+  if ($user->status == 'teacher') {
+  $html .= <<<HTML
+<button onclick="window.open('/sangaku/module_list.php')">Modules</button>
+
+HTML
+        ;
+
+  }
+  $html .= "</div>";
+  return $html;
+ }
+
+ function top_session_menu($session_id) {
+  global $user;
+  
+  $html = "<div class=\"topmenu\">";
+
+  $html .= <<<HTML
+<button onclick="window.open('/sangaku/logout.php')">Logout</button>
+
+HTML
+        ;
+
+  if ($user->status == 'teacher') {
+  $html .= <<<HTML
+<button onclick="window.open('/sangaku/module_list.php')">Modules</button>
+
+HTML
+        ;
+
+  }
+
+  $html .= <<<HTML
+<button onclick="window.open('/sangaku/fake_students.php?session_id={$session_id}')">Fake students</button>
+
+HTML
+        ;
+  
+  $html .= "</div>";
+  return $html;
  }
 }

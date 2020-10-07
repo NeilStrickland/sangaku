@@ -9,21 +9,27 @@ $sangaku->add_table(
   'module_id' => array('type' => 'integer','link' => 'module'),
   'semester' => array('type' => 'integer'),
   'week_number' => array('type' => 'integer'),
+  'code' => array('type' => 'text'),
   'title' => array('type' => 'text'),
   'intro' => array('type' => 'text'),
   'latex_source' => array('type' => 'text')
  ),
- array(),
+ array(
+  'module_code' => array('type' => ''text)
+ ),
  <<<SQL
 SELECT
  x.id,
  x.module_id,
+ m.code AS module_code,
  x.semester,
  x.week_number,
+ x.code,
  x.title,
  x.intro,
  x.latex_source
 FROM tbl_problem_sheets x
+ LEFT JOIN tbl_modules m ON x.module_id=m.id
 WHERE %s
  ORDER BY x.id
  
@@ -46,6 +52,7 @@ class problem_sheet extends frog_object {
   $this->bottom_items = array();
 
   foreach($this->question_items as $i) {
+   $i->children = array();
    if ($i->is_bottom) {
     $this->bottom_items[] = $i;
    }
@@ -67,6 +74,13 @@ class problem_sheet extends frog_object {
    $this->bottom_items_by_full_header[$i->full_header] = $i;
   }
 
+  foreach($this->question_items as $i) {
+   if ($i->parent_id && isset($this->question_items_by_id[$i->parent_id])) {
+    $i->parent = $this->question_items_by_id[$i->parent_id];
+    $i->parent->children[] = $i;
+   }
+  }
+  
   return($this->question_items);
  }
 

@@ -33,10 +33,19 @@ sangaku.sheet_viewer.init_data = function(x) {
  document.body.appendChild(this.h1);
  MathJax.typeset([this.h1]);
 
+ this.countdown_div = document.createElement('div');
+ this.countdown_div.className = 'countdown';
+ this.countdown_div.style.display = 'none';
+ document.body.appendChild(this.countdown_div);
+ 
+ this.sheet_div = document.createElement('div');
+ this.sheet_div.style.display = 'none';
+ document.body.appendChild(this.sheet_div);
+ 
  this.intro_div = document.createElement('div');
  this.intro_div.className = 'sheet_intro';
  this.intro_div.innerHTML = this.problem_sheet.intro;
- document.body.appendChild(this.intro_div);
+ this.sheet_div.appendChild(this.intro_div);
  MathJax.typeset([this.intro_div]);
  
  this.question_items = [];
@@ -52,7 +61,7 @@ sangaku.sheet_viewer.init_data = function(x) {
   item.student_id = this.student.id;
   this.question_items.push(item);
   this.question_items_by_id[item.id] = item;
-  document.body.appendChild(item.create_dom(this));
+  this.sheet_div.appendChild(item.create_dom(this));
 
   if (item.is_bottom) {
    this.bottom_items.push(item);
@@ -88,7 +97,7 @@ sangaku.sheet_viewer.init_data = function(x) {
  this.bottom_spacer = document.createElement('div');
  this.bottom_spacer.innerHTML = '&nbsp;';
  this.bottom_spacer.style['min-height'] = '50px';
- document.body.appendChild(this.bottom_spacer);
+ this.sheet_div.appendChild(this.bottom_spacer);
 
  this.notifier = document.createElement('div');
  this.notifier.className = 'notifier';
@@ -102,6 +111,8 @@ sangaku.sheet_viewer.init_data = function(x) {
   me.clear_notifier();
  };
  setTimeout(function() { me.update(); },me.interval);
+
+ this.countdown();
 };
 
 sangaku.sheet_viewer.question_item = {};
@@ -441,3 +452,49 @@ sangaku.sheet_viewer.clear_notifier = function() {
  this.notifier.innerHTML = '';
  this.notifier.style.display = 'none';
 };
+
+sangaku.sheet_viewer.countdown = function() {
+ var dd = this.session.start_time;
+ var t0 = this.session.start_timestamp * 1000;
+ var t1 = Date.now();
+ var d0 = (new Date(t0)).toISOString();
+ var d1 = (new Date(t1)).toISOString();
+ var w = t0 - t1;
+ this.wait = w;
+ var me = this;
+ var cd = this.countdown_div;
+ var sd = this.sheet_div;
+ 
+ if (w < 0 || (this.student.username.length >= 4 && this.student.username.substr(0,4) == 'fake')) {
+  cd.style.display = 'none';
+  sd.style.display = 'block';
+ } else if (w < 10 * 60 * 1000) {
+  var min = Math.floor(w / (60 * 1000));
+  var sec = Math.floor((w - 60 * 1000 * min) / 1000);
+  var min0,sec0;
+  if (min < 10) { min0 = '0' + min; } else { min0 = '' + min; } 
+  if (sec < 10) { sec0 = '0' + sec; } else { sec0 = '' + sec; }
+  cd.innerHTML = "This session will start in " + min0 + ':' + sec0;
+  cd.style.display = 'block';
+  sd.style.display = 'none';
+
+  setTimeout(function() {me.countdown(),1000} );
+ } else if (w < 24 * 3600 * 1000) {
+  var d = new Date(this.session.start_timestamp * 1000);
+  var h = d.getHours();
+  var m = d.getMinutes();
+  var h0,m0;
+  if (h < 10) { h0 = '0' + h; } else { h0 = '' + h; }
+  if (m < 10) { m0 = '0' + m; } else { m0 = '' + m; }
+
+  cd.innerHTML = "This session will start at " + h0 + ":" + m0;
+  cd.style.display = 'block';
+  sd.style.display = 'none';
+  
+  setTimeout(function() {me.countdown(),10000} );
+ } else {
+  cd.innerHTML = "This session does not open today. ";
+  cd.style.display = 'block';
+  sd.style.display = 'none';
+ }
+}

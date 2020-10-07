@@ -256,7 +256,7 @@ class user extends frog_object {
   $x->username = $this->username;
   $x->surname = $this->surname;
   $x->forename = $this->forename;
-
+  
   if (isset($this->status_reports)) {
    $x->status_reports = array();
 

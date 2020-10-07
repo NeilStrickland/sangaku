@@ -221,3 +221,37 @@ div.notifier {
 div.notifier:hover {
     cursor : crosshair;
 }
+
+span.item_header {
+    font-weight: bold;
+    color: #000070;
+}
+
+div.topmenu {
+    position : fixed;
+    left : 5px;
+    top : 5px;
+    height : 30px;
+    width : 100%;
+}
+
+div.topmenu button {
+    margin : 3px;
+    padding : 5px;
+    background : #B0E0B0;
+    border : 1px solid #70A070;
+    border-radius : 3px;
+}
+
+div.topmenu button:hover {
+    cursor: pointer;
+    background : #C0F0C0;
+}
+
+div.countdown {
+    width : 100%;
+    height : 100%;
+    font-size : 36px;
+    text-align : center;
+    vertical-align : center;
+}

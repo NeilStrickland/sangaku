@@ -26,19 +26,15 @@ class sangaku_class extends frog {
 
   $student->load_sessions();
   
-  if (false) {
-   $session_id = (int) get_optional_parameter('session_id',0);
+  $session_id = (int) get_optional_parameter('session_id',0);
 
-   if ((! $session_id) && count($student->current_sessions) == 1) {
-    $session_id = $student->current_sessions[0]->id;
-   }
-
-   if (! $session_id) {
-    $params->error = 'No session specified';
-    return $params;
-   }
-  } else {
-   $session_id = 372;
+  if ((! $session_id) && count($student->current_sessions) == 1) {
+   $session_id = $student->current_sessions[0]->id;
+  }
+  
+  if (! $session_id) {
+   $params->error = 'No session specified';
+   return $params;
   }
 
   $session = $sangaku->load('session',$session_id);

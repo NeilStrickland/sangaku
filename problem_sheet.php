@@ -31,7 +31,10 @@ function select_session_page($params) {
 //////////////////////////////////////////////////////////////////////
 
 function show_questions_page($params) {
-
+ global $sangaku;
+ 
+ $b = $sangaku->nav->top_menu();
+ 
  echo <<<HTML
 <!DOCTYPE html>
 <html>
@@ -50,6 +53,8 @@ function show_questions_page($params) {
   <link rel="stylesheet" href="css/sangaku.css">
  </head>
  <body>
+  <br/>
+$b
   <script>
    var v = Object.create(sangaku.sheet_viewer);
    v.init({$params->session_id},{$params->student_id});

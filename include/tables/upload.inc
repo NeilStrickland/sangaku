@@ -17,6 +17,8 @@ $sangaku->add_table(
   'timestamp' => array('type' => 'string')
  ),
  array(
+  'student_name' => array('type' => 'text'),
+  'student_username' => array('type' => 'text'),
   'teacher_name' => array('type' => 'text')
  ),
  <<<SQL
@@ -25,6 +27,8 @@ SELECT
  x.session_id,
  x.item_id,
  x.student_id,
+ CONCAT(s.forename,' ',s.surname) AS student_name,
+ s.username AS student_username,
  x.teacher_id,
  CONCAT(t.forename,' ',t.surname) AS teacher_name,
  x.source,
@@ -33,7 +37,8 @@ SELECT
  x.is_response,
  x.timestamp
 FROM tbl_uploads x
- LEFT JOIN tbl_users t ON x.teacher_id=t.id
+ LEFT JOIN tbl_users s ON x.student_id=s.id
+  LEFT JOIN tbl_users t ON x.teacher_id=t.id
 WHERE %s
  ORDER BY x.session_id,x.item_id,x.timestamp
  

@@ -126,6 +126,40 @@ class session extends frog_object {
   }
  } 
 
+ function clear_fake_data() {
+  global $sangaku;
+  
+  $this->load_associated();
+
+  $item_ids = array();
+  foreach($this->problem_sheet->question_items as $item) {
+   $item_ids[] = $item->id;
+  }
+
+  if (! $item_ids) { return null; }
+
+  $item_ids = implode(',',$item_ids);
+  $status_reports = $sangaku->load_where('status_reports',
+                                         "x.item_id IN ({$item_ids})");
+
+  foreach($status_reports AS $r) {
+   if (strlen($r->student_username) >= 4 &&
+       substr($r->student_username,0,4) == 'fake') {
+    $r->delete();
+   }
+  }
+
+  $uploads = $sangaku->load_where('uploads',
+                                         "x.item_id IN ({$item_ids})");
+
+  foreach($uploads AS $u) {
+   if (strlen($u->student_username) >= 4 &&
+       substr($u->student_username,0,4) == 'fake') {
+    $u->delete();
+   }
+  }  
+ }
+ 
  function for_json() {
   $x = new stdClass();
   $x->id = $this->id;

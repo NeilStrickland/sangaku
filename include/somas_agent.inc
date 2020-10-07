@@ -98,7 +98,6 @@ m.title AS title
 FROM tbl_module_occurrences x
  LEFT JOIN tbl_modules m ON x.module_code=m.code
 WHERE x.session=2020
-AND m.credit_level <= 2
 AND x.module_code NOT IN ($w)
 SQL;
 

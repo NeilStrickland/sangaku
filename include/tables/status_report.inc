@@ -13,6 +13,7 @@ $sangaku->add_table(
   'timestamp' => array('type' => 'string')
  ),
  array(
+  'student_username' => array('type' => 'text'),
   'code' => array('type' => 'text')
  ),
  <<<SQL
@@ -23,9 +24,11 @@ SELECT
  x.student_id,
  x.status_id,
  s.code,
+ p.username AS student_username,
  x.timestamp
 FROM tbl_status_reports x
  LEFT JOIN tbl_statuses s ON x.status_id = s.id
+  LEFT JOIN tbl_users p ON x.student_id = p.id
 WHERE %s
  ORDER BY x.item_id,x.timestamp
  

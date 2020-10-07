@@ -46,6 +46,8 @@ function info_page($params) {
  
  echo $N->header($m->code,array('widgets' => array('mathjax','tabber')));
 
+ echo $N->top_menu();
+ 
  echo <<<HTML
 <h1>{$m->code} {$m->title}</h1>
 <br/>
@@ -75,20 +77,22 @@ function groups_tab($params) {
 
  echo $H->tab_start('Tutorial groups');
  echo $H->edged_table_start();
- echo $H->spacer_row(60,60,60,60,300);
- echo $H->row('Group','Day','Time','Weeks','Teachers');
+ echo $H->spacer_row(60,60,60,60,300,60);
+ echo $H->row('Group','Day','Time','Weeks','Teachers','');
  foreach($m->tutorial_groups as $g) {
   $tt = array();
   foreach($g->teachers as $t) {
    $tt[] = $t->full_name;
   }
   $tt = implode(', ',$tt);
+  $url = 'group_info.php?id=' . $g->id;
   
-  echo $H->row($g->name,
-               $g->day_name(),
-               '' . $g->hour . ':00',
-               $g->week_parity_long(),
-               $tt);
+  echo $H->tr($H->td($g->name) .
+              $H->td($g->day_name()) .
+              $H->td('' . $g->hour . ':00') . 
+              $H->td($g->week_parity_long()) .
+              $H->td($tt) .
+              $H->link_td("Details",$url));
  }
  
  echo $H->edged_table_end();

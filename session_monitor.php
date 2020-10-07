@@ -24,6 +24,10 @@ function choose_session_page() {
 //////////////////////////////////////////////////////////////////////
 
 function show_status_page($session) {
+ global $sangaku;
+ 
+ $b = $sangaku->nav->top_session_menu($session->id);
+ 
   echo <<<HTML
 <!DOCTYPE html>
 <html>
@@ -41,6 +45,7 @@ function show_status_page($session) {
   <link rel="stylesheet" href="css/sangaku.css">
  </head>
  <body style="width:100%">
+$b<br/>
   <script>
    var v = Object.create(sangaku.session_monitor);
    v.init({$session->id});

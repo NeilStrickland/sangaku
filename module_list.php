@@ -11,6 +11,8 @@ echo $N->header('Modules');
 
 $c = $params->include_empty ? ' checked="checked"' : '';
 
+echo $N->top_menu();
+
 echo <<<HTML
 <h1>Modules</h1>
 <br/>
