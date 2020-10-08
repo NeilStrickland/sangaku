@@ -1,5 +1,6 @@
 z*
 .vscode/
+include/config.inc
 scratch/
 vendor/
 composer.lock

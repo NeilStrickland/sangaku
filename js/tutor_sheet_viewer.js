@@ -103,6 +103,10 @@ sangaku.tutor_sheet_viewer.question_item = {
 sangaku.tutor_sheet_viewer.question_item.create = function(item) {
  var x = Object.create(this);
  Object.assign(x,item);
+ x.header = item.auto_header();
+ x.titled_header = item.titled_header();
+ x.full_header = item.full_header();
+ 
  return x;
 };
 
@@ -161,7 +165,7 @@ sangaku.tutor_sheet_viewer.question_item.create_dom = function(viewer) {
  this.toggler.src = '/sangaku/icons/expand.png';
  this.header_div.appendChild(this.toggler);
  this.h = document.createElement('h3');
- this.h.innerHTML = this.full_header() + ' ';
+ this.h.innerHTML = this.full_header + ' ';
  this.header_div.appendChild(this.h);
  this.status_div = document.createElement('div');
  this.status_div.className = 'item_review_status';

@@ -43,11 +43,27 @@ class problem_sheet extends frog_object {
   parent::__construct($sangaku,'problem_sheet',$id,$with_defaults);
  }
 
+ function add_question_items($item0) {
+  global $sangaku;
+  $this->question_items[] = $item0;
+  $children = $sangaku->load_where('question_items',"x.parent_id={$item0->id}");
+  $item0->is_bottom = $children ? 0 : 1;
+  foreach($children as $child) {
+   $this->add_question_items($child);
+  }
+ }
+ 
  function load_question_items() {
   global $sangaku;
 
-  $this->question_items =
-   $sangaku->load_where('question_items',"x.problem_sheet_id={$this->id}");
+  $top_questions = 
+   $sangaku->load_where('question_items',"x.problem_sheet_id={$this->id} AND x.level=1");
+  
+  $this->question_items = array();
+
+  foreach($top_questions as $item0) {
+   $this->add_question_items($item0);
+  }
 
   $this->bottom_items = array();
 

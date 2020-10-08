@@ -136,7 +136,7 @@ sangaku.session_monitor.box.set_data = function(r) {
 
 sangaku.session_monitor.box.set_handlers = function() {
  var me = this;
- this.work_span.onclick = function() {
+ this.td.onclick = function() {
   var url =
       '/sangaku/show_student_session.php' +
       '?student_id=' + me.student_id +

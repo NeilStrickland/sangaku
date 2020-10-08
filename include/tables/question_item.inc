@@ -68,12 +68,14 @@ class question_item extends frog_object {
  }
 
  function full_header() {
-  if ($this->parent_id && ! $this->parent) {
-   $this->load_link('parent');
+  global $sangaku;
+  
+  if ($this->parent_id && ! isset($this->parent_item)) {
+   $this->parent_item = $sangaku->load('question_item',$this->parent_id);
   }
 
-  if ($this->parent) {
-   return $this->parent->full_header() . $this->auto_header();
+  if (isset($this->parent_item) && $this->parent_item) {
+   return $this->parent_item->full_header() . $this->auto_header();
   } else {
    return $this->auto_header();
   }
