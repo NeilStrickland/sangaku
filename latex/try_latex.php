@@ -4,7 +4,16 @@ require_once('../vendor/autoload.php');
 require_once('renderer.inc');
  
 $parser = new PhpLatex_Parser();
-$tree = $parser->parse(file_get_contents('min.tex'));
+$tex = file_get_contents('b.tex');
+$i = strpos($tex,'\begin{document}');
+if ($i === false) {
+ echo "Could not find beginning" . PHP_EOL;
+ exit;
+}
+
+$tex = substr($tex,$i);
+
+$tree = $parser->parse($tex);
 
 echo "<pre>";
 

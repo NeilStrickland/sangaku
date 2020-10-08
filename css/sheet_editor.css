@@ -1,0 +1,100 @@
+div.edit_question {
+    margin: 5px;
+    border: 1px solid black;
+}
+
+div.edit_question_headers {
+    position: relative;
+    background: #BBBBFF;
+    padding: 2px;
+}
+
+div.edit_question_auto_header {
+    display: inline-block;
+    width: 80px;
+}
+
+div.edit_question_header {
+    display: inline-block;
+    width: 160px;
+}
+
+div.edit_question_title {
+    display: inline-block;
+}
+
+img.edit_question_delete_icon {
+    width: 16px;
+    position: absolute;
+    top: 4px;
+    right: 24px;
+}
+
+div.edit_question_problem_label {
+    position: relative;
+    background: #CCCCFF;
+    padding: 2px;
+    border-top: 1px solid #888888;
+}
+
+textarea.edit_question_problem_area {
+    margin-left: 3px;
+}
+
+button.edit_question_preview_button {
+    margin-left: 3px;
+}
+
+button.edit_question_preview_button:hover {
+    cursor: pointer;
+}
+
+div.edit_question_problem_display {
+    margin-left: 3px;
+    margin-bottom: 8px;
+    background: #DDDDDD;
+    padding: 3px;
+}
+
+div.edit_question_solution_label {
+    position: relative;
+    background: #CCFFCC;
+    padding: 2px;
+    border-top: 1px solid #888888;
+}
+
+div.edit_question_solution_display {
+    margin-left: 3px;
+    margin-bottom: 8px;
+    background: #DDDDDD;
+    padding: 3px;
+}
+
+div.edit_question_parts_label {
+    position: relative;
+    background: #FFA500;
+    padding: 2px;
+    border-top: 1px solid #888888;
+}
+
+img.add_part {
+    width: 16px;
+    position: absolute;
+    top: 4px;
+    right: 4px;
+}
+
+img.add_part:hover {
+    cursor: pointer;
+}
+
+img.right_help_toggler {
+    width: 16px;
+    position: absolute;
+    top: 4px;
+    right: 4px;
+}
+
+img.right_help_toggler:hover {
+    cursor: pointer;
+}

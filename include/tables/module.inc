@@ -107,4 +107,45 @@ class module extends frog_object {
 
   return $this->sessions;
  }
+
+ function load_students() {
+  global $sangaku;
+  
+  $this->students = array();
+  $this->registrations = array();
+  $this->group_memberships = array();
+  $this->students_by_id = array();
+  $this->students_by_username = array();
+  $this->students_by_somas_id = array();
+
+  $this->registrations = $sangaku->load_where(
+   'registrations',
+   "x.module_id={$this->id}"
+  );
+
+  foreach($this->registrations as $r) {
+   $s = $r->load_link('student');
+   if (! $s) { $r->delete(); continue; }
+   $s->tutorial_group_id = null;
+   $s->tutorial_group_name = '';
+   $this->students[] = $s;
+   $this->students_by_id[$s->id] = $s;
+   $this->students_by_username[$s->username] = $s;
+   $this->students_by_somas_id[$s->somas_student_id] = $s;
+  }
+
+  $this->group_memberships = $sangaku->load_where(
+   'tutorial_group_students',
+   "m.id={$this->id}"
+  );
+
+  foreach($this->group_memberships as $m) {
+   if (isset($this->students_by_id[$m->student_id])) {
+    $s = $this->students_by_id[$m->student_id];
+    $m->student = $s;
+    $s->tutorial_group_id = $m->tutorial_group_id;
+    $s->tutorial_group_name = $m->tutorial_group_name;
+   }
+  }
+ }
 }

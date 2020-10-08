@@ -26,8 +26,7 @@ function get_params() {
 
  $params->module = $g->load_link('module');
  
- $params->date_info =
-  json_decode(file_get_contents('https://maths.shef.ac.uk/maths/date_info.php'));
+ $params->date_info = $sangaku->get_date_info();
 
  $tt = array();
  foreach($g->teachers as $t) {

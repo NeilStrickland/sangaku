@@ -12,7 +12,13 @@ $sangaku = new sangaku_class();
 $sangaku->name = 'sangaku';
 $sangaku->include_dir = dirname(__FILE__);
 
-$sangaku->data_dir = "/var/sangaku";
+require_once('config.inc');
+
+if (! $sangaku->data_dir) {
+ trigger_error('No sangaku data directory',E_USER_ERROR);
+ exit;
+}
+
 $sangaku->log_dir = $sangaku->data_dir . '/log';
 $sangaku->login_log_file = $sangaku->log_dir . '/login_log.txt';
 $sangaku->uploads_dir = $sangaku->data_dir . "/uploads";

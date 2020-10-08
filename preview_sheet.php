@@ -70,7 +70,7 @@ HTML;
 
  foreach($s->question_items as $i) {
   if ($i->level > 1) { continue; }
-  echo "<li><span class=\"item_header\">{$i->titled_header}: </span>";
+  echo "<li><span class=\"item_header\">{$i->titled_header()}: </span>";
   if (trim($i->problem)) {
    echo "<span class=\"problem\">{$i->problem}</span><br/>";
   }
@@ -78,7 +78,7 @@ HTML;
   if ($i->children) {
    echo "<ul>";
    foreach ($i->children as $j) {
-    echo "<li><span class=\"item_header\">{$j->titled_header}: </span>";
+    echo "<li><span class=\"item_header\">{$j->titled_header()}: </span>";
     if (trim($j->problem)) {
      echo "<span class=\"problem\">{$j->problem}</span><br/>";
     }
@@ -86,7 +86,7 @@ HTML;
     if ($j->children) {
      echo "<ul>";
      foreach ($j->children as $k) {
-      echo "<li><span class=\"item_header\">{$k->titled_header}: </span>";
+      echo "<li><span class=\"item_header\">{$k->titled_header()}: </span>";
       if (trim($k->problem)) {
        echo "<span class=\"problem\">{$k->problem}</span><br/>";
       }

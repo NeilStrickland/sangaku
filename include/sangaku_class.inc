@@ -78,8 +78,16 @@ class sangaku_class extends frog {
  }
 
  function get_date_info() {
-  $this->date_info = 
-   json_decode(file_get_contents('https://maths.shef.ac.uk/maths/date_info.php'));
+  $date_info_file = $this->data_dir . '/date_info.json';
+  if (file_exists($date_info_file)) {
+   $json = file_get_contents($date_info_file);
+  } else {
+   $json = file_get_contents('https://maths.shef.ac.uk/maths/date_info.php');
+   file_put_contents($date_info_file,$json);
+  }
+  
+  $this->date_info = json_decode($json);
+  return $this->date_info;
  }
 
  function week_number($t = 0) {

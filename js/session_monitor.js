@@ -46,7 +46,7 @@ sangaku.session_monitor.init_data = function(x) {
  for (var item of sheet.bottom_items) {
   item.header_td = document.createElement('td');
   item.header_td.className = 'item_header';
-  item.header_td.innerHTML = item.full_header;
+  item.header_td.innerHTML = item.full_header();
   this.header_tr.appendChild(item.header_td);
 
   sheet.bottom_items_by_id[item.id] = item;

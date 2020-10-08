@@ -161,7 +161,7 @@ sangaku.tutor_sheet_viewer.question_item.create_dom = function(viewer) {
  this.toggler.src = '/sangaku/icons/expand.png';
  this.header_div.appendChild(this.toggler);
  this.h = document.createElement('h3');
- this.h.innerHTML = this.full_header + ' ';
+ this.h.innerHTML = this.full_header() + ' ';
  this.header_div.appendChild(this.h);
  this.status_div = document.createElement('div');
  this.status_div.className = 'item_review_status';

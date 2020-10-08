@@ -156,14 +156,14 @@ HTML
   $html = "<div class=\"topmenu\">";
 
   $html .= <<<HTML
-<button onclick="window.open('/sangaku/logout.php')">Logout</button>
+<button onclick="location='/sangaku/logout.php'">Logout</button>
 
 HTML
         ;
 
   if ($user->status == 'teacher') {
   $html .= <<<HTML
-<button onclick="window.open('/sangaku/module_list.php')">Modules</button>
+<button onclick="location='/sangaku/module_list.php'">Modules</button>
 
 HTML
         ;
@@ -179,14 +179,14 @@ HTML
   $html = "<div class=\"topmenu\">";
 
   $html .= <<<HTML
-<button onclick="window.open('/sangaku/logout.php')">Logout</button>
+<button onclick="location='/sangaku/logout.php'">Logout</button>
 
 HTML
         ;
 
   if ($user->status == 'teacher') {
   $html .= <<<HTML
-<button onclick="window.open('/sangaku/module_list.php')">Modules</button>
+<button onclick="location='/sangaku/module_list.php'">Modules</button>
 
 HTML
         ;

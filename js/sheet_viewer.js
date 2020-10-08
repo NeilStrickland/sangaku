@@ -281,7 +281,7 @@ sangaku.sheet_viewer.question_item.create_dom = function(viewer) {
  this.div.innerHTML = this.problem;
  MathJax.typeset([this.div]);
  this.h = document.createElement('h' + (1 + this.level));
- this.h.innerHTML = this.titled_header + ' ';
+ this.h.innerHTML = this.titled_header() + ' ';
  if (this.div.hasChildNodes) {
   this.div.insertBefore(this.h,this.div.childNodes[0]);
  } else {
@@ -433,7 +433,7 @@ sangaku.sheet_viewer.update_data = function(x) {
   var msg = 'New responses for ';
   var c = '';
   for (item of this.notify_items) {
-   msg = msg + c + item.full_header;
+   msg = msg + c + item.full_header();
    c = ',';
   }
   msg = msg + '.';

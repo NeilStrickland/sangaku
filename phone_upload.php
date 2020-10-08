@@ -43,7 +43,7 @@ function upload_page($params) {
   <link rel="stylesheet" href="css/sangaku.css">
  </head>
  <body>
-  <h1>{$student->full_name} {$item->full_header}</div>
+  <h1>{$student->full_name} {$item->full_header()}</div>
   <script>
    sangaku.phone_upload_page.session_id = '{$params->session->id}';
    sangaku.phone_upload_page.student_id = '{$params->student->id}';

@@ -92,6 +92,49 @@ frog.object.load = function() {
 
 //////////////////////////////////////////////////
 
+frog.object.full_load = function() {
+ var i,x;
+
+ if (! (this.object_type && this.key && this[this.key])) {
+  return(null);
+ }
+
+ s =
+   'command=full_load' + 
+   '&object_type='  + encodeURIComponent(this.object_type) +
+   '&' + this.key + '=' + encodeURIComponent(this[this.key]);
+
+ xhr = frog.create_xhr();
+
+ try {
+  xhr.open('GET',this.ajax_url + '/db.php?' + s,false);
+ } catch(e) {
+  alert('frog.object.load: Could not open XMLHttpRequest object to connect to server');
+  return(null);
+ }
+
+ try {
+  xhr.send(null);
+ } catch(e) {
+  alert('frog.object.load: Could not send XMLHttpRequest object to connect to server');
+  return(null);
+ }
+
+ if (xhr.status == 200) {
+  x = JSON.parse(xhr.responseText);
+  if (x && ! x.error) {
+   this.munch(x);
+   return(this);
+  } else {
+   return(null);
+  }
+ } else {
+  return(null);
+ }
+};
+
+//////////////////////////////////////////////////
+
 frog.object.insert = function() {
  var data,s,xhr;
  data = new Object();

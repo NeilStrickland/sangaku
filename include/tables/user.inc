@@ -76,7 +76,6 @@ class user extends frog_object {
   $this->item_status_by_id = array();
   foreach($problem_sheet->question_items as $item) {
    $x = new student_item_status();
-   $this->item_status[$item->full_header] = $x;
    $this->item_status_by_id[$item->id] = $x;
   }
 

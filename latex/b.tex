@@ -1,0 +1,112 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage{amsfonts}
+\usepackage{amsmath}
+
+%\special{header = c:/daves/mytex/twoside.ps}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}{Lemma}[section]
+\newtheorem{prop}{Proposition}[section]
+\newtheorem{cor}{Corollary}[section]
+\renewcommand{\theequation}{\thesection.\arabic{equation}}
+\newcommand{\LP}{L\'{e}vy process}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\Rn}{\mathbb{R}^n}
+\newcommand{\nN}{n \in \mathbb{N}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}_{+}}
+\newcommand{\nZ}{n \in \mathbb{Z}_{+}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\B}{\mathbb{B}}
+\newcommand{\Br}{{\cal B}(\R)}
+\newcommand{\F}{{\cal F}}
+\newcommand{\Ft}{{\cal F}_{t}}
+\newcommand{\cadlag}{c\`adl\`ag}
+\newcommand{\ds}{\displaystyle}
+\newcommand{\g}{\textbf{g}}
+\newcommand{\h}{\textbf{h}}
+\newcommand{\tr}{\mbox{tr}}
+\newcommand{\pE}{E^{\prime}}
+\newcommand{\Dom}{\mbox{Dom}}
+\newcommand{\st}{\stackrel{d}{=}}
+\newcommand{\bean}{\begin{eqnarray*}}
+\newcommand{\eean}{\end{eqnarray*}}
+\newcommand{\uc}{\stackrel{uc}{\rightarrow}}
+\newcommand{\la}{\langle}
+\newcommand{\ra}{\rangle}
+\newcommand{\li}{\liminf_{n \rightarrow \infty}}
+\newcommand{\ls}{\limsup_{n \rightarrow \infty}}
+\newcommand{\aev}{\mbox{a.e.}}
+\newcommand{\NN}{N \in \mathbb{N}}
+\newcommand{\eps}{\epsilon > 0}
+\date{}
+\newcommand{\lima}{\lim_{x \rightarrow a}}
+
+\newcommand{\limn}{\lim_{n \rightarrow \infty}}
+
+\begin{document}
+
+\begin{enumerate}
+
+
+
+
+\item[5.] Prove Bernoulli's inequality:
+$$ ( 1 + x)^{n} \geq 1 + nx,$$
+for all $\nN, x > -1$, by using mathematical induction. Also, give a direct proof, using the binomial theorem, for the case $x > 0$.
+
+
+
+\item[8.] (This problem is important for developing skills to help manipulate limits.)
+\begin{enumerate}
+
+\item Let $c \in \R$ with $c > 0$. Prove that a real number $x$ satisfies $|x| < c$, if and only if $-c < x < c$.
+
+\item Let $l \in \R$ and $\epsilon > 0$. Show that
+\begin{center}
+$ |x - l| < \epsilon$, if and only if $l - \epsilon < x < l + \epsilon$.
+\end{center}
+\end{enumerate}
+
+\item[9.] For each of the following sets of real numbers, state
+whether it:  (i) is finite; (ii) has a maximum element; (iii) has
+a minimum element.  Give the maximum and minimum elements when they
+exist.
+\begin{itemize}
+\item[(a)] $\{2, 4, 6, 8\}$;
+\item[(b)] $(10,66]$;
+\item[(c)] $\Q$;
+\item[(d)] $[-2000, 2000]$;
+\item[(e)] $\{3,6, 9, \dots, 99\}$;
+\item[(f)] $(-\infty,6)$;
+\item[(g)] $(2, 8)$;
+\item[(h)] $\{0\} \cup (1, 2) \cup \{3\}$.
+\item[(i)] The set of those real numbers whose square is less than or equal to $-1.$
+\end{itemize}
+
+\item[10.]  For each of the sets $E$ considered in the previous
+question decide whether it is:  (i) bounded above;  (ii) bounded
+below; (iii) bounded. Give examples of upper and lower bounds
+where appropriate.  For those sets $E$ which
+are bounded, give a real number $M$ such that $|x|\leq M$ for all $x$ in $E$.
+
+
+
+\item[13.] Suppose that a non--empty set $A \subset \R$ is bounded above, and that $\alpha > 0$. Define the set
+$$ \alpha A = \{\alpha x\,|\, x \in A\}.$$
+Prove that $\alpha A$ is bounded above and find $\sup(\alpha A)$ in terms of $\alpha$ and $\sup(A)$. 
+
+[Hint: You should first make an intelligent guess as to what $\sup(\alpha A)$ might be. If you can't guess immediately, try some examples of particular sets $A$ and numbers $\alpha$.
+Once you have a guess, 
+then prove that your guess is right by showing that it is an upper bound for $\alpha A$ and
+that the existence of a smaller
+ upper bound for the set $\alpha A$ leads to a contradiction.]
+
+
+What happens when $\alpha < 0$?
+
+
+\end{enumerate}
+
+\end{document} 

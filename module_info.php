@@ -22,15 +22,15 @@ function get_params() {
   $m->load_tutorial_groups();
   $m->load_problem_sheets();
   $m->load_sessions();
-
+  $m->load_students();
+  
   foreach($m->tutorial_groups as $g) {
    $g->load_teachers();
    $g->load_students();
   }
  }
 
- $params->date_info =
-  json_decode(file_get_contents('https://maths.shef.ac.uk/maths/date_info.php'));
+ $params->date_info = $sangaku->get_date_info();
 
  return $params;
 }
@@ -78,7 +78,7 @@ function groups_tab($params) {
  echo $H->tab_start('Tutorial groups');
  echo $H->edged_table_start();
  echo $H->spacer_row(60,60,60,60,300,60);
- echo $H->row('Group','Day','Time','Weeks','Teachers','');
+ echo $H->row('Group','Day','Time','Weeks','Teachers','','');
  foreach($m->tutorial_groups as $g) {
   $tt = array();
   foreach($g->teachers as $t) {
@@ -108,14 +108,16 @@ function sheets_tab($params) {
 
  echo $H->tab_start('Problem sheets');
  echo $H->edged_table_start();
- echo $H->spacer_row(60,60,500,60);
+ echo $H->spacer_row(60,60,500,60,60);
 
- echo $H->row('Semester','Week','Title','');
+ echo $H->row('Semester','Week','Title','','');
  foreach ($m->problem_sheets as $s) {
   echo $H->tr($H->td($s->semester) .
               $H->td($s->week_number).
               $H->td($s->title) .
-              $H->link_td("Preview","preview_sheet.php?id={$s->id}"));
+              $H->link_td("Preview","problem_sheet_info.php?command=display&id={$s->id}") .
+              $H->link_td("Edit","problem_sheet_info.php?id={$s->id}")
+  );
  }
  
  echo $H->edged_table_end();
@@ -136,7 +138,8 @@ function sessions_tab($params) {
    echo <<<HTML
 <h3>Semester $i</h3><br/>
 
-HTML;
+HTML
+;
    echo $H->edged_table_start();
    echo $H->spacer_row(60,300,120,60);
     
@@ -173,8 +176,26 @@ function students_tab($params) {
  $H = $sangaku->html;
  $m = $params->module;
 
+ $n = count($m->students);
+ 
  echo $H->tab_start('Students');
 
+ echo <<<HTML
+<br/>
+There are $n registered students.
+<br/>
+
+HTML
+  ;
+ 
+ echo $H->edged_table_start();
+ echo $H->spacer_row(60,300,60);
+ 
+ foreach($m->students as $s) {
+  echo $H->row($s->username,$s->full_name,$s->tutorial_group_name);
+ }
+ 
+ echo $H->edged_table_end();
  echo $H->tab_end();
 }
 

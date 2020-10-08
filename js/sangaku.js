@@ -1,3 +1,6 @@
+sangaku.ajax_url = '/sangaku/ajax';
+sangaku.object.ajax_url = sangaku.ajax_url;
+
 sangaku.statuses_by_code = {};
 
 for (x of sangaku.statuses) {
@@ -57,25 +60,32 @@ sangaku.problem_sheet.munch = function(x) {
   this.module = sangaku.module.scrunch(x.module);
  }
 
- if (x.question_items) {
-  this.question_items = [];
-  this.question_items_by_id = {};
-  this.question_items_by_full_header = {};
-  this.bottom_items = [];
-  this.bottom_items_by_id = {};
-  this.bottom_items_by_full_header = {};
-  
+ this.question_items = [];
+ this.question_items_by_id = {};
+ this.top_items = [];
+ this.bottom_items = [];
+ this.bottom_items_by_id = {};
+
+ if (x.question_items) { 
   for (y of x.question_items) {
    var item = sangaku.question_item.scrunch(y);
+   item.children = [];
    item.item_index = this.question_items.length;
    this.question_items.push(item);
    this.question_items_by_id[item.id] = item;
-   this.question_items_by_full_header[item.full_header] = item;
    if (item.is_bottom) {
     item.bottom_index = this.bottom_items.length;
     this.bottom_items.push(item);
     this.bottom_items_by_id[item.id] = item;
-    this.bottom_items_by_full_header[item.full_header] = item;
+   }
+
+   if (item.level == 1) {
+    this.top_items.push(item);
+   }
+
+   if (item.parent_id && this.question_items_by_id[item.parent_id]) {
+    item.parent = this.question_items_by_id[item.parent_id];
+    item.parent.children.push(item);
    }
   }
  }
@@ -229,12 +239,60 @@ sangaku.problem_sheet.stepper.handle_mouseout = function() {
 
 sangaku.question_item.munch = function(x) {
  for (var k of ['id','problem_sheet_id','parent_id',
-                'titled_header','header','full_header',
+                'position','header','title',
                 'level','is_bottom',
                 'problem','solution']) {
   if (k in x) { this[k] = x[k]; }
+
+  if ('children' in x) {
+   this.children = [];
+   for (y of x.children) {
+    var z = sangaku.question_item.munch(y);
+    z.parent = this;
+    this.children.push(z);
+   }
+  }
  }
 };
+
+sangaku.question_item.level_names =
+ ['Sheet','Question','Part','Subpart',''];
+
+sangaku.question_item.level_name = function() {
+ return this.level_names[this.level];
+};
+
+sangaku.question_item.next_level_name = function() {
+ return this.level_names[this.level+1];
+};
+
+sangaku.question_item.auto_header = function() {
+ if (this.header) { return this.header; }
+ if (this.level == 1 && this.position) { return 'Q' + this.position; }
+ 
+ if (this.level == 2 && this.position >= 1 && this.position <= 26) {
+  return '(' + String.fromCharCode(this.position + 96) + ')';
+ }
+
+ if (this.level == 3 && this.position >= 1 && this.position <= 12) {
+  return ['','(i)','(ii)','(iii)','(iv)','(v)','(vi)','(vii)','(viii)','(ix)','(x)','(xi)','(xii)'][this.position];
+ }
+
+ return '';
+};
+
+sangaku.question_item.titled_header = function() {
+ if (this.title) {
+  return this.auto_header() + ': ' + this.title;
+ } else {
+  return this.auto_header();
+ }
+}
+
+sangaku.question_item.full_header = function() {
+ var h = this.parent ? this.parent.full_header() : '';
+ return h + this.auto_header();
+}
 
 sangaku.question_item.header_tag = function() {
  var i = 1 + this.level;
@@ -295,7 +353,7 @@ sangaku.session.make_summary_page = function() {
  for (var x of sheet.bottom_items) {
   x.header_td = document.createElement('td');
   x.header_td.className = 'item_header';
-  x.header_td.innerHTML = x.full_header;
+  x.header_td.innerHTML = x.full_header();
   this.header_tr.appendChild(x.header_td);
  }
 
@@ -524,144 +582,4 @@ sangaku.upload.update_dom = function() {
  this.teacher_label.innerHTML = this.teacher_name;
 };
 
-//////////////////////////////////////////////////////////////////////
 
-sangaku.init = function() {
- var me = this;
-
- this.status_option_by_code = {};
- for (var i in this.statuses) {
-  var x = this.statuses[i];
-  x.index = i;
-  this.status_option_by_code[x.code] = x;
- }
- 
- var questions_ = document.evaluate(".//div[@class='question']",
-				    document,null,
-				    XPathResult.ORDERED_NODE_ITERATOR_TYPE);
- this.items = [];
- this.bottom_items = [];
- this.questions = [];
-
- var question_ = questions_.iterateNext();
- var question = null;
-
- while(question_) {
-  question = Object.create(this.question);
-  question.question_index = this.questions.length;
-  question.item_index = this.items.length;
-  this.questions.push(question);
-  this.items.push(question);
-
-  question.div = question_;
-  question.get_header();
-  question.parts = [];
-  var parts_ = document.evaluate(".//div[@class='part']",
-				 question_,null,
-				 XPathResult.ORDERED_NODE_ITERATOR_TYPE);
-  var part_ = parts_.iterateNext();
-
-  while(part_) {
-   var part = Object.create(this.part);
-   part.part_index = question.parts.length;
-   part.item_index = this.items.length;
-   question.parts.push(part);
-   this.items.push(part);
-
-   part.parent = question;
-   part.div = part_;
-   part.get_header();
-   part.subparts = [];
-
-   var subparts_ = document.evaluate(".//div[@class='subpart']",
-				     part_,null,
-				     XPathResult.ORDERED_NODE_ITERATOR_TYPE);
-   var subpart_ = subparts_.iterateNext();
-
-   while(subpart_) {
-    var subpart = Object.create(this.subpart);
-    subpart.subpart_index = part.subparts.length;
-    subpart.item_index = this.items.length;
-    part.subparts.push(subpart);
-    this.items.push(subpart);
-
-    subpart.parent = part;
-    subpart.div = subpart_;
-    subpart.get_header();
-
-    subpart.bottom_index = this.bottom_items.length;
-    this.bottom_items.push(subpart)
-    subpart_ = subparts_.iterateNext();
-   }
-
-   if (! part.subparts.length) {
-    part.bottom_index = this.bottom_items.length;
-    this.bottom_items.push(part)
-   }
-
-   var part_ = parts_.iterateNext();
-  }
-
-  if (! question.parts.length) {
-   question.bottom_index = this.bottom_items.length;
-   this.bottom_items.push(question);
-  }
-
-  question_ = questions_.iterateNext();
- }
-
- for (i in this.items) {
-  var x = this.items[i];
-  x.id = this.item_ids[x.full_header];
- }
- 
- for (i in this.bottom_items) {
-  var x = this.bottom_items[i];
-
-  x.control_div = document.createElement('div');
-  x.control_div.className = 'control';
-  x.div.appendChild(x.control_div);
-
-  x.shower  = this.create_shower(x);
-  x.stepper = this.create_stepper(x);
- }
-
- this.set_stage(0);
- var x = this.bottom_items[this.stage];
- x.stepper.handle_click(1);
-};
-
-sangaku.set_stage = function(s) {
- var s0 = s;
- if (s0 < 0) { s0 = 0; }
- if (s0 >= this.bottom_items.length) {
-  s0 = this.bottom_items.length - 1;
- }
-
- this.stage = s0;
- var x = this.bottom_items[s0];
- var i = x.item_index;
-
- for (j in this.items) {
-  var y = this.items[j];
-  if (j <= i) {
-   y.div.style.display = 'block';
-  } else {
-   y.div.style.display = 'none';
-  }
- }
-
- if (x.stepper.status.code == 'not_started') {
-  x.stepper.handle_click(1);
- }
-};
-
-sangaku.step_forward = function() {
- this.set_stage(this.stage + 1);
- var x = this.bottom_items[this.stage];
- x.stepper.handle_click(1);
-};
-
-sangaku.step_backward = function() {
- this.set_stage(this.stage - 1);
-};
