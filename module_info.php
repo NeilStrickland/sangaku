@@ -51,7 +51,7 @@ function info_page($params) {
  echo <<<HTML
 <h1>{$m->code} {$m->title}</h1>
 <br/>
-<div class="tabber">
+<div class="tabber" id="module_info_tabber_{$m->id}">
 
 HTML;
 
@@ -78,7 +78,7 @@ function groups_tab($params) {
  echo $H->tab_start('Tutorial groups');
  echo $H->edged_table_start();
  echo $H->spacer_row(60,60,60,60,300,60);
- echo $H->row('Group','Day','Time','Weeks','Teachers','','');
+ echo $H->row('Group','Day','Time','Weeks','Teachers','');
  foreach($m->tutorial_groups as $g) {
   $tt = array();
   foreach($g->teachers as $t) {
