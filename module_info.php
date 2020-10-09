@@ -78,7 +78,7 @@ function groups_tab($params) {
  echo $H->tab_start('Tutorial groups');
  echo $H->edged_table_start();
  echo $H->spacer_row(60,60,60,60,300,60);
- echo $H->row('Group','Day','Time','Weeks','Teachers','','');
+ echo $H->row('Group','Day','Time','Weeks','Teachers','');
  foreach($m->tutorial_groups as $g) {
   $tt = array();
   foreach($g->teachers as $t) {
