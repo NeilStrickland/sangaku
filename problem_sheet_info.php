@@ -113,6 +113,7 @@ class problem_sheet_editor extends frog_object_editor {
   global $sangaku;
   
   $H = $sangaku->html;
+  $N = $sangaku->nav;
   $s = $this->object;
   $m = $s->load_link('module');
 
@@ -134,6 +135,8 @@ class problem_sheet_editor extends frog_object_editor {
   
   $this->edit_page_header();
 
+  echo $N->top_menu();
+  
   echo $H->edged_table_start();
   echo $H->spacer_row(120,500);
   echo $H->row($H->bold('Module:'),$module_selector);
