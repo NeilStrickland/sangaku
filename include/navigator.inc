@@ -157,6 +157,7 @@ HTML
 
   $html .= <<<HTML
 <button onclick="location='/sangaku/logout.php'">Logout</button>
+<button onclick="location='/sangaku/index.php'">Home</button>
 
 HTML
         ;
