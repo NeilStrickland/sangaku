@@ -6,6 +6,18 @@ class problem_sheet_editor extends frog_object_editor {
  function __construct() {
   global $sangaku;
   parent::__construct($sangaku,'problem_sheet');
+
+  $this->commands = 
+   array(
+    'display' => true,
+    'load' => true,
+    'create_sessions' => true,
+    'suggest_delete' => true,
+    'delete' => true,
+    'save' => true,
+    'new' => true
+   );
+
  }
 
  function parent_table() {
@@ -50,31 +62,42 @@ class problem_sheet_editor extends frog_object_editor {
 <table>
  <tr>
   <td id="save_td" class="command" width="100" onclick="frog.do_command('save');">Save</td>
+HTML
+        ;
+
+  if ($this->object->id) {
+   $html .= <<<HTML
   <td id="load_td" class="command" width="100" onclick="frog.do_command('load');">Restore</td>
   <td id="load_td" class="command" width="100" onclick="frog.do_command('display');">View</td>
+  <td id="load_td" class="command" width="100" onclick="frog.do_command('create_sessions');">Create sessions</td>
 
-HTML;
+HTML
+        ;
 
-  if (isset($this->commands['suggest_delete'])) {
-   $html .= <<<HTML
+   if (isset($this->commands['suggest_delete'])) {
+    $html .= <<<HTML
   <td id="suggest_delete_td" class="command" width="100" onclick="frog.do_command('suggest_delete');">Delete</td>
 
-HTML;
+HTML
+         ;
+   }
   }
-
+  
   $u = $this->listing_url();
   if ($u) {
    $html .= <<<HTML
   <td id="listing_td" class="command" width="100" onclick="location='$u';">Index</td>
 
-HTML;
+HTML
+         ;
   }
 
   $html .= <<<HTML
  </tr>
 </table>
 
-HTML;
+HTML
+        ;
 
   return $html;
  }
@@ -314,6 +337,58 @@ HTML
    ;
 
   $this->display_page_footer();
+ }
+
+ function handle_command() {
+  if ($this->command == 'create_sessions') {
+   $this->object->create_sessions(true);
+   $this->show_sessions_page();
+  }
+ }
+
+ function show_sessions_page() {
+  global $sangaku;
+  $N = $sangaku->nav;
+  $H = $sangaku->html;
+
+  $N->header('Sessions');
+  $s = $this->object;
+  $s->load();
+  $s->load_sessions();
+  
+  $u = $this->listing_url();
+  $v = '/sangaku/problem_sheet_info.php?id=' . $s->id . '&command=';
+
+  echo $N->top_menu();
+  
+  echo <<<HTML
+<h1>Sessions for:<br/> {$s->descriptor()}</h1>
+<br/>
+<table>
+ <tr>
+  <td id="load_td" class="command" width="100" onclick="location='{$v}load';">Edit</td>
+  <td id="load_td" class="command" width="100" onclick="location='{$v}display';">View</td>
+  <td id="listing_td" class="command" width="100" onclick="location='$u';">Index</td>
+ </tr>
+</table>
+<br/>
+
+HTML
+   ;
+
+  echo $H->edged_table_start();
+  echo $H->spacer_row(30,60,180,60);
+  echo $H->row('id','Group','Time','');
+  foreach($s->sessions as $x) {
+   echo $H->tr($H->td($x->id) .
+               $H->td($x->tutorial_group_name) .
+               $H->td($x->friendly_start_time()) .
+               $H->link_td('Monitor','/sangaku/session_monitor.php?session_id=' . $x->id));
+  }
+  
+  echo $H->edged_table_end();
+  
+  $N->footer();
  }
 }
 
