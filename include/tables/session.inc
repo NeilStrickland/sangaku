@@ -69,6 +69,14 @@ class session extends frog_object {
   }
  }
 
+ function friendly_start_time() {
+  if ($this->start_time) {
+   return date('H:i D, j/m',$this->start_timestamp());
+  } else {
+   return '';
+  }
+ }
+ 
  function is_current($leeway = 600) {
   $t0 = $this->start_timestamp();
   $t1 = $this->end_timestamp();
