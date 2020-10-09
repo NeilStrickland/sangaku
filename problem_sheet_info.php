@@ -45,6 +45,40 @@ class problem_sheet_editor extends frog_object_editor {
   return "sangaku.sheet_editor.init($id)";
  }
  
+ function edit_page_command_bar() {
+  $html = <<<HTML
+<table>
+ <tr>
+  <td id="save_td" class="command" width="100" onclick="frog.do_command('save');">Save</td>
+  <td id="load_td" class="command" width="100" onclick="frog.do_command('load');">Restore</td>
+  <td id="load_td" class="command" width="100" onclick="frog.do_command('display');">View</td>
+
+HTML;
+
+  if (isset($this->commands['suggest_delete'])) {
+   $html .= <<<HTML
+  <td id="suggest_delete_td" class="command" width="100" onclick="frog.do_command('suggest_delete');">Delete</td>
+
+HTML;
+  }
+
+  $u = $this->listing_url();
+  if ($u) {
+   $html .= <<<HTML
+  <td id="listing_td" class="command" width="100" onclick="location='$u';">Index</td>
+
+HTML;
+  }
+
+  $html .= <<<HTML
+ </tr>
+</table>
+
+HTML;
+
+  return $html;
+ }
+
  function display_page_widgets() {
   return array('mathjax');
  }
