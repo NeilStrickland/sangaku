@@ -108,4 +108,17 @@ class sangaku_class extends frog {
 
   return false;
  }
+
+ function academic_timestamp($semester,$week_number,$day_number,$hour) {
+  if (! isset($this->date_info)) { $this->get_date_info(); }
+
+  $t0 = $this->date_info->week_start_time[$semester][$week_number];
+  $t1 = strtotime("+" . ($day_number - 1) . " days +" . $hours . " hours",$t0);
+
+  return $t1;
+ }
+
+ function academic_time($semester,$week_number,$day_number,$hour) {
+  return date('Y-m-d H:i:s',$this->academic_timestamp($semester,$week_number,$day_number,$hour));
+ }
 }
