@@ -341,6 +341,7 @@ HTML
 
  function handle_command() {
   if ($this->command == 'create_sessions') {
+   $this->load_from_database();
    $this->object->create_sessions(true);
    $this->show_sessions_page();
   }

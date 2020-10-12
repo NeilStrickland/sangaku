@@ -114,11 +114,35 @@ class problem_sheet extends frog_object {
   
   $module = $this->load_link('module');
 
+  $this->which = '';
+  if ($this->module_code == 'EngL1') {
+   if (strlen($this->code) >= 1 and substr($this->code,-1) == 'a') {
+    $this->which = 'a';
+   }
+   if (strlen($this->code) >= 1 and substr($this->code,-1) == 'b') {
+    $this->which = 'b';
+   }
+  }
+  
   $groups = $module->load_tutorial_groups();
   $this->load_sessions();
 
   foreach($groups as $g) {
-   if ($g->day_number && $g->hour && ! isset($this->sessions_by_group_id[$g->id])) {
+   $create = $g->day_number && $g->hour && ! isset($this->sessions_by_group_id[$g->id]);
+
+   $g->which = '';
+
+   if (! isset($this->module_code)) { $this->dump(); exit; }
+   
+   if ($this->module_code == 'EngL1') {
+    $g->which = ($g->name == strtolower($g->name)) ? 'b' : 'a';
+
+    if (! ($g->which && ($g->which == $this->which))) {
+     $create = false;
+    }
+   }
+   
+   if ($create) {
     $s = $sangaku->new_object('session');
     $s->problem_sheet_id = $this->id;
     $s->tutorial_group_id = $g->id;
