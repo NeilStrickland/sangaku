@@ -121,6 +121,13 @@ class session extends frog_object {
          '?session_id=' . $this->id .
           '&teacher_id=' . $user->id;
  }
+
+ function load_snapshots() {
+  global $sangaku;
+  
+  $this->snapshots = $sangaku->load_where('snapshots',"x.session_id={$this->id}");
+  $this->snapshots_by_id = make_index($this->snapshots,'id');
+ }
  
  function load_associated() {
   $p = $this->load_link('problem_sheet');
@@ -132,6 +139,8 @@ class session extends frog_object {
   foreach($g->students as $s) {
    $s->load_status($this);
   }
+
+  $this->load_snapshots();
  } 
 
  function clear_fake_data() {

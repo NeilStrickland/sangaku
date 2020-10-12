@@ -43,6 +43,7 @@ $sangaku->register('problem_sheet');
 $sangaku->register('question_item');
 $sangaku->register('registration');
 $sangaku->register('session');
+$sangaku->register('snapshot');
 $sangaku->register('status','statuses');
 $sangaku->register('status_report');
 $sangaku->register('tutorial_group');
@@ -58,9 +59,12 @@ require_once('auth.inc');
 require_once('navigator.inc');
 
 $sangaku->html = new frog_html($sangaku);
+$sangaku->html->icons_url = '/sangaku/icons';
+
 $sangaku->nav  = new sangaku_navigator($sangaku);
 $sangaku->auth = new sangaku_auth($sangaku);
 
+                          
 $f = $_SERVER['PHP_SELF'];
 
 if (! ($f == '/sangaku/login.php' ||
