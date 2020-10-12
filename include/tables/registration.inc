@@ -11,6 +11,7 @@ $sangaku->add_table(
  ),
  array(
   'module_code' => array('type' => 'text'),
+  'module_title' => array('type' => 'text'),
   'somas_moid' => array('type' => 'integer'),
   'username' => array('type' => 'text'), 
   'gmail_name' => array('type' => 'text'), 
@@ -23,6 +24,7 @@ SELECT
  x.student_id,
  x.module_id,
  m.code AS module_code,
+ m.title AS module_title,
  m.somas_moid,
  x.student_id,
  s.username,
