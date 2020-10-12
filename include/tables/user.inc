@@ -44,6 +44,24 @@ class user extends frog_object {
   parent::__construct($sangaku,'user',$id,$with_defaults);
  }
 
+ function descriptor() {
+  if ($this->surname && $this->username) {
+   if ($this->username) {
+    return "{$this->forename} {$this->surname} ({$this->username})";
+   } else {
+    return "{$this->forename} {$this->surname}";
+   }
+  } else {
+   if ($this->username) {
+    return $this->username;
+   } else if ($this->id) {
+    return "User {$this->id}";
+   } else {
+    return "New user";
+   }
+  }
+ }
+ 
  function load_status($session) {
   global $sangaku;
 
