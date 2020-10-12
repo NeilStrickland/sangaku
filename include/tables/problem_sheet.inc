@@ -102,6 +102,17 @@ class problem_sheet extends frog_object {
   $this->sessions = $sangaku->load_where('sessions',"x.problem_sheet_id={$this->id}");
   $this->sessions_by_group_id =
    make_index($this->sessions,'tutorial_group_id');
+
+  $this->sessions_by_state = array();
+  foreach(session::$time_states as $x) {
+   $this->sessions_by_state[$x] = array();
+  }
+
+  foreach($this->sessions as $s) {
+   $x = $s->get_time_state();
+   $this->sessions_by_state[$x][] = $s;
+  }
+  
   return $this->sessions;
  }
 

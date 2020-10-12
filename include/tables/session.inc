@@ -76,11 +76,39 @@ class session extends frog_object {
    return '';
   }
  }
+
+ static $time_states = array('unscheduled','future','imminent','running','finished');
  
- function is_current($leeway = 600) {
+ function get_time_state() {
+  global $sangaku;
+  
   $t0 = $this->start_timestamp();
   $t1 = $this->end_timestamp();
-  $t = time();
+
+  $t = $sangaku->time();
+  
+  if (! $t0) {
+   $s = 'unscheduled';
+  } else if ($t < $t0 - 600) {
+   $s = 'future';
+  } else if ($t < $t0) {
+   $s = 'imminent';
+  } else if ($t < $t1) {
+   $s = 'running';
+  } else {
+   $s = 'finished';
+  }
+
+  $this->time_state = $s;
+  return $s;
+ }
+ 
+ function is_current($leeway = 600) {
+  global $sangaku;
+  
+  $t0 = $this->start_timestamp();
+  $t1 = $this->end_timestamp();
+  $t = $sangaku->time();
 
   if ($t0 && $t1 && ($t0 - $leeway <= $t) && ($t <= $t1 + $leeway)) {
    return true;
@@ -90,8 +118,10 @@ class session extends frog_object {
  }
 
  function is_future($leeway = 600) {
+  global $sangaku;
+  
   $t1 = $this->end_timestamp();
-  $t = time();
+  $t = $sangaku->time();
 
   if ($t1 && ($t <= $t1 + $leeway)) {
    return true;
@@ -175,6 +205,49 @@ class session extends frog_object {
     $u->delete();
    }
   }  
+ }
+
+ function student_button($student_id,$approved = false) {
+  $s = $this->get_time_state();
+  $d = $this->friendly_start_time();
+  $g = 'Group ' . $this->tutorial_group_name;
+  $u = '/sangaku/problem_sheet.php?session_id=' . $this->id .
+     '&student_id=' . $student_id;
+  $a = $approved ? ' approved' : '';
+  
+  if ($s == 'unscheduled') {
+   return <<<HTML
+<button type="button" class="unscheduled session{$a}">$g : unscheduled</button>
+
+HTML
+    ;
+  } else if ($s == 'future') {
+   return <<<HTML
+<button type="button" class="future session{$a}">$g : $d</button>
+
+HTML
+    ;
+  } else if ($s == 'imminent') {
+   return <<<HTML
+<button type="button" class="imminent session{$a}" onclick="location='$u'">$g : On soon</button>
+
+HTML
+    ;
+  } else if ($s == 'running') {
+   return <<<HTML
+<button type="button" class="running session{$a}" onclick="location='$u'">$g : On now</button>
+
+HTML
+    ;
+  } else if ($s == 'finished') {
+   return <<<HTML
+<button type="button" class="finished session{$a}">$g : finished</button>
+
+HTML
+    ;
+  } else {
+   return '';
+  }
  }
  
  function for_json() {

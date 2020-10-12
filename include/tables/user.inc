@@ -160,6 +160,16 @@ class user extends frog_object {
   return $this->tutorial_groups;
  }
 
+ function load_student_sessions() {
+  $this->load_registrations();
+
+  $this->sessions = array();
+
+  foreach($this->registrations as $r) {
+   $r->load_sessions();
+  }
+ }
+
  function load_sessions() {
   $this->load_registrations();
   $this->load_tutorial_groups();
@@ -236,7 +246,7 @@ class user extends frog_object {
    }
   }
   
-  return $this->tutorial_groups;
+  return $this->teacher_tutorial_groups;
  }
 
  function load_teacher_sessions() {

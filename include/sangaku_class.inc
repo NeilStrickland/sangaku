@@ -2,6 +2,14 @@
 
 class sangaku_class extends frog {
 
+ function time() {
+  if (isset($this->fake_time) && $this->fake_time) {
+   return $this->fake_time;
+  } else {
+   return time();
+  }
+ }
+ 
  function get_session_student_params($p = null) {
   global $user,$sangaku;
   
@@ -91,7 +99,7 @@ class sangaku_class extends frog {
  }
 
  function week_number($t = 0) {
-  if (! $t) { $t = time(); }
+  if (! $t) { $t = $this->time(); }
 
   if (! isset($this->date_info)) { $this->get_date_info(); }
 
