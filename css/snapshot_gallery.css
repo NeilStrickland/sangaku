@@ -1,10 +1,18 @@
+body {
+}
+
+div#gallery {
+    position: relative;
+    width: 900px;
+}
+
 div.snapshot {
     display : none;
-    width: 100%;
+    width: 900px;
 }
 
 img.snapshot {
-    max-width: 1000px;
+    max-width: 900px;
 }
 
 div.thumb {
@@ -21,7 +29,7 @@ img.thumb {
     width : 120px;
 }
 
-.prev, .next {
+a#prev, a#next {
   cursor: pointer;
   position: absolute;
   top: 50%;
@@ -37,12 +45,12 @@ img.thumb {
   -webkit-user-select: none;
 }
 
-.next {
+a#next {
   right: 0;
   border-radius: 3px 0 0 3px;
 }
 
-.prev:hover, .next:hover {
+a#prev:hover, a#next:hover {
   background-color: rgba(0, 0, 0, 0.8);
 }
 
