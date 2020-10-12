@@ -156,15 +156,15 @@ HTML
   $html = "<div class=\"topmenu\">";
 
   $html .= <<<HTML
-<button onclick="location='/sangaku/logout.php'">Logout</button>
-<button onclick="location='/sangaku/index.php'">Home</button>
+<button type="button" onclick="location='/sangaku/logout.php'">Logout</button>
+<button type="button" onclick="location='/sangaku/index.php'">Home</button>
 
 HTML
         ;
 
   if ($user->status == 'teacher') {
   $html .= <<<HTML
-<button onclick="location='/sangaku/module_list.php'">Modules</button>
+<button type="button" onclick="location='/sangaku/module_list.php'">Modules</button>
 
 HTML
         ;
@@ -180,14 +180,14 @@ HTML
   $html = "<div class=\"topmenu\">";
 
   $html .= <<<HTML
-<button onclick="location='/sangaku/logout.php'">Logout</button>
+<button type="button" onclick="location='/sangaku/logout.php'">Logout</button>
 
 HTML
         ;
 
   if ($user->status == 'teacher') {
   $html .= <<<HTML
-<button onclick="location='/sangaku/module_list.php'">Modules</button>
+<button type="button" onclick="location='/sangaku/module_list.php'">Modules</button>
 
 HTML
         ;
@@ -195,7 +195,7 @@ HTML
   }
 
   $html .= <<<HTML
-<button onclick="window.open('/sangaku/fake_students.php?session_id={$session_id}')">Fake students</button>
+<button type="button" onclick="window.open('/sangaku/fake_students.php?session_id={$session_id}')">Fake students</button>
 
 HTML
         ;

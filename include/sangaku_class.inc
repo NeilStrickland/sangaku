@@ -113,7 +113,7 @@ class sangaku_class extends frog {
   if (! isset($this->date_info)) { $this->get_date_info(); }
 
   $t0 = $this->date_info->week_start_time[$semester][$week_number];
-  $t1 = strtotime("+" . ($day_number - 1) . " days +" . $hours . " hours",$t0);
+  $t1 = strtotime("+" . ($day_number - 1) . " days +" . $hour . " hours",$t0);
 
   return $t1;
  }

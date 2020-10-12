@@ -96,6 +96,46 @@ class problem_sheet extends frog_object {
   return($this->question_items);
  }
 
+ function load_sessions() {
+  global $sangaku;
+  
+  $this->sessions = $sangaku->load_where('sessions',"x.problem_sheet_id={$this->id}");
+  $this->sessions_by_group_id =
+   make_index($this->sessions,'tutorial_group_id');
+  return $this->sessions;
+ }
+
+ function create_sessions($force = false) {
+  global $sangaku;
+
+  $this->load_question_items();
+  if (! $this->question_items && ! $force) { return false; }
+  if (! ($this->semester && $this->week_number)) { return false; }
+  
+  $module = $this->load_link('module');
+
+  $groups = $module->load_tutorial_groups();
+  $this->load_sessions();
+
+  foreach($groups as $g) {
+   if ($g->day_number && $g->hour && ! isset($this->sessions_by_group_id[$g->id])) {
+    $s = $sangaku->new_object('session');
+    $s->problem_sheet_id = $this->id;
+    $s->tutorial_group_id = $g->id;
+    $s->start_time = $sangaku->academic_time(
+     $this->semester,$this->week_number,$g->day_number,$g->hour
+    );
+    $s->duration = 50;
+    $s->save();
+    $s->load();
+    $this->sessions[] = $s;
+    $this->sessions_by_group_id[$g->id] = $s;
+   }
+  }
+  
+  return true;
+ }
+ 
  function for_json($with_solutions = false) {
   $x = new stdClass();
   foreach (array('id','module_id','semester','week_number','code','title','intro') as $k) {

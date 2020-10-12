@@ -69,6 +69,14 @@ class session extends frog_object {
   }
  }
 
+ function friendly_start_time() {
+  if ($this->start_time) {
+   return date('H:i D, j/m',$this->start_timestamp());
+  } else {
+   return '';
+  }
+ }
+ 
  function is_current($leeway = 600) {
   $t0 = $this->start_timestamp();
   $t1 = $this->end_timestamp();
@@ -113,6 +121,13 @@ class session extends frog_object {
          '?session_id=' . $this->id .
           '&teacher_id=' . $user->id;
  }
+
+ function load_snapshots() {
+  global $sangaku;
+  
+  $this->snapshots = $sangaku->load_where('snapshots',"x.session_id={$this->id}");
+  $this->snapshots_by_id = make_index($this->snapshots,'id');
+ }
  
  function load_associated() {
   $p = $this->load_link('problem_sheet');
@@ -124,6 +139,8 @@ class session extends frog_object {
   foreach($g->students as $s) {
    $s->load_status($this);
   }
+
+  $this->load_snapshots();
  } 
 
  function clear_fake_data() {
