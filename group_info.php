@@ -141,7 +141,7 @@ function students_tab($params) {
   echo $H->tr($H->td($s->username) .
               $H->td($s->forename) .
               $H->td($s->surname) .
-              $H->link_td('Details',"student_info.php?id={$s->id}")) ;
+              $H->link_td('Details',"user_info.php?id={$s->id}")) ;
  }
  
  echo $H->edged_table_end();
