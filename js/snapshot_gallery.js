@@ -3,7 +3,6 @@ sangaku.snapshot_gallery = {};
 sangaku.snapshot_gallery.init = function(session_id) {
  var me = this;
 
- document.body.style.width = '100%';
  var m = document.getElementById('main_div');
 // m.removeChild(m.children[0]);
  
@@ -82,6 +81,7 @@ sangaku.snapshot_gallery.show_snapshot = function(id) {
   if (s.id == id) {
    s.div.style.display = 'block';
    s.thumb_div.className = 'thumb_selected';
+   this.current_snapshot = s.index;
   } else {
    s.div.style.display = 'none';
    s.thumb_div.className = 'thumb';
@@ -93,7 +93,7 @@ sangaku.snapshot_gallery.step = function(d) {
  var n = this.snapshots.length;
  if (n == 0) { return null; }
 
- var i = (this.current_snapshot + d) % n;
+ var i = (this.current_snapshot + d + n) % n;
  var s = this.snapshots[i];
  this.show_snapshot(s.id);
 };
