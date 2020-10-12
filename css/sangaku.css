@@ -255,3 +255,77 @@ div.countdown {
     text-align : center;
     vertical-align : center;
 }
+
+tr.module_header td {
+    width: 680px;
+    font-size: 24px;
+    background: #B0E0B0;
+}
+
+tr.problem_sheet_header td {
+    font-size : 20px;
+    background: #B0F0D0
+}
+
+button.session {
+    width : 200px;
+    height : 30px;
+    border-radius : 4px;
+}
+
+button.session.approved {
+    width : 300px;
+    height : 50px;
+    font-size : 18px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+button.unscheduled.session {
+    color : #888888;
+    background : #EEEEEE;
+}
+
+button.future.session {
+    color : #000000;
+    background : #FFFFFF;
+}
+
+button.imminent.session {
+    color : #000000;
+    background : #2266DD;
+}
+
+button.imminent.session:hover {
+    cursor : pointer;
+    background : #4488FF;
+}
+
+button.running.session {
+    color : #000000;
+    background : #6666FF;
+}
+
+button.running.session:hover {
+    cursor : pointer;
+    background : #8888FF;
+}
+
+button.finished.session {
+    color : #888888;
+    background : #DDEEFF;
+}
+
+button.future.session.approved {
+    border: 2px solid #000000;
+}
+
+button.imminent.session.approved {
+    border: 2px solid #000000;
+}
+
+button.running.session.approved {
+    border: 2px solid #000000;
+}
+
+
