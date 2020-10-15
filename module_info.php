@@ -121,6 +121,15 @@ function sheets_tab($params) {
  }
  
  echo $H->edged_table_end();
+
+ $url = "problem_sheet_info.php?module_id={$m->id}&command=new";
+ 
+ echo <<<HTML
+<br/><br/>
+<button type="button" onclick="location='$url'">Create new problem sheet</button>
+
+HTML
+  ;
  echo $H->tab_end();
 }
 
