@@ -47,6 +47,12 @@ HTML
 You are registered as a teacher for the following sessions:
 <br/><br/>
 <table class="edged">
+ <tr>
+  <td>Module</td>
+  <td>Group</td>
+  <td>Problem sheet</td>
+  <td>Time</td>
+ </tr>
 
 HTML
    ;
@@ -74,12 +80,14 @@ HTML
 HTML
 ;
    }
-  
+
+   $edit_sheet_url = "problem_sheet_info.php?id={$s->problem_sheet_id}";
+   
    echo <<<HTML
  <tr>
   <td class="module_code">{$s->module_code}</td>
   <td class="group_name">{$s->tutorial_group_name}</td>
-  <td class="sheet_name">{$s->problem_sheet_title}</td>
+  <td class="command" class="sheet_name" onclick="location='{$edit_sheet_url}'">{$s->problem_sheet_title}</td>
 $x
  </tr>
 
