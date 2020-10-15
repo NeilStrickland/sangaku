@@ -221,7 +221,7 @@ HTML
  ;
   echo $H->tr($H->td($code_instructions,null,array('colspan' => 2)));
 
-  echo $H->row($H->bold('Title:'),$H->text_input('code',$s->code,array('size' => 60)));
+  echo $H->row($H->bold('Title:'),$H->text_input('title',$s->title,array('size' => 60)));
 
   $title_instructions = <<<HTML
 Here you can enter a longer and more descriptive title for this 
