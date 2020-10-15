@@ -39,6 +39,18 @@ class problem_sheet_editor extends frog_object_editor {
   }
  }
 
+ function edit_page_title() {
+  if ($this->command == 'new') {
+   return('New problem sheet');
+  } else {
+   $t = $this->object->descriptor();
+   if ($this->command == 'clone') {
+    $t .= ' (copy)';
+   }
+   return($t);
+  }
+ }
+
  function edit_page_widgets() {
   return array('mathjax');
  }
