@@ -43,6 +43,18 @@ class problem_sheet extends frog_object {
   parent::__construct($sangaku,'problem_sheet',$id,$with_defaults);
  }
 
+ function descriptor() {
+  if ($this->title) {
+   return $this->title;
+  } else if ($this->code) {
+   return $this->code;
+  } else if ($this->id) {
+   return "Problem sheet [{$this->id}]";
+  } else {
+   return "New problem sheet";
+  }
+ }
+ 
  function add_question_items($item0) {
   global $sangaku;
   $this->question_items[] = $item0;

@@ -39,6 +39,28 @@ td.command:hover {
  cursor: pointer;
 }
 
+button {
+ font-weight: bold;
+ font-size: 12px;
+ text-decoration: none;
+ padding: 3px 0.5em;
+ margin-left: 3px;
+ border: 1px solid #778;
+ background: #DDE;
+}
+
+button a:link { 
+ color: #448;
+ text-decoration: none;
+}  
+
+button:hover { 
+ color: #000;
+ background: #AAE;
+ border-color: #227;   
+ cursor: pointer;
+}
+
 h3, h4 {
     display : inline;
 }
