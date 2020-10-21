@@ -25,7 +25,7 @@ autosuggest.create = function(type,parent,key,value) {
 
 autosuggest.setup = function(type,hidden,display,key,value) {
  if (this.known_types[type]) {
-  url = somas.ajax_url + '/suggest.php?type=' + type;
+  url = sangaku.ajax_url + '/suggest.php?type=' + type;
   hidden.value = key;
   display.value = value;
   return(this.setup_ajax(hidden,display,url));
@@ -500,14 +500,8 @@ autosuggest.get_error_div = function() {
   e.style.display = 'none';
   e.appendChild(document.createElement('br'));
   e.appendChild(document.createTextNode(
-  'For each box with a pale green background, there is a list of possible ' +
-  'values that can be entered, and if you enter anything else, it will ' +
-  'have no effect.  For example there are many boxes that will only ' +
-  'accept the name of a member of SoMaS staff (in the format \'Smith, ' +
-  'John\').  If you feel a need to enter a value that is not accepted, ' +
-  'then you should either find a way to enter that value in the database ' +
-  '(and then refresh the current page) or consult with Neil Strickland.'
- ));
+   '(Autosuggest error explanation can be entered here '
+  ));
   d.appendChild(e);
   return(d);
  }
@@ -560,19 +554,7 @@ autosuggest.set_value = function(i) {
 };
 
 autosuggest.known_types = {
- 'person'         : 1,
- 'module'         : 1,
- 'teaching_room'  : 1,
- 'student'        : 1,
- 'committee'      : 1,
- 'conference'     : 1,
- 'grant'          : 1,
- 'grant_sponsor'  : 1,
- 'programme'      : 1,
- 'research_group' : 1,
- 'role'           : 1,
- 'seminar_series' : 1,
- 'pg_applicant'   : 1
+ 'student'        : 1
 };
 
 autosuggest.default_size = {
@@ -596,7 +578,7 @@ autosuggest.setup_all = function() {
    s = ip.className.substr(12);
 
    if (this.known_types[s]) {
-    url = somas.ajax_url + '/suggest.php?type=' + s;
+    url = sangaku.ajax_url + '/suggest.php?type=' + s;
     if (s == 'student' && (moid = ip.getAttribute('moid'))) {
      url = url + '&moid=' + moid;
     }

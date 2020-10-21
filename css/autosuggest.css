@@ -1,3 +1,5 @@
+input.autosuggest { background-color: #CCFF99; } 
+
 .suggestion_list {
  background: white;
  border: 1px solid;
@@ -24,11 +26,11 @@
  color: white;
 }
 
-#auto_suggest_div {
+#autosuggest_div {
 display: none;
 }
 
-#auto_suggest_error_div {
+#autosuggest_error_div {
  position: absolute;
  width: 310px;
  background: #EDBF19;
@@ -36,4 +38,9 @@ display: none;
  padding: 4px;
  display: none;
 }
+
+span.fade {
+ color: #AAAAAA;
+}
+
 

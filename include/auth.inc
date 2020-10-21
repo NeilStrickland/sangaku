@@ -33,6 +33,15 @@ class sangaku_auth extends frog_auth {
    return $x;
   }
  }
+
+ function after_login($params) {
+  $u = $params->user;
+  if ($u->status == 'teacher') {
+   $_SESSION['sangaku_logged_in_teacher'] = true;
+  } else {
+   $_SESSION['sangaku_logged_in_teacher'] = false;
+  }
+ }
 }
 
 ?>

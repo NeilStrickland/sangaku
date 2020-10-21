@@ -46,6 +46,14 @@ class user_editor extends frog_object_editor {
 
   return null;
  }
+
+ function listing_url() {
+  if ($this->object && $this->object->status == 'teacher') {
+   return '/sangaku/teacher_list.php';
+  } else {
+   return '/sangaku/student_list.php';
+  }
+ }
  
  function associated_lists() {
   return(

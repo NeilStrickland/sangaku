@@ -18,6 +18,11 @@ class sangaku_navigator extends frog_navigator {
   
   $this->standard_scripts = array('objects_auto','sangaku');
   $this->standard_styles  = array('sangaku');
+
+  $this->standard_body_scripts = array(
+   'autosuggest_setup'
+  );
+  
  }
 
  function request_login_page($params = null) {

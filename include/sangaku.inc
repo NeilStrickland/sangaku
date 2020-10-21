@@ -56,14 +56,12 @@ $sangaku->load_table('status');
 $sangaku->load_all('status');
 
 require_once('auth.inc');
+require_once('html.inc');
 require_once('navigator.inc');
 
-$sangaku->html = new frog_html($sangaku);
-$sangaku->html->icons_url = '/sangaku/icons';
-
+$sangaku->html = new sangaku_html($sangaku);
 $sangaku->nav  = new sangaku_navigator($sangaku);
 $sangaku->auth = new sangaku_auth($sangaku);
-
                           
 $f = $_SERVER['PHP_SELF'];
 

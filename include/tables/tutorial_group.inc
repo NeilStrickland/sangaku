@@ -127,8 +127,8 @@ class tutorial_group extends frog_object {
    $sangaku->load_where('sessions',"x.tutorial_group_id={$this->id}");
 
   $this->confirmed_sessions = array();
-  $this->sessions_by_state = array();
-  $this->confirmed_sessions_by_state = array();
+  $this->sessions_by_state = array('unfinished' => array());
+  $this->confirmed_sessions_by_state = array('unfinished' => array());
 
   foreach(session::$time_states as $x) {
    $this->sessions_by_state[$x] = array();
@@ -138,9 +138,11 @@ class tutorial_group extends frog_object {
   foreach($this->sessions as $s) {
    $x = $s->get_time_state();
    $this->sessions_by_state[$x][] = $s;
+   if ($x != 'finished') { $this->sessions_by_state['unfinished'][] = $s; }
    if ($s->is_confirmed) {
     $this->confirmed_sessions[] = $s;
     $this->confirmed_sessions_by_state[$x][] = $s;
+    if ($x != 'finished') { $this->confirmed_sessions_by_state['unfinished'][] = $s; }
    }
   }
 
@@ -152,7 +154,7 @@ class tutorial_group extends frog_object {
   for ($i = 1; $i <= 2; $i++) {
    for ($j = 0; $j <= 12; $j++) {
     $this->sessions_by_week[$i][$j] = array();
-    $this->confiirmed_sessions_by_week[$i][$j] = array();
+    $this->confirmed_sessions_by_week[$i][$j] = array();
    }
   }
 

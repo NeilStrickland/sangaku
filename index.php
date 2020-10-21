@@ -25,6 +25,7 @@ function teacher_index_page() {
 
  $force_index = get_optional_parameter('force_index',0) ? 1 : 0;
  $user->load_teacher_sessions();
+ $user->load_teacher_tutorial_groups();
 
  if (count($user->current_teacher_sessions) == 1 &&
      ! $force_index) {
@@ -38,11 +39,11 @@ function teacher_index_page() {
  
  echo <<<HTML
 <h1>Sangaku sessions</h1>
+
 HTML
   ;
  
- if ($user->future_teacher_sessions ||
-     $user->unlimited_teacher_sessions) {
+ if ($user->teacher_tutorial_groups) {
   echo <<<HTML
 You are registered as a teacher for the following sessions:
 <br/><br/>
@@ -57,39 +58,42 @@ You are registered as a teacher for the following sessions:
 
 HTML
    ;
-
-  foreach($user->future_teacher_sessions as $s) {
-   if ($s->is_current()) {
-    $t = ($sangaku->time() < $s->start_timestamp()) ? 'On soon' : 'On now';
-    $url = $s->teacher_url();
-    $x = <<<HTML
+  echo $H->spacer_row(80,80,300,140,80);
+  
+  foreach($user->teacher_tutorial_groups as $g) {
+   if ($g->sessions_by_state['unfinished']) {
+    foreach ($g->sessions_by_state['unfinished'] as $s) {
+    if ($s->is_current()) {
+     $t = ($sangaku->time() < $s->start_timestamp()) ? 'On soon' : 'On now';
+     $url = $s->teacher_url();
+     $x = <<<HTML
   <td style="width:140px" class="command" onclick="location='{$url}'">$t</td>
 
 HTML
        ;
-   } else {
-    $t = date('D j/n H:i',$s->start_timestamp());
-    $x = <<<HTML
+    } else {
+     $t = date('D j/n H:i',$s->start_timestamp());
+     $x = <<<HTML
   <td style="width:140px">$t</td>
 
 HTML
-       ;
-    $url = $s->teacher_url();
-    $x = <<<HTML
+        ;
+     $url = $s->teacher_url();
+     $x = <<<HTML
   <td style="width:140px" class="command" onclick="location='{$url}'">$t</td>
 
 HTML
 ;
-   }
+    }
 
-   $edit_sheet_url = "problem_sheet_info.php?id={$s->problem_sheet_id}";
+    $edit_sheet_url = "problem_sheet_info.php?id={$s->problem_sheet_id}";
 
-   $y = $H->td($H->checkbox('session_confirmed_' . $s->id,$s->is_confirmed,
-                            array(
-                             'id' => 'session_confirmed_' . $s->id,
-                             'onclick' => "sangaku.toggle_session_confirmed({$s->id})")));
+    $y = $H->td($H->checkbox('session_confirmed_' . $s->id,$s->is_confirmed,
+                             array(
+                              'id' => 'session_confirmed_' . $s->id,
+                              'onclick' => "sangaku.toggle_session_confirmed({$s->id})")));
    
-   echo <<<HTML
+    echo <<<HTML
  <tr>
   <td class="module_code">{$s->module_code}</td>
   <td class="group_name">{$s->tutorial_group_name}</td>
@@ -99,23 +103,20 @@ $y
  </tr>
 
 HTML
-    ;
-  }
-
-  foreach($user->unlimited_teacher_sessions as $s) {
-   $edit_sheet_url = "problem_sheet_info.php?id={$s->problem_sheet_id}";
-
-   echo <<<HTML
+     ;
+    }
+   } else {
+    echo <<<HTML
  <tr>
-  <td class="module_code">{$s->module_code}</td>
-  <td class="group_name">{$s->tutorial_group_name}</td>
-  <td class="command" class="sheet_name" onclick="location='{$edit_sheet_url}'">{$s->problem_sheet_title}</td>
-  <td class="session_link">&nbsp;</td>
-  <td class="session_link">&nbsp;</td>
+  <td class="module_code">{$g->module_code}</td>
+  <td class="group_name">{$g->name}</td>
+  <td colspan="3">No upcoming sessions</td>
  </tr>
 
 HTML
-    ;
+     ;
+
+   }
   }
 
   echo <<<HTML
