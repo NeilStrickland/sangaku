@@ -122,7 +122,7 @@ class registration extends frog_object {
     $p->unapproved_sessions_by_state[$x] = array();
    }
 
-   foreach ($p->sessions as $x) {
+   foreach ($p->confirmed_sessions as $x) {
     if (array_key_exists($x->tutorial_group_id,$this->groups_by_id)) {
      $p->approved_session = $x;
     } else {

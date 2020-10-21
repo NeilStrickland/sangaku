@@ -51,6 +51,11 @@ class sangaku_class extends frog {
    return $params;
   }
   
+  if (! $student->is_fake_student() && ! $session->is_confirmed) {
+   $params->error = 'Session is unconfirmed';
+   return $params;
+  }
+  
   $group = $session->load_link('tutorial_group');
   if (! $group) {
    $params->error = 'Tutorial group not found';

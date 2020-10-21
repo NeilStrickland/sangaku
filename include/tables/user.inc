@@ -61,6 +61,12 @@ class user extends frog_object {
    }
   }
  }
+
+ function is_fake_student() {
+  return ($this->status == 'student' &&
+          strlen($this->username >= 4) &&
+          substr($this->username,0,4) == 'fake');
+ }
  
  function load_status($session) {
   global $sangaku;

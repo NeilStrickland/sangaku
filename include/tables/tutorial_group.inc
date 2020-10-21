@@ -126,29 +126,33 @@ class tutorial_group extends frog_object {
   $this->sessions =
    $sangaku->load_where('sessions',"x.tutorial_group_id={$this->id}");
 
-  $this->current_sessions = array();
-  $this->future_sessions = array();
-  $this->unlimited_sessions = array();
+  $this->confirmed_sessions = array();
+  $this->sessions_by_state = array();
+  $this->confirmed_sessions_by_state = array();
+
+  foreach(session::$time_states as $x) {
+   $this->sessions_by_state[$x] = array();
+   $this->confirmed_sessions_by_state[$x] = array();
+  }
 
   foreach($this->sessions as $s) {
-   if ($s->is_current()) {
-    $this->current_sessions[] = $s;
-   }
-
-   if ($s->is_future()) {
-    $this->future_sessions[] = $s;
-   }
-
-   if ($s->is_unlimited()) {
-    $this->unlimited_sessions[] = $s;
+   $x = $s->get_time_state();
+   $this->sessions_by_state[$x][] = $s;
+   if ($s->is_confirmed) {
+    $this->confirmed_sessions[] = $s;
+    $this->confirmed_sessions_by_state[$x][] = $s;
    }
   }
 
   $this->sessions_by_semester = array(1 => array(),2 => array());
   $this->sessions_by_week = array(1 => array(),2 => array());
+  $this->confirmed_sessions_by_semester = array(1 => array(),2 => array());
+  $this->confirmed_sessions_by_week = array(1 => array(),2 => array());
+  
   for ($i = 1; $i <= 2; $i++) {
    for ($j = 0; $j <= 12; $j++) {
     $this->sessions_by_week[$i][$j] = array();
+    $this->confiirmed_sessions_by_week[$i][$j] = array();
    }
   }
 
@@ -163,6 +167,10 @@ class tutorial_group extends frog_object {
     $s->week_number = $w[1];
     $this->sessions_by_semester[$w[0]][] = $s;
     $this->sessions_by_week[$w[0]][$w[1]][] = $s;
+    if ($s->is_confirmed) {
+     $this->confirmed_sessions_by_semester[$w[0]][] = $s;
+     $this->confirmed_sessions_by_week[$w[0]][$w[1]][] = $s;
+    }
    }
   }
   

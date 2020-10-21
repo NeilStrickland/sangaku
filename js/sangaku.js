@@ -22,6 +22,16 @@ sangaku.timestamp_to_hm = function(s) {
 
 //////////////////////////////////////////////////////////////////////
 
+sangaku.toggle_session_confirmed = function(session_id) {
+ var cb = document.getElementById('session_confirmed_' + session_id);
+ var s = Object.create(this.session);
+ s.id = session_id;
+ s.is_confirmed = cb.checked ? 1 : 0;
+ s.save();
+};
+
+//////////////////////////////////////////////////////////////////////
+
 sangaku.module.munch = function(x) {
  for (var k of ['id','code','title']) {
   if (k in x) { this[k] = x[k]; }

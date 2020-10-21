@@ -9,7 +9,8 @@ $sangaku->add_table(
   'problem_sheet_id' => array('type' => 'integer','link' => 'problem_sheet'),
   'tutorial_group_id' => array('type' => 'integer','link' => 'tutorial_group'),
   'start_time' => array('type' => 'text'),
-  'duration' => array('type' => 'integer','default' => 50,'notnull' => true)
+  'duration' => array('type' => 'integer','default' => 50,'notnull' => true),
+  'is_confirmed' => array('type' => 'boolean','default' => 0,'notnull' => true)
  ),
  array(
   'problem_sheet_title' => array('type' => 'text'),
@@ -26,7 +27,8 @@ SELECT
  m.code AS module_code,
  m.title AS module_title, 
  x.start_time,
- x.duration
+ x.duration,
+ x.is_confirmed
 FROM tbl_sessions x
  LEFT JOIN tbl_problem_sheets p ON x.problem_sheet_id = p.id 
   LEFT JOIN tbl_tutorial_groups g ON x.tutorial_group_id = g.id

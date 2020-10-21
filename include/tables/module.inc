@@ -65,20 +65,39 @@ class module extends frog_object {
    $this->load_tutorial_groups();
    $this->load_problem_sheets();
 
-   foreach($this->tutorial_groups as $x) { $x->sessions = array(); }
-   foreach($this->problem_sheets  as $x) { $x->sessions = array(); }
+   foreach($this->tutorial_groups as $x) {
+    $x->sessions = array();
+    $x->confirmed_sessions = array();
+   }
+
+   foreach($this->problem_sheets  as $x) {
+    $x->sessions = array();
+    $x->confirmed_sessions = array();
+   }
 
    $this->sessions =
      $sangaku->load_where('sessions',"g.module_id={$this->id}");
 
+   $this->confirmed_sessions = array();
+   
    foreach($this->sessions as $s) {
+    if ($s->is_confirmed) {
+     $this->confirmed_sessions[] = $s;
+    }
+    
     if (isset($this->tutorial_groups[$s->tutorial_group_id])) {
      $g = $this->tutorial_groups[$s->tutorial_group_id];
      $g->sessions[] = $s;
+     if ($s->is_confirmed) {
+      $g->confirmed_sessions[] = $s;
+     }
     }
     if (isset($this->problem_sheets[$s->problem_sheet_id])) {
      $p = $this->problem_sheets[$s->problem_sheet_id];
      $p->sessions[] = $s;
+     if ($s->is_confirmed) {
+      $p->confirmed_sessions[] = $s;
+     }
     }
    }
 

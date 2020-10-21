@@ -52,6 +52,7 @@ You are registered as a teacher for the following sessions:
   <td>Group</td>
   <td>Problem sheet</td>
   <td>Time</td>
+  <td>Confirm</td>
  </tr>
 
 HTML
@@ -82,6 +83,11 @@ HTML
    }
 
    $edit_sheet_url = "problem_sheet_info.php?id={$s->problem_sheet_id}";
+
+   $y = $H->td($H->checkbox('session_confirmed_' . $s->id,$s->is_confirmed,
+                            array(
+                             'id' => 'session_confirmed_' . $s->id,
+                             'onclick' => "sangaku.toggle_session_confirmed({$s->id})")));
    
    echo <<<HTML
  <tr>
@@ -89,6 +95,7 @@ HTML
   <td class="group_name">{$s->tutorial_group_name}</td>
   <td class="command" class="sheet_name" onclick="location='{$edit_sheet_url}'">{$s->problem_sheet_title}</td>
 $x
+$y
  </tr>
 
 HTML
@@ -96,11 +103,14 @@ HTML
   }
 
   foreach($user->unlimited_teacher_sessions as $s) {
+   $edit_sheet_url = "problem_sheet_info.php?id={$s->problem_sheet_id}";
+
    echo <<<HTML
  <tr>
   <td class="module_code">{$s->module_code}</td>
   <td class="group_name">{$s->tutorial_group_name}</td>
-  <td class="sheet_name">{$s->problem_sheet_title}</td>
+  <td class="command" class="sheet_name" onclick="location='{$edit_sheet_url}'">{$s->problem_sheet_title}</td>
+  <td class="session_link">&nbsp;</td>
   <td class="session_link">&nbsp;</td>
  </tr>
 

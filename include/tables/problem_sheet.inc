@@ -115,14 +115,22 @@ class problem_sheet extends frog_object {
   $this->sessions_by_group_id =
    make_index($this->sessions,'tutorial_group_id');
 
+  $this->confirmed_sessions = array();
   $this->sessions_by_state = array();
+  $this->confirmed_sessions_by_state = array();
+
   foreach(session::$time_states as $x) {
    $this->sessions_by_state[$x] = array();
+   $this->confirmed_sessions_by_state[$x] = array();
   }
 
   foreach($this->sessions as $s) {
    $x = $s->get_time_state();
    $this->sessions_by_state[$x][] = $s;
+   if ($s->is_confirmed) {
+    $this->confirmed_sessions[] = $s;
+    $this->confirmed_sessions_by_state[$x][] = $s;
+   }
   }
   
   return $this->sessions;
