@@ -102,6 +102,15 @@ div.stepper_option {
     border-radius: 4px;
 }
 
+div.stepper_option_responded {
+    flex : 1;
+    padding : 3px;
+    min-height: 20px;
+    background: #F8D568;
+    border: 1px solid orange;
+    border-radius: 4px;
+}
+
 div.stepper_option_active {
     cursor : pointer;
     flex : 1;
@@ -111,6 +120,10 @@ div.stepper_option_active {
     border: 1px solid #4444AA;
     border-radius: 4px;
 }
+
+div.stepper_option:hover { cursor: pointer }
+div.stepper_option_active:hover { cursor: pointer }
+div.stepper_option_responded:hover { cursor: pointer }
 
 div.tab {
     overflow : hidden;

@@ -22,8 +22,8 @@ sangaku.session_monitor.init_data = function(x) {
 
  var sheet = this.session.problem_sheet;
  var group = this.session.tutorial_group;
- var students = group.students;
- group.students_by_id = {};
+ var students = this.session.students;
+ this.students_by_id = {};
  
  this.h1 = document.createElement('h1');
  this.h1.innerHTML =
@@ -53,38 +53,44 @@ sangaku.session_monitor.init_data = function(x) {
  }
 
  for (var student of students) {
-  group.students_by_id[student.id] = student;
-  student.tr = document.createElement('tr');
-  this.status_table.appendChild(student.tr);
-  student.name_td = document.createElement('td');
-  student.name_td.className = 'student_name';
-  student.name_td.innerHTML =
-   student.forename + ' ' + student.surname
-   + ' (' + student.id + ')';
-  student.tr.appendChild(student.name_td);
-  student.last_seen = 0;
-  student.box = {};
-  for (var item of sheet.bottom_items) {
-   var r = student.item_status_by_id[item.id];
-   var u = Object.create(sangaku.session_monitor.box);
-   student.box[item.id] = u;
-   u.student_id = student.id;
-   u.session_id = this.session.id;
-   u.item_id = item.id;
-   u.create_dom();
-   u.set_data(r);
-   u.set_handlers();
-   student.tr.appendChild(u.td);
-   student.last_seen = Math.max(student.last_seen,u.data.last_access_time);
-  }
-
-  student.tr.style.display =
-   student.last_seen ? 'table-row' : 'none';
+  this.add_student(student);
  }
 
  var me = this;
  setTimeout(function() { me.update(); },me.interval);
 };
+
+sangaku.session_monitor.add_student = function(student) {
+ var sheet = this.session.problem_sheet;
+ this.students_by_id[student.id] = student;
+ student.tr = document.createElement('tr');
+ this.status_table.appendChild(student.tr);
+ student.name_td = document.createElement('td');
+ student.name_td.className = 'student_name';
+ student.name_td.innerHTML =
+  student.forename + ' ' + student.surname
+  + ' (' + student.id + ')';
+ student.tr.appendChild(student.name_td);
+ student.last_seen = 0;
+ student.box = {};
+ for (var item of sheet.bottom_items) {
+  var r = student.item_status_by_id[item.id];
+  var u = Object.create(sangaku.session_monitor.box);
+  student.box[item.id] = u;
+  u.student_id = student.id;
+  u.student_username = student.username;
+  u.session_id = this.session.id;
+  u.item_id = item.id;
+  u.create_dom();
+  u.set_data(r);
+  u.set_handlers();
+  student.tr.appendChild(u.td);
+  student.last_seen = Math.max(student.last_seen,u.data.last_access_time);
+ }
+
+ student.tr.style.display =
+  student.last_seen ? 'table-row' : 'none';
+}
 
 sangaku.session_monitor.box = {
  data : null,
@@ -116,7 +122,14 @@ sangaku.session_monitor.box.create_dom = function() {
 sangaku.session_monitor.box.set_data = function(r) {
  this.data = r;
  var s;
- if (r.latest_report) {
+
+ if (r.last_status_time || r.last_access_time || r.last_response_time || r.has_uploads) {
+  var z = 1;
+ }
+ 
+ if (r.last_response_time > r.last_access_time) {
+  s = sangaku.statuses_by_code['responded'];
+ } else if (r.latest_report) {
   s = sangaku.statuses[r.latest_report.status_id];
  } else {
   s = sangaku.statuses[0];
@@ -142,7 +155,7 @@ sangaku.session_monitor.box.set_handlers = function() {
       '?student_id=' + me.student_id +
       '&session_id=' + me.session_id +
       '&item_id=' + me.item_id;
-  window.open(url);
+  window.open(url,me.student_username);
  };
 
  this.td.onmouseover = function() {
@@ -194,10 +207,17 @@ sangaku.session_monitor.update = function() {
 sangaku.session_monitor.update_data = function(x) {
  var sheet = this.session.problem_sheet;
  var group = this.session.tutorial_group;
- var students = group.students;
+ var students = this.session.students;
 
- for (s of x.tutorial_group.students) {
-  var student = group.students_by_id[s.id];
+ for (s of x.students) {
+  var student;
+  if (s.id in this.students_by_id) {
+   student = this.students_by_id[s.id];
+  } else {
+   this.add_student(s);
+   student = s;
+  }
+  
   student.last_seen = 0;
   
   for (var item of sheet.bottom_items) {

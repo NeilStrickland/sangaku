@@ -161,7 +161,7 @@ sangaku.problem_sheet.create_stepper = function(item) {
  for (var i in sangaku.question_item.statuses) {
   var y = sangaku.question_item.statuses[i];
   var d = document.createElement('div');
-  d.className = 'stepper_option';
+  d.className = (y.code == 'responded') ? 'stepper_option_responded' : 'stepper_option';
   d.innerHTML = y.text;
   d.style.display = (i == 0) ? 'block' : 'none';
   d.peer = y;
@@ -185,8 +185,13 @@ sangaku.problem_sheet.stepper.handle_mouseover = function(i) {
 
  for (j in this.option_divs) {
   var d = this.option_divs[j];
-  d.className = (d.peer.id == i) ? 'stepper_option_active' : 'stepper_option';
-  d.style.display = 'block';
+  if (d.peer.code == 'responded') {
+   d.className = (d.peer.id == i) ? 'stepper_option_active' : 'stepper_option_responded';
+   d.style.display = (d.peer.id == i) ? 'block' : 'none';
+  } else {
+   d.className = (d.peer.id == i) ? 'stepper_option_active' : 'stepper_option';
+   d.style.display = 'block';
+  }
  }
 };
 
@@ -337,6 +342,13 @@ sangaku.session.munch = function(x) {
  if (x.teacher) {
   this.teacher = sangaku.teacher.scrunch(x.teacher);
  }
+
+ if (x.students) {
+  this.students = [];
+  for (s of x.students) {
+   this.students.push(sangaku.student.scrunch(s));
+  }
+ }
 };
 
 sangaku.session.get_data_for_student = function(student_id) {
@@ -444,7 +456,7 @@ sangaku.student.munch = function(x) {
  }
 
  if ('item_status_by_id' in x) {
-  this.item_status_by_id = x;
+  this.item_status_by_id = x.item_status_by_id;
  }
 };
 

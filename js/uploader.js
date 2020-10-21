@@ -473,15 +473,23 @@ sangaku.create_upload_block =
   return u;
  };
 
-sangaku.upload_block.toggle = function() {
- if (this.state == 'closed') {
-  this.state = 'open';
-  this.button_div.innerHTML = 'Hide';
-  this.panel_div.style.display = 'block';
- } else {
+sangaku.upload_block.open = function() {
+ this.state = 'open';
+ this.button_div.innerHTML = 'Hide';
+ this.panel_div.style.display = 'block';
+}
+
+sangaku.upload_block.close = function() {
   this.state = 'closed';
   this.button_div.innerHTML = 'Show my work to the teacher';
   this.panel_div.style.display = 'none';  
+}
+
+sangaku.upload_block.toggle = function() {
+ if (this.state == 'closed') {
+  this.open();
+ } else {
+  this.close();
  }
 };
 

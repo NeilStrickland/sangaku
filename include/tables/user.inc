@@ -85,13 +85,16 @@ class user extends frog_object {
   $this->status_reports = $sangaku->load_where('status_reports',$w);
   $this->uploads = $sangaku->load_where('uploads',$w);
   $this->last_seen = 0;
+  $this->last_response_time = 0;
   foreach($this->status_reports as $x) {
    $t = strtotime($x->timestamp);
    $this->last_seen = max($this->last_seen,$t);
   }
   foreach($this->uploads as $x) {
-   if (! $x->is_response) {
-    $t = strtotime($x->timestamp);
+   $t = strtotime($x->timestamp);
+   if ($x->teacher_id) {
+    $this->last_response_time = max($this->last_response_time,$t);    
+   } else {
     $this->last_seen = max($this->last_seen,$t);
    }
   }
@@ -365,7 +368,7 @@ class student_item_status {
   $this->uploads[] = $x;
   $this->has_uploads = true;
 
-  if ($x->is_response) {
+  if ($x->teacher_id) {
     $this->last_response_time = max($this->last_response_time,$t);
   } else {
    $this->last_upload_time = max($this->last_upload_time,$t);

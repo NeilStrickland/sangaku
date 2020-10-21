@@ -70,6 +70,7 @@ sangaku.tutor_sheet_viewer.init_data = function(x,item_id) {
    item.uploads_by_id = {};
    item.latest_report = null;
    item.latest_status = sangaku.statuses[0];
+   item.notify = false;
   }
  }
  
@@ -294,6 +295,7 @@ sangaku.tutor_sheet_viewer.update_data = function(x) {
    if (Date.parse(u0.timestamp) > Date.parse(u1.timestamp)) {
     item.modified_uploads.push(u0);
     if (u0.teacher_id) {
+     item.notify = true;
      item.notify_uploads.push(u0);
     }
    }
@@ -301,6 +303,7 @@ sangaku.tutor_sheet_viewer.update_data = function(x) {
    item.new_uploads.push(u0);
    u0.seen = true;
    if (u0.teacher_id) {
+    item.notify = true;
     item.notify_uploads.push(u0);
    }
   }
@@ -321,6 +324,11 @@ sangaku.tutor_sheet_viewer.update_data = function(x) {
    }
   }
 
+  if (item.notify) {
+   this.latest_status = sangaku.statuses[7];
+   this.status_div.innerHTML = this.latest_status.icon;
+  }
+  
   item.work_icon_div.style.visibility =
    item.uploads.length ? 'visible' : 'hidden';
  }

@@ -162,13 +162,43 @@ class session extends frog_object {
  }
  
  function load_associated() {
+  global $sangaku;
+  
   $p = $this->load_link('problem_sheet');
   $g = $this->load_link('tutorial_group');
   $p->load_question_items();
   $g->load_students();
   $g->load_teachers();
 
-  foreach($g->students as $s) {
+  $this->students = make_index($g->students,'id');
+
+  $q = <<<SQL
+SELECT DISTINCT y.id FROM ((
+ SELECT x.student_id AS id
+ FROM tbl_tutorial_group_students x 
+ WHERE x.tutorial_group_id={$g->id}
+) UNION (
+ SELECT x.student_id AS id
+ FROM tbl_status_reports x 
+ WHERE x.session_id={$this->id}
+) UNION (
+ SELECT x.student_id AS id
+ FROM tbl_uploads x 
+ WHERE x.session_id={$this->id}
+) ) y
+
+SQL
+     ;
+
+  $ss = $sangaku->get_all($q);
+  foreach($ss as $s0) {
+   if (! isset($this->students[$s0->id])) {
+    $s = $sangaku->load('user',$s0->id);
+    $this->students[$s->id] = $s;
+   }
+  }
+  
+  foreach($this->students as $s) {
    $s->load_status($this);
   }
 
@@ -269,6 +299,15 @@ HTML
 
   if (isset($this->tutorial_group)) {
    $x->tutorial_group = $this->tutorial_group->for_session_json();
+   $x->tutorial_group->students = array();
+  }
+
+  if (isset($this->students)) {
+   $x->students = array();
+
+   foreach($this->students as $s) {
+    $x->students[] = $s->for_session_json();
+   }
   }
   
   return ($x);

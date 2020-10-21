@@ -11,9 +11,5 @@ if (! $session) {
 
 $session->load_associated();
 
-foreach($session->tutorial_group->students as $s) {
- $s->load_status($session);
-}
-
 echo $session->to_json();
 

@@ -3,6 +3,12 @@ sangaku.sheet_viewer = {
  interval : 5000 // update inteval in milliseconds  
 };
 
+// This function loads information about the session and student
+// from the page ajax/get_session_student.php.  More precisely,
+// this function returns immediately but sets things up via promises 
+// to ensure that the functions sangaku.session.scrunch() and then
+// sangaku.sheet_viewer.init_data() will be called to process the
+// information when it is received from the server.
 sangaku.sheet_viewer.init = function(session_id,student_id) {
  var me = this;
  
@@ -18,6 +24,10 @@ sangaku.sheet_viewer.init = function(session_id,student_id) {
  )
 };
 
+// Here x will be an instance of sangaku.session constructed in such
+// a way that x.student, x.problem_sheet and x.session are instances
+// of sangaku.student, sangaku.problem_sheet and sangaku.session,
+// respectively.
 sangaku.sheet_viewer.init_data = function(x) {
  this.session = x;
  this.student = x.student;
@@ -33,28 +43,42 @@ sangaku.sheet_viewer.init_data = function(x) {
  document.body.appendChild(this.h1);
  MathJax.typeset([this.h1]);
 
+ // If the session has not started yet, this div will show a countdown
+ // to the start time.  The main div with the questions will be hidden
+ // until then.
  this.countdown_div = document.createElement('div');
  this.countdown_div.className = 'countdown';
  this.countdown_div.style.display = 'none';
  document.body.appendChild(this.countdown_div);
- 
+
+ // The main div with the questions etc
  this.sheet_div = document.createElement('div');
  this.sheet_div.style.display = 'none';
  document.body.appendChild(this.sheet_div);
- 
+
+ // Introduction to the problem sheet
  this.intro_div = document.createElement('div');
  this.intro_div.className = 'sheet_intro';
  this.intro_div.innerHTML = this.problem_sheet.intro;
  this.sheet_div.appendChild(this.intro_div);
  MathJax.typeset([this.intro_div]);
- 
+
+ // The system is that question items may have subitems or they may
+ // have things that directly require student response but not both.
+ // The bottom_items array contains the items with no subitems.
  this.question_items = [];
  this.question_items_by_id = {};
  this.bottom_items = [];
  this.bottom_items_by_id = {};
 
+ // The stage is an index for the bottom_items array.  It points to
+ // the latest bottom item that is expanded.  
  var stage = 0;
- 
+
+ // The entries in this.problem_sheet.question_items are instances of
+ // sangaku.question_item.  We promote them to instances of
+ // sangaku.sheet_viewer.question_item before putting them in
+ // this.question_items and similar arrays.
  for (item0 of this.problem_sheet.question_items) {
   var item = this.question_item.create(item0);
   item.session_id = this.session.id;
@@ -75,6 +99,9 @@ sangaku.sheet_viewer.init_data = function(x) {
   }
  }
 
+ // The server sends the full list of status reports for each question
+ // item.  This is a bit redundant; it should probably be refactored
+ // so that we only send the latest report.
  for (var r of this.student.status_reports) {
   var item = this.bottom_items_by_id[r.item_id];
   item.status_reports.push(r);
@@ -94,29 +121,76 @@ sangaku.sheet_viewer.init_data = function(x) {
   }
  }
 
+ this.check_responded();
+
+ for(item of this.bottom_items) {
+  if (item.uploads) {
+   item.upload_block.open();
+  }
+ }
+ 
+ // We need to create some space at the bottom, to avoid various
+ // pathologies.  There is a doubtless a better solution using
+ // CSS styles without adding a spurious div.
  this.bottom_spacer = document.createElement('div');
  this.bottom_spacer.innerHTML = '&nbsp;';
  this.bottom_spacer.style['min-height'] = '50px';
  this.sheet_div.appendChild(this.bottom_spacer);
 
+ // This div is used to display a notification to the student whenever
+ // a teacher uploads a response to something that they have done.
  this.notifier = document.createElement('div');
  this.notifier.className = 'notifier';
  document.body.appendChild(this.notifier);
  this.notify_items = [];
- 
+
+ // The above code set the local variable stage to correspond to the
+ // last item that has an associated status report or upload.  We now
+ // record this local variable as a property, and adjust the DOM
+ // accordingly.
  this.set_stage(stage);
 
  var me = this;
- this.notifier.onclick = function() {
-  me.clear_notifier();
- };
+ // Make the notification go away when clicked.
+ this.notifier.onclick = function() { me.clear_notifier(); };
+
+ // Update the data after a five seconds (or the time specified by
+ // this.interval, if that has been changed from five seconds).
  setTimeout(function() { me.update(); },me.interval);
 
+ // This will start the countdown if the session has not started yet,
+ // or display the questions if it has started.
  this.countdown();
 };
 
+sangaku.sheet_viewer.check_responded = function() {
+ for (item of this.bottom_items) {
+  item.last_access_time = 0;
+  item.last_response_time = 0;
+  if (item.latest_report) {
+   item.last_access_time = Date.parse(item.latest_report.timestamp);
+  }
+
+  for (u of item.uploads) {
+   var t = Date.parse(u.timestamp);
+   if (u.teacher_id) {
+    item.last_response_time = Math.max(item.last_response_time,t);
+   } else {
+    item.last_access_time = Math.max(item.last_access_time,t);
+   }
+  }
+
+  if (item.last_response_time > item.last_access_time) {
+   item.stepper.set_responded();
+  }
+ }
+}
+
 sangaku.sheet_viewer.question_item = {};
 
+// This promotes an instance of sangaku.question_item to an instance of
+// sangaku.sheet_viewer.question_item.  The point is that the latter
+// has methods for manipulating the DOM, whereas the former does not.
 sangaku.sheet_viewer.question_item.create = function(item) {
  var x = Object.create(this);
  Object.assign(x,item);
@@ -127,6 +201,10 @@ sangaku.sheet_viewer.question_item.create = function(item) {
  return x;
 };
 
+// Attached to each bottom level question item we will have an
+// instance of sangaku.sheet_viewer.stepper.  This encapsulates the
+// menu of possible statuses ("I am working on this" etc) and the
+// associated DOM elements and event handlers.
 sangaku.sheet_viewer.stepper = {};
 
 sangaku.sheet_viewer.question_item.create_stepper = function(viewer) {
@@ -145,7 +223,8 @@ sangaku.sheet_viewer.question_item.create_stepper = function(viewer) {
  x.container_div.className = 'stepper_container';
  this.control_div.appendChild(x.container_div);
 
- x.container_div.onmouseout = function() { x.handle_mouseout(); };
+ x.container_div.onmouseenter = function() { x.handle_mouseenter(); };
+ x.container_div.onmouseout   = function() { x.handle_mouseout(); };
  
  x.option_divs = [];
  
@@ -169,20 +248,64 @@ sangaku.sheet_viewer.stepper.set_handlers = function(d) {
  var i = d.peer.id;
  var me = this;
  
- d.onmouseover = function() { me.handle_mouseover(i); }
+ d.onmouseenter = function() { me.handle_status_mouseenter(i); }
  d.onclick = function() { me.handle_click(i); }
 };
 
-sangaku.sheet_viewer.stepper.handle_mouseover = function(i) {
+// Normally, only a div showing the current status is visible.
+// When the mouse enters this, we expand the full menu of
+// possible statuses.  There is special logic for the last
+// possible status, indicating that a teacher has responded
+// to the student.  Students do not select this status directly,
+// it gets set automatically in appropriate circumstances.
+sangaku.sheet_viewer.stepper.handle_mouseenter = function() {
  this.menu_open = true;
 
  for (j in this.option_divs) {
   var d = this.option_divs[j];
-  d.className = (d.peer.id == i) ? 'stepper_option_active' : 'stepper_option';
-  d.style.display = 'block';
+  if (d.peer.code == 'responded') {
+   d.className = 'stepper_option_responded';
+   if (d.peer.id == this.status_id) {
+    d.style.display = 'block';
+   } else {
+    d.style.display = 'none';
+   }
+  } else {
+   if (d.peer.id == this.status_id) {
+    d.className = 'stepper_option_active';
+   } else {
+    d.className = 'stepper_option';
+   }
+   d.style.display = 'block';
+  }
  }
 };
 
+// This should probably be deleted and the same effect produced
+// using CSS :hover selectors.
+sangaku.sheet_viewer.stepper.handle_status_mouseenter = function(i) {
+ for (j in this.option_divs) {
+  var d = this.option_divs[j];
+  if (d.peer.code == 'responded') {
+   d.className = 'stepper_option_responded';
+   if (d.peer.id == this.status_id) {
+    d.style.display = 'block';
+   } else {
+    d.style.display = 'none';
+   }
+  } else {
+   if (d.peer.id == i) {   
+    d.className = 'stepper_option_active';
+   } else {
+    d.className = 'stepper_option';
+   }
+   d.style.display = 'block';
+  }
+ }
+};
+
+// When we set the item status, we rotate the other possible statuses
+// cyclically so that the selected status appears at the top of the list.
 sangaku.sheet_viewer.stepper.set_status_id = function(i) {
  this.menu_open = false;
 
@@ -192,7 +315,7 @@ sangaku.sheet_viewer.stepper.set_status_id = function(i) {
  
  for (j in this.option_divs) {
   var d = this.option_divs[j];
-  d.className = 'stepper_option'
+  d.className = d.peer.code == 'responded' ? 'stepper_option_responded' : 'stepper_option';
 
   if (found) {
    d.style.display = 'none';
@@ -212,6 +335,14 @@ sangaku.sheet_viewer.stepper.set_status_id = function(i) {
  }
 };
 
+// Set the status to indicate that a teacher has responded
+sangaku.sheet_viewer.stepper.set_responded = function() {
+ this.set_status_id(7);
+};
+
+// This method sets the status of an item, informs the server of the new
+// status, and advances to the next question if the new status indicates
+// that that is required.
 sangaku.sheet_viewer.stepper.handle_click = function(i) {
  this.menu_open = false;
 
@@ -226,16 +357,22 @@ sangaku.sheet_viewer.stepper.handle_click = function(i) {
      '&student_id=' + this.student_id +
      '&status_id=' + i;
 
- fetch(url);
+ fetch(url).then(response => console.log(response));
 };
 
-
+// If the mouse leaves the status menu then we hide it and just display
+// the current status.
 sangaku.sheet_viewer.stepper.handle_mouseout = function() {
  this.menu_open = false;
 
  for (j in this.option_divs) {
   var d = this.option_divs[j];
-  d.className = 'stepper_option'
+  if (d.peer.code == 'responded') {
+   d.className = 'stepper_option_responded';
+  } else {
+   d.className = 'stepper_option';
+  }
+
   if (d.peer.id == this.status.id) {
    d.style.display = 'block';
   } else {
@@ -243,6 +380,7 @@ sangaku.sheet_viewer.stepper.handle_mouseout = function() {
   }
  }
 };
+
 
 sangaku.sheet_viewer.question_item.add_upload = function(u) {
  this.uploads.push(u);
@@ -381,8 +519,9 @@ sangaku.sheet_viewer.update_data = function(x) {
  for (var r of x.student.status_reports) {
   var item = this.bottom_items_by_id[r.item_id];
   this.new_stage = Math.max(this.new_stage,item.bottom_index);
-  if (! item.latest_report || r.timestamp > item.latest_report.timestamp) {
+  if (! item.latest_report || Date.parse(r.timestamp) > Date.parse(item.latest_report.timestamp)) {
    item.new_report = r;
+   item.latest_report = r;
   }
  }
 
@@ -447,6 +586,8 @@ sangaku.sheet_viewer.update_data = function(x) {
   this.notifier.innerHTML = '';
   this.notifier.style.display = 'none';
  }
+
+ this.check_responded();
 };
 
 sangaku.sheet_viewer.clear_notifier = function() {
