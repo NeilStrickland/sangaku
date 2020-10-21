@@ -482,9 +482,13 @@ sangaku.upload.url = function() {
 sangaku.upload.create_dom = function() {
  var me = this;
  
+ var t = this.mime_type;
+ this.is_image = t && t.length >= 6 && t.substring(0,6) == 'image/';
+ 
  this.div = document.createElement('div');
  this.div.className = 'review';
  var c = document.createElement('div');
+ c.className = 'upload_content';
  this.content_div = c;
  this.div.appendChild(this.content_div);
 
@@ -507,6 +511,24 @@ sangaku.upload.create_dom = function() {
  this.buttons_div = document.createElement('div');
  this.buttons_div.className = 'upload_buttons';
  l.appendChild(this.buttons_div);
+
+ if (this.is_image) {
+  this.rot = 0;
+
+  this.rot_left_button = document.createElement('button');
+  this.rot_left_button.type = 'button';
+  this.rot_left_button.className = 'rot_button';
+  this.rot_left_button.innerHTML = "\u27f2";
+  this.rot_left_button.onclick = function() { me.rotate(1); };
+  this.buttons_div.appendChild(this.rot_left_button);
+
+  this.rot_right_button = document.createElement('button');
+  this.rot_right_button.type = 'button';
+  this.rot_right_button.className = 'rot_button';
+  this.rot_right_button.innerHTML = "\u27f3";
+  this.rot_right_button.onclick = function() { me.rotate(-1); };
+  this.buttons_div.appendChild(this.rot_right_button);
+ }
  
  this.delete_button = document.createElement('button');
  this.delete_button.className = 'upload_delete';
@@ -522,14 +544,19 @@ sangaku.upload.create_dom = function() {
  this.edit_button.innerHTML = 'Edit';
  this.buttons_div.appendChild(this.edit_button);
  
- var t = this.mime_type;
- if (t && t.length >= 6 && t.substring(0,6) == 'image/') {
+ if (this.is_image) {
   var img = document.createElement('img');
   img.className = 'upload';
-  img.src = this.url();
+  img.onload = function() {
+   var r = img.getBoundingClientRect();
+   me.img_w = r.width;
+   me.img_h = r.height;
+   me.content_div.style['min-height'] = (me.img_h + 30) + 'px';
+  };
+  
   this.img = img;
-  this.img.style.width = '640px';
   this.content_div.appendChild(img);
+  img.src = this.url();
  } else if (t == 'text/html') {
   fetch(this.url()).then(
    x => x.text()
@@ -571,6 +598,28 @@ sangaku.upload.create_dom = function() {
 
  return this.div;
 };
+
+sangaku.upload.rotate = function(x) {
+ if (! ('img_w' in this)) {
+  var i = this.img;
+  var r = i.getBoundingClientRect();
+  this.img_w = r.width;
+  this.img_h = r.height;
+ }
+
+ this.rot += x;
+ var angle = 90 * this.rot;
+ var t = 'rotate(' + angle + 'deg)';
+ this.img.style.transform = t;
+ if (this.rot % 2) {
+  this.content_div.style['min-height'] = this.img_w + 'px';
+  var z = (this.img_w - this.img_h)/2;
+  this.img.style.top = z + 'px';
+ } else {
+  this.content_div.style['min-height'] = this.img_h + 'px';
+  this.img.style.top = '0px';
+ }
+}
 
 sangaku.upload.update_dom = function() {
  var t = this.mime_type;

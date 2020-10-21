@@ -89,6 +89,52 @@ div.upload_block_button:hover {
     background: #44AA44;
 }
 
+div.upload_content {
+    position: relative;
+}
+
+img.upload {
+    position: absolute;
+    top: 0px;
+    width: 640px;
+}
+
+div.upload_label {
+    width : 98%;
+    margin: 2px;
+    padding-left: 3px;
+    padding-right: 5px;
+    padding-bottom: 3px;
+    border: 1px solid blue;
+    border-radius: 3px;
+    position: relative;
+}
+
+div.upload_time_label {
+    display : inline-block;
+    padding-right: 4px;
+}
+
+div.upload_teacher_label {
+    display : inline-block;
+}
+
+div.upload_buttons {
+    display : inline-block;
+    position: absolute;
+    right: 5px;
+}
+
+button.rot_button {
+    font-size: 100%;
+    padding: 0px;
+    margin-top: 0px;
+    margin-bottom: 0px;
+    margin-left: 2px;
+    margin-right: 2px;
+}
+
+
 div.stepper_container {
     flex : 1;
 }
@@ -210,30 +256,6 @@ div.item_review_status {
 
 div.item_review_work_icon {
     display: inline-block;
-    position: absolute;
-    right: 5px;
-}
-
-div.upload_label {
-    width : 98%;
-    margin: 2px;
-    padding: 3px;
-    border: 1px solid blue;
-    border-radius: 3px;
-    position: relative;
-}
-
-div.upload_time_label {
-    display : inline-block;
-    padding-right: 4px;
-}
-
-div.upload_teacher_label {
-    display : inline-block;
-}
-
-div.upload_buttons {
-    display : inline-block;
     position: absolute;
     right: 5px;
 }
