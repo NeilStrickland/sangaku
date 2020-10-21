@@ -364,7 +364,7 @@ HTML
   $N = $sangaku->nav;
   $H = $sangaku->html;
 
-  $N->header('Sessions');
+  $N->header('Sessions',array('widgets' => array('mathjax')));
   $s = $this->object;
   $s->load();
   $s->load_sessions();
@@ -391,12 +391,17 @@ HTML
 
   echo $H->edged_table_start();
   echo $H->spacer_row(30,60,180,60);
-  echo $H->row('id','Group','Time','');
+  echo $H->row('id','Group','Time','','Confirm');
   foreach($s->sessions as $x) {
    echo $H->tr($H->td($x->id) .
                $H->td($x->tutorial_group_name) .
                $H->td($x->friendly_start_time()) .
-               $H->link_td('Monitor','/sangaku/session_monitor.php?session_id=' . $x->id));
+               $H->link_td('Monitor','/sangaku/session_monitor.php?session_id=' . $x->id) .
+               $H->td($H->checkbox('session_confirmed_' . $x->id,$x->is_confirmed,
+                                   array(
+                                    'id' => 'session_confirmed_' . $x->id,
+                                    'onclick' => "sangaku.toggle_session_confirmed({$x->id})")))
+   );
   }
   
   echo $H->edged_table_end();

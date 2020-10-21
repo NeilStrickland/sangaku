@@ -150,13 +150,13 @@ function sessions_tab($params) {
 HTML
 ;
    echo $H->edged_table_start();
-   echo $H->spacer_row(60,300,120,60);
+   echo $H->spacer_row(60,300,120,60,30);
     
    for ($j = 0; $j <= 12; $j++) {
     if ($m->sessions_by_week[$i][$j]) {
      echo <<<HTML
  <tr>
-  <td colspan="4" style="font-weight:bold; text-align:center; background: #888888;">Week $j</td>
+  <td colspan="5" style="font-weight:bold; text-align:center; background: #888888;">Week $j</td>
  </tr>
 
 HTML
@@ -166,7 +166,13 @@ HTML
       echo $H->tr($H->td($s->tutorial_group_name) . 
                   $H->td($s->problem_sheet_title) .
                   $H->td(date('D j/n H:i',$s->start_timestamp)) .
-                  $H->link_td("Monitor",$url));
+                  $H->link_td("Monitor",$url) . 
+                  $H->td($H->checkbox(
+                   'session_confirmed_' . $s->id,$s->is_confirmed,
+                   array(
+                    'id' => 'session_confirmed_' . $s->id,
+                    'onclick' => "sangaku.toggle_session_confirmed({$s->id})")))
+      );
      }
     }
    }
