@@ -350,4 +350,15 @@ button.running.session.approved {
     border: 2px solid #000000;
 }
 
-
+textarea.temp {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 2em;
+    height: 2em;
+    padding: 0;
+    border: none;
+    outline: none;
+    boxShadow: none;
+    background: transparent;
+}
