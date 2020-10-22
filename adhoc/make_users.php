@@ -258,6 +258,6 @@ foreach($students as $s0) {
   $s->username = $s0[2];
   $s->save();
 
-  $m = $sangaku->new_object('tutorial_group_student')
+  $m = $sangaku->new_object('tutorial_group_student');
  }
 }
