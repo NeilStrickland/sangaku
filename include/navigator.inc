@@ -22,7 +22,20 @@ class sangaku_navigator extends frog_navigator {
   $this->standard_body_scripts = array(
    'autosuggest_setup'
   );
-  
+
+  $this->available_widgets['mathjax'] = <<<HTML
+  <script>
+   MathJax = { 
+    loader: {load: ['[tex]/color']},
+    tex: { packages: {'[+]': ['color']},
+           inlineMath : [['$','$'],['\\\\(','\\\\)']] }
+   };
+  </script>
+  <script id="MathJax-script" async
+          src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+HTML
+                                      ;
  }
 
  function request_login_page($params = null) {
