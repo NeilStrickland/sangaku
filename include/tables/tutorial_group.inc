@@ -354,3 +354,4 @@ class tutorial_group extends frog_object {
   return json_encode($this->for_session_json());
  }
 }
+
