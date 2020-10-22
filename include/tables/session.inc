@@ -282,7 +282,7 @@ HTML
   }
  }
  
- function for_json() {
+ function for_json($with_solutions = false) {
   $x = new stdClass();
   $x->id = $this->id;
   $x->problem_sheet_id = $this->problem_sheet_id;
@@ -294,7 +294,7 @@ HTML
   $x->duration        = $this->duration;
   
   if (isset($this->problem_sheet)) {
-   $x->problem_sheet = $this->problem_sheet->for_json();
+   $x->problem_sheet = $this->problem_sheet->for_json($with_solutions);
   }
 
   if (isset($this->tutorial_group)) {

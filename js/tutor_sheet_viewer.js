@@ -190,7 +190,7 @@ sangaku.tutor_sheet_viewer.question_item.create_dom = function(viewer) {
  if (this.solution) {
   this.solution_div = document.createElement('div');
   this.solution_div.className = 'item_review_solution';
-  this.solution_div.innerHTML = this.solution;
+  this.solution_div.innerHTML = '<b>Solution:</b> ' + this.solution;
   this.body_div.appendChild(this.solution_div);
  }
  

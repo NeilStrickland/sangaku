@@ -14,12 +14,14 @@ $session->load_link('problem_sheet');
 $session->load_link('tutorial_group');
 $session->problem_sheet->load_question_items();
 $student->load_status($session);
- 
-$x = $session->for_json();
-$x->student = $student->for_json();
 
 if ($user->status == 'teacher') {
+ $x = $session->for_json(true);
+ $x->student = $student->for_json();
  $x->teacher = $user->for_json();
+} else {
+ $x = $session->for_json();
+ $x->student = $student->for_json();
 }
 
 echo json_encode($x);

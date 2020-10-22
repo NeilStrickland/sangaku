@@ -260,6 +260,9 @@ div.item_review_work_icon {
     right: 5px;
 }
 
+div.item_review_solution {
+    background: #CCDDFF
+}
 div.notifier {
     display : none;
     position : fixed;
