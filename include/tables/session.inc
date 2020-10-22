@@ -309,7 +309,9 @@ HTML
     $x->students[] = $s->for_session_json();
    }
   }
-  
+
+  $x->has_snapshots = isset($this->snapshots) && $this->snapshots;
+
   return ($x);
  }
 

@@ -320,7 +320,7 @@ sangaku.session.munch = function(x) {
  for (var k of ['id','problem_sheet_id','tutorial_group_id',
                 'start_time','end_time',
                 'start_timestamp','end_timestamp',
-                'duration']) {
+                'duration','has_snapshots']) {
   if (k in x) { this[k] = x[k]; }
  }
 
@@ -343,10 +343,17 @@ sangaku.session.munch = function(x) {
   this.teacher = sangaku.teacher.scrunch(x.teacher);
  }
 
- if (x.students) {
+ if ('students' in x) {
   this.students = [];
   for (s of x.students) {
    this.students.push(sangaku.student.scrunch(s));
+  }
+ }
+
+ if ('snapshots' in x) {
+  this.snapshots = [];
+  for (s of x.snapshots) {
+   this.snapshots.push(sangaku.snapshot.scrunch(s));
   }
  }
 };

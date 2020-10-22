@@ -13,6 +13,7 @@ if (! ($session && $student)) {
 $session->load_link('problem_sheet');
 $session->load_link('tutorial_group');
 $session->problem_sheet->load_question_items();
+$session->load_snapshots();
 $student->load_status($session);
 
 if ($user->status == 'teacher') {

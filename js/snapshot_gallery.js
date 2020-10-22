@@ -4,7 +4,6 @@ sangaku.snapshot_gallery.init = function(session_id) {
  var me = this;
 
  var m = document.getElementById('main_div');
-// m.removeChild(m.children[0]);
  
  this.snapshots = [];
  this.snapshots_by_id = {};
@@ -31,7 +30,7 @@ sangaku.snapshot_gallery.load_snapshots = function() {
   x => me.load_snapshots_data(x)
  );
 
-// setTimeout(function() { me.load_snapshots(); },5000 );
+ setTimeout(function() { me.load_snapshots(); },5000 );
 }; 
 
 sangaku.snapshot_gallery.load_snapshots_data = function(ss) {

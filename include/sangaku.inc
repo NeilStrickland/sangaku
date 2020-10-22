@@ -65,8 +65,11 @@ $sangaku->auth = new sangaku_auth($sangaku);
                           
 $f = $_SERVER['PHP_SELF'];
 
+global $allow_bot;
+
 if (! ($f == '/sangaku/login.php' ||
-       $f == '/sangaku/logout.php')) {
+       $f == '/sangaku/logout.php' ||
+       $allow_bot)) {
  $sangaku->auth->require_login();
 }
 

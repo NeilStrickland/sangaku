@@ -29,6 +29,8 @@ sangaku.sheet_viewer.init = function(session_id,student_id) {
 // of sangaku.student, sangaku.problem_sheet and sangaku.session,
 // respectively.
 sangaku.sheet_viewer.init_data = function(x) {
+ var me = this;
+ 
  this.session = x;
  this.student = x.student;
  this.problem_sheet = x.problem_sheet;
@@ -56,6 +58,18 @@ sangaku.sheet_viewer.init_data = function(x) {
  this.sheet_div.style.display = 'none';
  document.body.appendChild(this.sheet_div);
 
+ // Button to show visualiser snapshots
+ this.snapshots_button = document.createElement('button');
+ this.snapshots_button.className = 'snapshots';
+ this.snapshots_button.innerHTML = 'Show visualiser snapshots';
+ this.snapshots_button.onclick = function() {
+  window.open('/sangaku/show_snapshots.php?session_id=' + me.session.id,
+	      'snapshots_' + me.session.id);
+ }
+ this.snapshots_button.style.display =
+  this.session.has_snapshots ? 'block' : 'none';
+ this.sheet_div.appendChild(this.snapshots_button);
+ 
  // Introduction to the problem sheet
  this.intro_div = document.createElement('div');
  this.intro_div.className = 'sheet_intro';
@@ -507,6 +521,11 @@ sangaku.sheet_viewer.update = function() {
 
 sangaku.sheet_viewer.update_data = function(x) {
  this.new_stage = this.stage;
+
+ if (y.has_snapshots) {
+  this.session.has_snapshots = 1;
+  this.snapshots_button.style.display = 'block';
+ }
  
  for (var item of this.bottom_items) {
   item.new_report = null;
