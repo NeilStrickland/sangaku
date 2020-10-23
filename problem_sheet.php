@@ -34,15 +34,14 @@ function show_questions_page($params) {
  global $sangaku;
  
  $b = $sangaku->nav->top_menu();
- 
+ $m = $sangaku->nav->mathjax_script();
+
  echo <<<HTML
 <!DOCTYPE html>
 <html>
  <head>
   <meta charset="UTF-8">
-  <script>MathJax = { tex : { inlineMath : [['$','$'],['\\\\(','\\\\)']] }};</script>
-  <script id="MathJax-script" async
-          src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+$m
   <script src="js/ckeditor/ckeditor.js"></script>
   <script src="js/qrcodejs/qrcode.min.js"></script>
   <script src="js/frog.js"></script>

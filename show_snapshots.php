@@ -8,6 +8,7 @@ if (! $session) { exit; }
 
 $N = $sangaku->nav;
 $H = $sangaku->html;
+$m = $N->mathjax_script();
 
 echo <<<HTML
 <!DOCTYPE HTML>
@@ -22,9 +23,7 @@ echo <<<HTML
 <style type="text/css" media="screen">
   @import url(/sangaku/css/sangaku.css?1602508506);
 </style>
-  <script>MathJax = { tex : { inlineMath : [['$','$'],['\\(','\\)']] }};</script>
-  <script id="MathJax-script" async
-          src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+$m
 <script type="text/javascript" src="/sangaku/js/snapshot_gallery.js?1602489216"></script>
 <style type="text/css" media="screen">
   @import url(/sangaku/css/snapshot_gallery.css?1602488992);

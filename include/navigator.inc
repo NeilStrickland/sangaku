@@ -23,7 +23,11 @@ class sangaku_navigator extends frog_navigator {
    'autosuggest_setup'
   );
 
-  $this->available_widgets['mathjax'] = <<<HTML
+  $this->available_widgets['mathjax'] = $this->mathjax_script();
+ }
+
+ function mathjax_script() {
+  return <<<HTML
   <script>
    MathJax = { 
     loader: {load: ['[tex]/color']},
@@ -35,7 +39,7 @@ class sangaku_navigator extends frog_navigator {
           src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
 HTML
-                                      ;
+   ;
  }
 
  function request_login_page($params = null) {

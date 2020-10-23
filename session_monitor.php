@@ -27,6 +27,7 @@ function show_status_page($session) {
  global $sangaku;
  
  $b = $sangaku->nav->top_session_menu($session->id);
+ $m = $sangaku->nav->mathjax_script();
  $u = 'https://' . $_SERVER['HTTP_HOST'] . '/sangaku/' . $session->id;
     
   echo <<<HTML
@@ -34,10 +35,7 @@ function show_status_page($session) {
 <html>
  <head>
   <meta charset="UTF-8">
-  <script>MathJax = { tex : { inlineMath : [['$','$'],['\\\\(','\\\\)']] }};</script>
-  <script id="MathJax-script" async
-          src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-  <script src="js/ckeditor/ckeditor.js"></script>
+$m
   <script src="js/qrcodejs/qrcode.min.js"></script>
   <script src="js/frog.js"></script>
   <script src="js/objects_auto.js"></script>
