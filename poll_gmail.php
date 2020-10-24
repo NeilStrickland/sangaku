@@ -7,15 +7,25 @@ $f = $sangaku->data_dir . '/imap_cred.json';
 if (! file_exists($f)) { exit; }
 $imap_cred = json_decode(file_get_contents($f));
 if (! $imap_cred && isset($imap_cred->username) && isset($imap_cred->password)) { exit; }
-                         
+
+echo "Connecting to GMail<br/>";
+
 $imap = imap_open(
  '{imap.gmail.com:993/imap/ssl}INBOX',
  $imap_cred->username,
  $imap_cred->password
 );
-if (! $imap) { exit; }
+
+if (! $imap) {
+ echo "Failed<br/>"; exit;
+ exit;
+}
+
+echo "Searching messages<br/>";
 
 $ids = imap_search($imap, 'SUBJECT "Sangaku"');
+
+echo "" . count($ids) . " results<br/>";
 
 foreach($ids as $id) {
  handle_message($imap,$id);
@@ -57,13 +67,15 @@ function handle_message($imap,$id) {
   }
  }
 
- $ok = find_user($x) &&
-       find_question_item($x) &&
-       create_temp_file($x) &&
-       add_upload($x);
- delete_email($x);
+ var_dump($x);
+ 
+ // $ok = find_user($x) &&
+ //       find_question_item($x) &&
+ //       create_temp_file($x) &&
+ //       add_upload($x);
+ // delete_email($x);
 
- return $ok;
+ // return $ok;
 }
 
 function find_user($x) {
@@ -106,7 +118,7 @@ function find_question_item($x) {
   // UNFINISHED
   
   foreach($sessions as $s) {
-   $right_group = ($s->tutorial_group_id == 
+   $right_group = ($s->tutorial_group_id == 0);
   }
  } else {
   $x->user->load_sessions();
