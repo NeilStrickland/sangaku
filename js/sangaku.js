@@ -320,8 +320,13 @@ sangaku.session.munch = function(x) {
  for (var k of ['id','problem_sheet_id','tutorial_group_id',
                 'start_time','end_time',
                 'start_timestamp','end_timestamp',
-                'duration','has_snapshots']) {
+                'duration','has_snapshots','solutions_shown']) {
   if (k in x) { this[k] = x[k]; }
+ }
+
+ this.solutions_shown_array = JSON.parse(this.solutions_shown);
+ if (! this.solutions_shown_array) {
+  this.solutions_shown_array = [];
  }
 
  if (x.problem_sheet) {

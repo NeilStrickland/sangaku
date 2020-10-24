@@ -395,7 +395,6 @@ sangaku.sheet_viewer.stepper.handle_mouseout = function() {
  }
 };
 
-
 sangaku.sheet_viewer.question_item.add_upload = function(u) {
  this.uploads.push(u);
  this.uploads_by_id[u.id] = u;
@@ -443,6 +442,15 @@ sangaku.sheet_viewer.question_item.create_dom = function(viewer) {
  } else {
   this.div.appendChild(this.h)
  }
+
+ this.solution_div = document.createElement('div');
+ this.solution_div.className = 'item_review_solution';
+ if (this.solution) {
+  this.solution_div.innerHTML = '<b>Solution:</b> ' + this.solution;
+ } else {
+   this.solution_div.style.display = 'none';
+ }
+ this.div.appendChild(this.solution_div);
 
  if (this.is_bottom) {
   this.control_div = document.createElement('div');
@@ -522,11 +530,20 @@ sangaku.sheet_viewer.update = function() {
 sangaku.sheet_viewer.update_data = function(x) {
  this.new_stage = this.stage;
 
- if (y.has_snapshots) {
+ if (x.has_snapshots) {
   this.session.has_snapshots = 1;
   this.snapshots_button.style.display = 'block';
  }
- 
+
+ for (var item0 of x.problem_sheet.question_items) {
+  if (item0.solution) {
+   var item = this.question_items_by_id[item0.id];
+   item.solution = item0.solution;
+   item.solution_div.innerHTML = '<b>Solution:</b> ' + item.solution;
+   item.solution_div.style.display = 'block';
+  }
+ }
+
  for (var item of this.bottom_items) {
   item.new_report = null;
   item.new_uploads = [];

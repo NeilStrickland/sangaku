@@ -8,7 +8,8 @@ sangaku.tutor_sheet_viewer.init = function(session_id,student_id,item_id,teacher
  
  var url = '/sangaku/ajax/get_session_student.php' +
      '?session_id=' + session_id +
-     '&student_id=' + student_id;
+     '&student_id=' + student_id + 
+     '&with_solutions=1';
  
  fetch(url).then(
   response => response.json()
@@ -199,6 +200,7 @@ sangaku.tutor_sheet_viewer.question_item.create_dom = function(viewer) {
    sangaku.create_upload_block(
     this.session_id,
     this.student_id,
+
     this,
     this.teacher_id
    );

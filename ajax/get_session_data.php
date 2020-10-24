@@ -11,5 +11,6 @@ if (! $session) {
 
 $session->load_associated();
 
-echo $session->to_json();
+$with_solutions = ($user->status == 'teacher');
+echo $session->to_json($with_solutions);
 

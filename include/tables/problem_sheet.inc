@@ -191,7 +191,7 @@ class problem_sheet extends frog_object {
   return true;
  }
  
- function for_json($with_solutions = false) {
+ function for_json($with_solutions = false,$solutions_shown = array()) {
   $x = new stdClass();
   foreach (array('id','module_id','semester','week_number','code','title','intro') as $k) {
    $x->$k = $this->$k;
@@ -206,14 +206,15 @@ class problem_sheet extends frog_object {
    $x->question_items = array();
    
    foreach($this->question_items as $q) {
-    $x->question_items[] = $q->for_json($ws);
+    $ws0 = in_array($q->id,$solutions_shown) || $ws;
+    $x->question_items[] = $q->for_json($ws0);
    }
   }
 
   return ($x);
  }
 
- function to_json($with_solutions = false) {
+ function to_json($with_solutions = false,$solutions_shown = array()) {
   return json_encode($this->for_json($with_solutions));
  }
 }

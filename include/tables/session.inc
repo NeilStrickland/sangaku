@@ -10,7 +10,8 @@ $sangaku->add_table(
   'tutorial_group_id' => array('type' => 'integer','link' => 'tutorial_group'),
   'start_time' => array('type' => 'text'),
   'duration' => array('type' => 'integer','default' => 50,'notnull' => true),
-  'is_confirmed' => array('type' => 'boolean','default' => 0,'notnull' => true)
+  'is_confirmed' => array('type' => 'boolean','default' => 0,'notnull' => true),
+  'solutions_shown' => array('type' => 'text')
  ),
  array(
   'problem_sheet_title' => array('type' => 'text'),
@@ -28,7 +29,8 @@ SELECT
  m.title AS module_title, 
  x.start_time,
  x.duration,
- x.is_confirmed
+ x.is_confirmed,
+ x.solutions_shown
 FROM tbl_sessions x
  LEFT JOIN tbl_problem_sheets p ON x.problem_sheet_id = p.id 
   LEFT JOIN tbl_tutorial_groups g ON x.tutorial_group_id = g.id
@@ -292,9 +294,14 @@ HTML
   $x->start_timestamp = $this->start_timestamp();
   $x->end_timestamp   = $this->end_timestamp();
   $x->duration        = $this->duration;
-  
+  $x->is_confirmed    = $this->is_confirmed;
+  $sols = $this->solutions_shown;
+  if (! $sols) { $sols = '[]'; }
+  $sols_array = json_decode($sols);
+  $x->solutions_shown = $sols;
+
   if (isset($this->problem_sheet)) {
-   $x->problem_sheet = $this->problem_sheet->for_json($with_solutions);
+   $x->problem_sheet = $this->problem_sheet->for_json($with_solutions,$sols_array);
   }
 
   if (isset($this->tutorial_group)) {
@@ -315,7 +322,7 @@ HTML
   return ($x);
  }
 
- function to_json() {
-  return json_encode($this->for_json());
+ function to_json($with_solutions = false) {
+  return json_encode($this->for_json($with_solutions));
  }
 }

@@ -18,6 +18,7 @@ sangaku.session_monitor.init = function(session_id) {
 };
 
 sangaku.session_monitor.init_data = function(x) {
+ var me = this;
  this.session = x;
 
  var sheet = this.session.problem_sheet;
@@ -52,6 +53,36 @@ sangaku.session_monitor.init_data = function(x) {
   sheet.bottom_items_by_id[item.id] = item;
  }
 
+ sheet.has_solutions = false;
+ for (var item of sheet.bottom_items) {
+  if (item.solution) {
+   sheet.has_solutions = true;
+  }
+ }
+
+ if (sheet.has_solutions) {
+  this.solutions_tr = document.createElement('tr');
+  this.status_table.appendChild(this.solutions_tr);
+  this.solutions_td = document.createElement('td');
+  this.solutions_td.innerHTML = 'Show solution to students';
+  this.solutions_tr.appendChild(this.solutions_td);
+  for (var item of sheet.bottom_items) {
+   item.show_solution_td = document.createElement('td');
+   this.solutions_tr.appendChild(item.show_solution_td);
+   if (item.solution) {
+    item.solution_shown = this.session.solutions_shown_array.includes(item.id);
+    var cb = document.createElement('input');
+    item.show_solution_cb = cb;
+    cb.type = 'checkbox';
+    cb.checked = item.solution_shown;
+    cb.onclick = function() { me.save_solutions_shown(); };
+    item.show_solution_td.appendChild(cb);
+   } else {
+    item.show_solution_td.innerHTML = '&nbsp;';
+   }
+  }
+ }
+
  for (var student of students) {
   this.add_student(student);
  }
@@ -67,9 +98,7 @@ sangaku.session_monitor.add_student = function(student) {
  this.status_table.appendChild(student.tr);
  student.name_td = document.createElement('td');
  student.name_td.className = 'student_name';
- student.name_td.innerHTML =
-  student.forename + ' ' + student.surname
-  + ' (' + student.id + ')';
+ student.name_td.innerHTML = student.forename + ' ' + student.surname;
  student.tr.appendChild(student.name_td);
  student.last_seen = 0;
  student.box = {};
@@ -147,6 +176,19 @@ sangaku.session_monitor.box.set_data = function(r) {
  }
 }
 
+sangaku.session_monitor.save_solutions_shown = function() {
+ var ss = [];
+ for (var item of this.session.problem_sheet.bottom_items) {
+  if (item.show_solution_cb && item.show_solution_cb.checked) {
+   ss.push(item.id);
+  }
+ }
+
+ this.session.solutions_shown_array = ss;
+ this.session.solutions_shown = JSON.stringify(ss);
+ this.session.save();
+}
+
 sangaku.session_monitor.box.set_handlers = function() {
  var me = this;
  this.td.onclick = function() {
@@ -205,9 +247,23 @@ sangaku.session_monitor.update = function() {
 };
 
 sangaku.session_monitor.update_data = function(x) {
- var sheet = this.session.problem_sheet;
- var group = this.session.tutorial_group;
- var students = this.session.students;
+ var session = this.session;
+ var sheet = session.problem_sheet;
+ var group = session.tutorial_group;
+ var students = session.students;
+
+ session.solutions_shown = x.solution_shown;
+ session.solutions_shown_array = JSON.parse(x.solutions_shown);
+ if (! session.solutions_shown_array) {
+  session.solutions_shown_array = [];
+ }
+
+ for (var item of sheet.bottom_items) {
+  if (item.show_solution_cb) {
+   item.show_solution_cb.checked = 
+    session.solutions_shown_array.includes(item.id) ? 'checked' : '';
+  }
+ }
 
  for (s of x.students) {
   var student;
