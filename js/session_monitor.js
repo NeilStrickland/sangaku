@@ -5,6 +5,15 @@ sangaku.session_monitor = {
 sangaku.session_monitor.init = function(session_id) {
  var me = this;
 
+ for (var id of ['session_tab',
+		 'session_header',
+		 'monitor_tab',
+		 'sheet_tab',
+		 'snapshots_tab',
+		 'help_tab']) {
+  this[id] = document.getElementById(id);
+ }
+ 
  var url = '/sangaku/ajax/get_session_data.php' +
      '?session_id=' + session_id;
  
@@ -26,17 +35,9 @@ sangaku.session_monitor.init_data = function(x) {
  var students = this.session.students;
  this.students_by_id = {};
  
- this.h1 = document.createElement('h1');
- this.h1.innerHTML =
-  sheet.title + '<br/>' +
-  'Group ' + group.module_code +
-  '(' + group.name + ')';
- document.body.appendChild(this.h1);
- MathJax.typeset([this.h1]);
- 
  this.status_table = document.createElement('table');
  this.status_table.className = 'edged';
- document.body.appendChild(this.status_table);
+ this.monitor_tab.appendChild(this.status_table);
  
  this.header_tr = document.createElement('tr');
  this.status_table.appendChild(this.header_tr);

@@ -191,6 +191,93 @@ class problem_sheet extends frog_object {
   return true;
  }
  
+ function preview() {
+  global $sangaku;
+  
+  $H = $sangaku->html;
+  $m = $this->load_link('module');
+ 
+  $ss = $this->semester ? 'Semester ' . $this->semester : '';
+  $ws = $this->week_number ? 'Week ' . $this->week_number : '';
+
+  $html = '';
+  
+  $html .=  <<<HTML
+<h1>{$this->title}<br/>
+{$m->code} {$m->title} $ss $ws
+</h1>
+
+HTML
+   ;
+
+  if (trim($this->intro)) {
+   $html .=  <<<HTML
+<div class="sheet_intro">
+{$this->intro}
+</div>
+
+HTML
+    ;
+  }
+
+  $html .=  <<<HTML
+<ul>
+
+HTML
+   ;
+
+  foreach($this->question_items as $i) {
+   if ($i->level > 1) { continue; }
+   $html .=  "<li><span class=\"item_header\">{$i->titled_header()}: </span>";
+   if (trim($i->problem)) {
+    $html .=  "<span class=\"problem\">{$i->problem}</span><br/>";
+    if (trim($i->solution)) {
+     $html .=  "<div class=\"preview_solution\"><b>Solution:</b>{$i->solution}</div>";
+    }
+   }
+
+   if ($i->children) {
+    $html .=  "<ul>";
+    foreach ($i->children as $j) {
+     $html .=  "<li><span class=\"item_header\">{$j->titled_header()}: </span>";
+     if (trim($j->problem)) {
+      $html .=  "<span class=\"problem\">{$j->problem}</span><br/>";
+      if (trim($j->solution)) {
+       $html .=  "<div class=\"preview_solution\"><b>Solution:</b>{$j->solution}</div>";
+      }
+     }
+    
+     if ($j->children) {
+      $html .=  "<ul>";
+      foreach ($j->children as $k) {
+       $html .=  "<li><span class=\"item_header\">{$k->titled_header()}: </span>";
+       if (trim($k->problem)) {
+        $html .=  "<span class=\"problem\">{$k->problem}</span><br/>";
+       }
+
+       if (trim($k->solution)) {
+        $html .=  "<div class=\"preview_solution\"><b>Solution:</b>{$k->solution}</div>";
+       }
+       $html .=  "</li>";
+      }
+      $html .=  "</ul>";
+     }
+     $html .=  "</li>";
+    }
+    $html .=  "</ul>";
+   }
+   $html .=  "</li>";
+  }
+ 
+  $html .=  <<<HTML
+</ul>
+
+HTML
+   ;
+
+  return $html;
+ }
+
  function for_json($with_solutions = false,$solutions_shown = array()) {
   $x = new stdClass();
   foreach (array('id','module_id','semester','week_number','code','title','intro') as $k) {

@@ -276,77 +276,12 @@ HTML
  function display_page() {
   global $sangaku;
   
-  $H = $sangaku->html;
   $s = $this->object;
   $m = $s->load_link('module');
  
   $this->display_page_header();
 
-  $ss = $s->semester ? 'Semester ' . $s->semester : '';
-  $ws = $s->week_number ? 'Week ' . $s->week_number : '';
- 
-  echo <<<HTML
-<h1>{$s->title}<br/>
-{$m->code} {$m->title} $ss $ws
-</h1>
-
-HTML
-   ;
-
-  if (trim($s->intro)) {
-   echo <<<HTML
-<div class="sheet_intro">
-{$s->intro}
-</div>
-
-HTML
-    ;
-  }
-
-  echo <<<HTML
-<ul>
-
-HTML
-   ;
-
-  foreach($s->question_items as $i) {
-   if ($i->level > 1) { continue; }
-   echo "<li><span class=\"item_header\">{$i->titled_header()}: </span>";
-   if (trim($i->problem)) {
-    echo "<span class=\"problem\">{$i->problem}</span><br/>";
-   }
-
-   if ($i->children) {
-    echo "<ul>";
-    foreach ($i->children as $j) {
-     echo "<li><span class=\"item_header\">{$j->titled_header()}: </span>";
-     if (trim($j->problem)) {
-      echo "<span class=\"problem\">{$j->problem}</span><br/>";
-     }
-    
-     if ($j->children) {
-      echo "<ul>";
-      foreach ($j->children as $k) {
-       echo "<li><span class=\"item_header\">{$k->titled_header()}: </span>";
-       if (trim($k->problem)) {
-        echo "<span class=\"problem\">{$k->problem}</span><br/>";
-       }
-       echo "</li>";
-      }
-      echo "</ul>";
-     }
-     echo "</li>";
-    }
-    echo "</ul>";
-   }
-   echo "</li>";
-  }
- 
-  echo <<<HTML
-</ul>
-
-HTML
-   ;
+  echo $s->preview();  
 
   $this->display_page_footer();
  }

@@ -263,6 +263,7 @@ div.item_review_work_icon {
 div.item_review_solution {
     background: #CCDDFF
 }
+
 div.notifier {
     display : none;
     position : fixed;
@@ -399,4 +400,14 @@ textarea.temp {
     outline: none;
     boxShadow: none;
     background: transparent;
+}
+
+div#session_header {
+    font-size : 36px;
+    font-weight : bold;
+}
+
+div.preview_solution {
+    padding: 3px;
+    background: #CCDDFF
 }
