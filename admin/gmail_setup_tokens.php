@@ -1,8 +1,8 @@
 <?php
 
-require_once('vendor/autoload.php');
-require_once('include/sangaku.inc');
-require_once('../include/frog/googler.inc');
+require_once('../vendor/autoload.php');
+require_once('../include/sangaku.inc');
+require_once('../../include/frog/googler.inc');
 
 $goog = new frog_googler();
 $goog->log_file = $sangaku->data_dir . '/google/log.txt';
