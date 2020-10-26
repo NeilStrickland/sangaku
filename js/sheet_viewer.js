@@ -541,7 +541,7 @@ sangaku.sheet_viewer.update_data = function(x) {
    var item = this.question_items_by_id[item0.id];
    item.solution = item0.solution;
    item.solution_div.innerHTML = '<b>Solution:</b> ' + item.solution;
-   MathJax.typeset([this.solution_div]);
+   MathJax.typeset([item.solution_div]);
    item.solution_div.style.display = 'block';
   }
  }
