@@ -8,7 +8,8 @@ $sangaku->add_table(
   'id' => array('type' => 'integer','notnull' => 'true'),
   'somas_moid' => array('type' => 'integer'),
   'code' => array('type' => 'text'),
-  'title' => array('type' => 'text')
+  'title' => array('type' => 'text'),
+  'blackboard_url' => array('type' => 'text')
  ),
  array(
  ),
@@ -17,7 +18,8 @@ SELECT
  x.id,
  x.somas_moid,
  x.code,
- x.title
+ x.title,
+ x.blackboard_url
 FROM tbl_modules x
 WHERE %s
  ORDER BY x.code,x.title,x.id
