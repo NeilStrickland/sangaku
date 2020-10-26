@@ -447,6 +447,7 @@ sangaku.sheet_viewer.question_item.create_dom = function(viewer) {
  this.solution_div.className = 'item_review_solution';
  if (this.solution) {
   this.solution_div.innerHTML = '<b>Solution:</b> ' + this.solution;
+  MathJax.typeset([this.solution_div]);
  } else {
    this.solution_div.style.display = 'none';
  }
@@ -540,6 +541,7 @@ sangaku.sheet_viewer.update_data = function(x) {
    var item = this.question_items_by_id[item0.id];
    item.solution = item0.solution;
    item.solution_div.innerHTML = '<b>Solution:</b> ' + item.solution;
+   MathJax.typeset([this.solution_div]);
    item.solution_div.style.display = 'block';
   }
  }
