@@ -306,7 +306,7 @@ sangaku.sheet_editor.delete_item = function(item) {
  }
 
  if (item.id) {
-  this.deletions.push(item.id);
+  this.problem_sheet.deletions.push(item.id);
  }
 };
 
