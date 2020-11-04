@@ -167,7 +167,9 @@ HTML
    );
 
    foreach($keys as $k) {
-    $child->$k = $child0->$k;
+    if (isset($child0->$k)) {
+     $child->$k = $child0->$k;
+    }
    }
 
    $child->save();
