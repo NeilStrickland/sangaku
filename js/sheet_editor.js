@@ -57,7 +57,9 @@ sangaku.sheet_editor.init = function(id) {
 sangaku.sheet_editor.create_item_dom = function(item) {
  var me = this;
  this.next_id = Math.max(this.next_id,item.id + 1);
- item.alt_id = item.id;
+ if (! 'alt_id' in item) {
+  item.alt_id = item.id;
+ }
  item.parent = null;
  this.items_by_alt_id[item.alt_id] = item;
   
