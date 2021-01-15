@@ -42,6 +42,5 @@ if (isset($allowed_types[$mime_type])) {
  echo $s->to_json();
 } else {
  if ($debug) { echo "Bad mime type: {$mime_type}"; }
- $s->delete();
 }
 
