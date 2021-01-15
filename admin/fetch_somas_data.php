@@ -3,11 +3,14 @@
 require_once('../include/sangaku.inc');
 require_once('../include/somas_agent.inc');
 
+$session = 2020;
+$semester = '2';
+
 $a = new somas_agent();
 $a->connect();
 
-$a->fetch_engl1_modules();
-$module_changes = $a->fetch_modules();
+$a->fetch_engl1_modules($session);
+$module_changes = $a->fetch_modules($session);
 echo "Changed modules:<br/>";
 foreach($module_changes as $m) {
  echo "{$m->code}<br/>" . PHP_EOL;
@@ -15,7 +18,7 @@ foreach($module_changes as $m) {
 
 echo "<br/><br/>" . PHP_EOL;
 
-$group_changes = $a->fetch_groups();
+$group_changes = $a->fetch_groups($session,$semester);
 echo "Changed groups:<br/>";
 foreach($group_changes as $g) {
  $g->load();

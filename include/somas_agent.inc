@@ -54,7 +54,7 @@ class somas_agent {
   return $rows;
  }
  
- function fetch_engl1_modules() {
+ function fetch_engl1_modules($session) {
   $w = somas_agent::$engl1_codes_string;
   
   $q = <<<SQL
@@ -64,7 +64,7 @@ SELECT
  m.title
 FROM tbl_module_occurrences o 
  LEFT JOIN tbl_modules m ON o.module_code=m.code
-WHERE o.session=2020
+WHERE o.session=$session
   AND o.module_code IN ($w)
 ORDER BY o.module_code
 SQL;
@@ -84,7 +84,7 @@ SQL;
   somas_agent::$engl1_moids_string = implode(',',$w);
  }
  
- function fetch_modules() {
+ function fetch_modules($session) {
   global $sangaku;
 
   $modules = $sangaku->load_where_indexed('modules','1','code');
@@ -97,7 +97,7 @@ x.module_code AS code,
 m.title AS title
 FROM tbl_module_occurrences x
  LEFT JOIN tbl_modules m ON x.module_code=m.code
-WHERE x.session=2020
+WHERE x.session=$session
 AND x.module_code NOT IN ($w)
 SQL;
 
@@ -130,7 +130,7 @@ SQL;
   return $changes;
  }
 
- function fetch_groups() {
+ function fetch_groups($session,$semester) {
   global $sangaku;
 
   $modules = $sangaku->load_where_indexed('modules','1','somas_moid');
@@ -154,11 +154,11 @@ SELECT
 FROM `tbl_teaching_events` g 
  LEFT JOIN tbl_module_occurrences o ON g.module_occurrence_id=o.id
   LEFT JOIN tbl_modules m ON o.module_code=m.code
-WHERE o.session=2020
+WHERE o.session=$session
 AND m.credit_level <= 2
 AND g.type IN ('tutorial','lab session')
 AND g.room_id=451
-AND (o.semester = '1' OR (o.semester = 'Year' AND (g.semester = '1' OR g.semester = 'Year')))
+AND (o.semester = '$semester' OR (o.semester = 'Year' AND (g.semester = '$semester' OR g.semester = 'Year')))
 ORDER BY m.code,g.tutorial_group
 SQL;
 
