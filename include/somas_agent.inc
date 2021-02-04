@@ -61,6 +61,7 @@ class somas_agent {
 SELECT
  o.id AS somas_moid,
  o.module_code AS code, 
+ o.semester,
  m.title
 FROM tbl_module_occurrences o 
  LEFT JOIN tbl_modules m ON o.module_code=m.code
@@ -92,9 +93,10 @@ SQL;
   
   $q = <<<SQL
 SELECT 
-x.id AS somas_moid,
-x.module_code AS code,
-m.title AS title
+ x.id AS somas_moid,
+ x.module_code AS code,
+ x.semester,
+ m.title AS title
 FROM tbl_module_occurrences x
  LEFT JOIN tbl_modules m ON x.module_code=m.code
 WHERE x.session=$session
@@ -114,7 +116,7 @@ SQL;
     $needs_update = true;
    }
 
-   foreach (array('somas_moid','title') as $k) {
+   foreach (array('somas_moid','semester','title') as $k) {
     if ($m->$k != $x->$k) {
      $m->$k = $x->$k;
      $needs_update = true;
@@ -148,6 +150,7 @@ SELECT
  g.tutorial_group AS name,
  teacher_id,
  assistant_id,
+ g.semester,
  day_number,
  time_slot_id AS hour,
  week_parity 
@@ -163,7 +166,7 @@ ORDER BY m.code,g.tutorial_group
 SQL;
 
   $xx = $this->get_all($q);
-
+  $nn = count($xx); 
   $changes = array();
   
   foreach($xx as $x) {
@@ -176,6 +179,11 @@ SQL;
    } else {
     continue;
    }
+
+   if ( ($m->semester == '1' || $m->semester == '2') &&
+        ! ($x->semester == '1' || $x->semester == '2')) {
+    $x->semester = $m->semester;
+   }
    
    if (isset($m->tgbsi[$x->somas_id])) {
     $y = $m->tgbsi[$x->somas_id];
@@ -187,7 +195,7 @@ SQL;
 
    $y->module_id = $m->id;
    
-   foreach (array('name','day_number','hour','week_parity') as $k) {
+   foreach (array('name','semester','day_number','hour','week_parity') as $k) {
     if ($y->$k != $x->$k) {
      $y->$k = $x->$k;
      $needs_update = true;

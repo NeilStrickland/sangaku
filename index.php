@@ -23,9 +23,13 @@ function teacher_index_page() {
  $N = $sangaku->nav;
  $H = $sangaku->html;
 
+ $d = $sangaku->get_date_info();
+ $semester = get_restricted_parameter('semester',array('','1','2'),$d->semester);
+
  $force_index = get_optional_parameter('force_index',0) ? 1 : 0;
- $user->load_teacher_sessions();
- $user->load_teacher_tutorial_groups();
+
+ $user->load_teacher_sessions(true,$semester);
+ $user->load_teacher_tutorial_groups(true,$semester);
 
  if (count($user->current_teacher_sessions) == 1 &&
      ! $force_index) {
@@ -96,7 +100,7 @@ HTML
     echo <<<HTML
  <tr>
   <td class="module_code">{$s->module_code}</td>
-  <td class="group_name">{$s->tutorial_group_name}</td>
+  <td class="group_name">{$s->tutorial_group_name} [{$s->tutorial_group_id}]</td>
   <td class="command" class="sheet_name" onclick="location='{$edit_sheet_url}'">{$s->problem_sheet_title}</td>
 $x
 $y
@@ -109,7 +113,7 @@ HTML
     echo <<<HTML
  <tr>
   <td class="module_code">{$g->module_code}</td>
-  <td class="group_name">{$g->name}</td>
+  <td class="group_name">{$g->name} [{$g->id}]</td>
   <td colspan="3">No upcoming sessions</td>
  </tr>
 
@@ -139,12 +143,12 @@ function student_index_page() {
  
  $force_index = get_optional_parameter('force_index',0) ? 1 : 0;
 
- $user->load_student_sessions();
+ list($sem,$w) = $sangaku->week_number();
+ 
+ $user->load_student_sessions($sem);
 
  $N->header('Sangaku');
 
- list($sem,$w) = $sangaku->week_number();
- 
  echo <<<HTML
 <h1>Sangaku sessions for Week $w</h1>
 <br/>

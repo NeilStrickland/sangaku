@@ -155,7 +155,7 @@ class problem_sheet extends frog_object {
    }
   }
   
-  $groups = $module->load_tutorial_groups();
+  $groups = $module->load_tutorial_groups(true,$this->semester);
   $this->load_sessions();
 
   foreach($groups as $g) {

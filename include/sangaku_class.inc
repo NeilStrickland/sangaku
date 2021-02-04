@@ -92,7 +92,8 @@ class sangaku_class extends frog {
 
  function get_date_info() {
   $date_info_file = $this->data_dir . '/date_info.json';
-  if (file_exists($date_info_file)) {
+  if (file_exists($date_info_file) &&
+      time() - filemtime($date_info_file) < 3600) {
    $json = file_get_contents($date_info_file);
   } else {
    $json = file_get_contents('https://maths.shef.ac.uk/maths/date_info.php');

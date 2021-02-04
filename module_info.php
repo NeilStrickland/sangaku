@@ -18,10 +18,14 @@ function get_params() {
  $m = $sangaku->get_object_parameter('id','module');
  $params->module = $m;
  
+ $params->date_info = $sangaku->get_date_info();
+
+ $sem = $params->date_info->semester;
+
  if ($m) {
-  $m->load_tutorial_groups();
-  $m->load_problem_sheets();
-  $m->load_sessions();
+  $m->load_tutorial_groups(true,$sem);
+  $m->load_problem_sheets(true,$sem);
+  $m->load_sessions(true,$sem);
   $m->load_students();
   
   foreach($m->tutorial_groups as $g) {
@@ -29,8 +33,6 @@ function get_params() {
    $g->load_students();
   }
  }
-
- $params->date_info = $sangaku->get_date_info();
 
  return $params;
 }
@@ -77,8 +79,8 @@ function groups_tab($params) {
 
  echo $H->tab_start('Tutorial groups');
  echo $H->edged_table_start();
- echo $H->spacer_row(60,60,60,60,300,60);
- echo $H->row('Group','Day','Time','Weeks','Teachers','');
+ echo $H->spacer_row(60,90,60,60,60,300,60);
+ echo $H->row('Group','Semester','Day','Time','Weeks','Teachers','');
  foreach($m->tutorial_groups as $g) {
   $tt = array();
   foreach($g->teachers as $t) {
@@ -88,6 +90,7 @@ function groups_tab($params) {
   $url = 'group_info.php?id=' . $g->id;
   
   echo $H->tr($H->td($g->name) .
+              $H->td($g->semester) .
               $H->td($g->day_name()) .
               $H->td('' . $g->hour . ':00') . 
               $H->td($g->week_parity_long()) .
