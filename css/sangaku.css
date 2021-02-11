@@ -261,7 +261,23 @@ div.item_review_work_icon {
 }
 
 div.item_review_solution {
-    background: #CCDDFF
+    background: #CCDDFF;
+    padding : 3px;
+    min-height: 20px;
+    border: 1px solid #445566;
+    border-radius: 4px;
+}
+
+div.item_show_solution {
+    background: #CCDDFF;
+    padding : 3px;
+    min-height: 20px;
+    border: 1px solid #445566;
+    border-radius: 4px;
+}
+
+div.item_show_solution:hover {
+    cursor: pointer;
 }
 
 div.notifier {
