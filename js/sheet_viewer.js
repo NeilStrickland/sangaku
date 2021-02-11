@@ -430,6 +430,7 @@ sangaku.sheet_viewer.question_item.remove_upload = function(id) {
 };
 
 sangaku.sheet_viewer.question_item.create_dom = function(viewer) {
+ var me = this;
  this.viewer = viewer;
  this.div = document.createElement('div');
  this.div.style.display = 'none';
@@ -443,13 +444,24 @@ sangaku.sheet_viewer.question_item.create_dom = function(viewer) {
   this.div.appendChild(this.h)
  }
 
+ this.show_solution_div = document.createElement('div');
+ this.show_solution_div.className = 'item_show_solution';
+ this.show_solution_div.innerHTML = 'Show solution';
+ if (! this.solution) {
+   this.show_solution_div.style.display = 'none';
+ }
+ this.div.appendChild(this.show_solution_div);
+ this.show_solution_div.onclick = function() {
+  me.solution_div.style.display = 'block';
+  me.show_solution_div.style.display = 'none';
+ };
+
  this.solution_div = document.createElement('div');
  this.solution_div.className = 'item_review_solution';
+ this.solution_div.style.display = 'none';
  if (this.solution) {
   this.solution_div.innerHTML = '<b>Solution:</b> ' + this.solution;
   MathJax.typeset([this.solution_div]);
- } else {
-   this.solution_div.style.display = 'none';
  }
  this.div.appendChild(this.solution_div);
 
@@ -542,7 +554,9 @@ sangaku.sheet_viewer.update_data = function(x) {
    item.solution = item0.solution;
    item.solution_div.innerHTML = '<b>Solution:</b> ' + item.solution;
    MathJax.typeset([item.solution_div]);
-   item.solution_div.style.display = 'block';
+   if (item.solution_div.style.display == 'none') {
+    item.show_solution_div.style.display = 'block';  
+   }
   }
  }
 
