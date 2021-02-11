@@ -9,6 +9,7 @@ $sangaku->add_table(
   'somas_id' => array('type' => 'integer'),
   'module_id' => array('type' => 'integer','link' => 'module'),
   'name' => array('type' => 'text'),
+  'semester' => array('type' => 'text'),
   'day_number' => array('type' => 'integer'),
   'hour' => array('type' => 'integer'),
   'week_parity' => array('type' => 'text')
@@ -27,6 +28,7 @@ SELECT
  m.title AS module_title,
  m.somas_moid,
  x.name,
+ x.semester,
  x.day_number,
  x.hour,
  x.week_parity
