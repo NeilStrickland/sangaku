@@ -146,7 +146,7 @@ class problem_sheet extends frog_object {
   $module = $this->load_link('module');
 
   $this->which = '';
-  if ($this->module_code == 'EngL1') {
+  if ($this->module_code == 'EngL1' || $this->module_code == 'MAS004') {
    if (strlen($this->code) >= 1 and substr($this->code,-1) == 'a') {
     $this->which = 'a';
    }
@@ -155,7 +155,7 @@ class problem_sheet extends frog_object {
    }
   }
   
-  $groups = $module->load_tutorial_groups(true,$this->semester);
+  $groups = $module->load_tutorial_groups($this->semester);
   $this->load_sessions();
 
   foreach($groups as $g) {
@@ -165,7 +165,7 @@ class problem_sheet extends frog_object {
 
    if (! isset($this->module_code)) { $this->dump(); exit; }
    
-   if ($this->module_code == 'EngL1') {
+   if ($this->module_code == 'EngL1' || $this->module_code == 'MAS004') {
     $g->which = ($g->name == strtolower($g->name)) ? 'b' : 'a';
 
     if (! ($g->which && ($g->which == $this->which))) {
