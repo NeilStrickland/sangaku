@@ -13,8 +13,11 @@ class sangaku_auth extends frog_auth {
   $this->user_key = 'username';
   $this->user_is_current_clause = '1';
   $this->user_key_regex = '/^[A-Za-z0-9]+$/i';
-  $this->ldap_server = 'auth.shef.ac.uk';
-  $this->ldap_base_dn = 'ou=Users,dc=sheffield,dc=ac,dc=uk';
+  $this->ldap_server = null;
+  $this->ldap_bind_dn = null;
+  $this->ldap_bind_pw = null;
+  $this->ldap_base_dn = null;
+  $this->ldap_user_key = null;
   $this->login_log_file = $sangaku->login_log_file;
  }
 
@@ -22,6 +25,11 @@ class sangaku_auth extends frog_auth {
   global $sangaku;
 
   $u = $params->user;
+
+  if ($this->use_hash && $u->password_hash) {
+   return $this->hash_check_password($u->password_hash,
+  				     $params->password);
+  }
 
   $x = $this->ldap_check_password($u->username,$params->password);
   if ($x->ok) { return $x; }
