@@ -1,8 +1,8 @@
 <?php
 
-xdebug_disable();
+//xdebug_disable();
 ini_set('html_errors',0);
-ini_set('xdebug.overload_var_dump',0);
+//ini_set('xdebug.overload_var_dump',0);
 
 $allow_bot = 1;
 
