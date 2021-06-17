@@ -49,7 +49,7 @@ You are registered as a teacher for the following sessions:
 <br/><br/>
 <table class="edged">
  <tr>
-  <td>Module</td>
+  <td>Course</td>
   <td>Group</td>
   <td>Problem sheet</td>
   <td>Time</td>
@@ -142,11 +142,14 @@ function student_index_page() {
  $user->load_student_sessions();
 
  $N->header('Sangaku');
-
+ echo $N->top_menu();
+ 
  list($sem,$w) = $sangaku->week_number();
+
+ $wh = $w ? " for Week $w" : "";
  
  echo <<<HTML
-<h1>Sangaku sessions for Week $w</h1>
+<h1>Sangaku sessions $wh</h1>
 <br/>
 
 HTML
