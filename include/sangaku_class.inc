@@ -70,8 +70,8 @@ class sangaku_class extends frog {
   if ($student_id == $user->id) {
    $params->user_is_student = true;
   } else {
-   if (! $group->is_teacher_member($user->id)) {
-    $params->error = 'User is not a teacher for this tutorial group';
+   if ($user->status != 'teacher') {
+    $params->error = 'User is not a teacher';
     return $params;
    }
   }
