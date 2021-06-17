@@ -554,13 +554,11 @@ autosuggest.set_value = function(i) {
 };
 
 autosuggest.known_types = {
- 'student'        : 1
+ 'user'        : 1
 };
 
 autosuggest.default_size = {
- 'person' : 50,
- 'student' : 50,
- 'grant' : 50
+ 'user' : 50
 };
 
 autosuggest.setup_all = function() {
@@ -579,7 +577,7 @@ autosuggest.setup_all = function() {
 
    if (this.known_types[s]) {
     url = sangaku.ajax_url + '/suggest.php?type=' + s;
-    if (s == 'student' && (moid = ip.getAttribute('moid'))) {
+    if (s == 'user' && (moid = ip.getAttribute('moid'))) {
      url = url + '&moid=' + moid;
     }
     this.setup_ajax(ip,d,url);
