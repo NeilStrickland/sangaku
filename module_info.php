@@ -23,9 +23,9 @@ function get_params() {
  $sem = $params->date_info->semester;
 
  if ($m) {
-  $m->load_tutorial_groups(true,$sem);
-  $m->load_problem_sheets(true,$sem);
-  $m->load_sessions(true,$sem);
+  $m->load_tutorial_groups($sem);
+  $m->load_problem_sheets($sem);
+  $m->load_sessions($sem);
   $m->load_students();
   
   foreach($m->tutorial_groups as $g) {
