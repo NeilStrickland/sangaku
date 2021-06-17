@@ -13,7 +13,9 @@ class user_editor extends frog_object_editor {
     'suggest_delete' => true,
     'delete' => true,
     'save' => true,
-    'new' => true
+    'new' => true,
+    'generate_password' => true,
+    'delete_password' => true
    );
  }
 
@@ -48,11 +50,7 @@ class user_editor extends frog_object_editor {
  }
 
  function listing_url() {
-  if ($this->object && $this->object->status == 'teacher') {
-   return '/sangaku/teacher_list.php';
-  } else {
-   return '/sangaku/student_list.php';
-  }
+  return '/sangaku/user_list.php';
  }
  
  function associated_lists() {
@@ -66,7 +64,7 @@ class user_editor extends frog_object_editor {
  }
 
  function edit_page() {
-  global $sangaku;
+  global $sangaku,$user;
   
   $H = $sangaku->html;
   $N = $sangaku->nav;
@@ -99,7 +97,9 @@ class user_editor extends frog_object_editor {
   echo $N->top_menu();
   echo $H->edged_table_start();
   echo $H->spacer_row(150,300);
-  if ($u->gmail_name) {
+  if ($u->email_address) {
+   $m = $H->email_popup($u->email_address);
+  } else if ($u->gmail_name) {
    $m = $H->email_popup($u->gmail_name . '@sheffield.ac.uk');
   } else {
    $m = '';
@@ -108,12 +108,33 @@ class user_editor extends frog_object_editor {
   echo $H->row($H->bold('Forename:'),$H->text_input('forename',$u->forename));
   echo $H->row($H->bold('Surname:') ,$H->text_input('surname' ,$u->surname ));
   echo $H->row($H->bold('Username:'),$H->text_input('username',$u->username));
-  echo $H->row($H->bold('GMail:')   ,$H->text_input('gmail_name',$u->gmail_name) . $m);
+//  echo $H->row($H->bold('GMail:')   ,$H->text_input('gmail_name',$u->gmail_name) . $m);
+  echo $H->row($H->bold('Email:')   ,$H->text_input('email_address',$u->email_address) . $m);
 
   $s = $H->selector('status',array('student','teacher'),$u->status);
   echo $H->row($H->bold('Status:')  ,$s);
-  
+
+  $c = $H->checkbox('is_admin',$u->is_admin);
+  echo $H->row($H->bold('Administrator:')  ,$c);
+
   echo $H->edged_table_end();
+
+  if ($user->is_admin) {
+   $this->password_block();
+  }
+  
+  if ($u->registrations) {
+   $this->registrations_block();
+  }
+  
+  $this->edit_page_footer();
+ }
+
+ function registrations_block() {
+  global $sangaku;
+  
+  $H = $sangaku->html;
+  $u = $this->object;
 
   echo '<h2>Registrations</h2>';
 
@@ -126,7 +147,235 @@ class user_editor extends frog_object_editor {
 
   echo $H->edged_table_end();
 
-  $this->edit_page_footer();
+ }
+
+ function password_block() {
+  global $sangaku;
+  
+  $H = $sangaku->html;
+  $u = $this->object;
+
+  $new_pw_url = "user_info.php?id={$u->id}&command=generate_password";
+  $delete_pw_url = "user_info.php?id={$u->id}&command=delete_password";
+  
+  echo '<h2>Password</h2>';
+
+  if ($u->email_address) {
+   if ($u->password_hash) {
+    echo <<<HTML
+<div class="text">
+ <p>
+  This user has a hashed password in the Sangaku database.  Because
+  the password has been hashed, Sangaku cannot reveal it, but
+  Sangaku can check whether the password has been entered correctly.
+  Because there is a password in the database, Sangaku will check 
+  the password directly rather than passing it to an LDAP server.
+ </p>
+ <p>
+  You can generate a new password, in which case it will be sent to
+  the user by email.  Alternatively, you can delete the password.
+  If the password in the database is deleted, then Sangaku will
+  ask the LDAP server to check the password entered by the user.
+ </p>
+ <button type="button" onclick="location='$new_pw_url'">
+  Generate a new password
+ </button>
+ &nbsp;&nbsp;&nbsp;
+ <button type="button" onclick="location='$delete_pw_url'">
+  Delete password
+ </button> 
+</div>
+
+HTML;
+   } else {
+    echo <<<HTML
+<div class="text">
+ <p>
+  This user does not have a password in the Sangaku database.
+  If they attempt to log in, then the password that they enter
+  will be sent to the LDAP server for verification.
+ </p>
+ <p>
+  If this user is not known to the LDAP server, then you can
+  give them a password in the Sangaku database instead, by
+  clicking 'Generate password' below.  The password will
+  then be sent to them by email.  
+ </p>
+ <br/><br/>
+ <button type="button" onclick="location='$new_pw_url'">
+  Generate password
+ </button>
+</div>
+
+HTML;
+   }
+  } else {
+   if ($u->password_hash) {
+    echo <<<HTML
+<div class="text">
+ <p>
+  This user has a hashed password in the Sangaku database.  Because
+  the password has been hashed, Sangaku cannot reveal it, but
+  Sangaku can check whether the password has been entered correctly.
+  Because there is a password in the database, Sangaku will check 
+  the password directly rather than passing it to an LDAP server.
+ </p>
+ <p>
+  However, Sangaku does not have an email address for this user,
+  which means that they probably do not know their password.
+  You should enter and save an email address, then generate
+  a new password, which will be emailed to the user.
+ </p>
+ <p>
+  Alternatively, you can delete the password.
+  If the password in the database is deleted, then Sangaku will
+  ask the LDAP server to check the password entered by the user.
+ </p>
+ <br/><br/>
+ <button type="button" onclick="location='$delete_pw_url'">
+  Generate a new password
+ </button> 
+</div>
+
+HTML;
+   } else {
+    echo <<<HTML
+<div class="text">
+ <p>
+  This user does not have a password in the Sangaku database.
+  If they attempt to log in, then the password that they enter
+  will be sent to the LDAP server for verification.
+ </p>
+ <p>
+  If this user is not known to the LDAP server, then you can
+  give them a password in the Sangaku database instead.
+  However, you will first need to enter and save an email
+  address that can be used to inform the user of their
+  password.
+ </p>
+</div>
+
+HTML;
+   }
+  }
+ }
+
+ function handle_command() {
+  if ($this->command == 'generate_password') {
+   $this->generate_password();
+  } elseif ($this->command == 'delete_password') {
+   $this->delete_password();
+  }
+ }
+
+ function generate_password() {
+  global $sangaku,$user;
+  
+  $A = $sangaku->auth;
+  $H = $sangaku->html;
+  $N = $sangaku->nav;
+  $this->load_from_database();
+  $u = $this->object;
+
+  if (! $user->is_admin) { error_page('Not authorised'); exit; }
+  if (! $u) { error_page('No user'); exit; }
+  if (! $u->email_address) {
+   error_page('User has no email address, so cannot be notified of a new password.');
+   exit;
+  }
+
+  $u->had_password = $u->password_hash ? 1 : 0;
+  $ret = $A->generate_and_notify_password($u);
+
+  if (! $ret) {
+   error_page(<<<TEXT
+A new password was generated for user {$u->username}, and we attempted
+to send it by email to {$u->email_address}.  However, this email failed
+for some reason.
+
+TEXT
+   );
+   exit;
+  }
+
+  $N->header('New password generated');
+  echo $N->top_menu();
+  
+  echo <<<HTML
+<h1>New password generated</h1>
+<div class="text">
+<p>
+A new password was generated for user {$u->username} ($u->full_name)
+and was sent to them by email at <code>{$u->email_address}</code>.
+</p>
+
+HTML;
+
+  if ($u->had_password) {
+   echo <<<HTML
+<p>
+This new password replaces the old one, which will no longer work.
+</p>
+HTML;
+  } else {
+   echo <<<HTML
+<p>
+As this user now has a password in the database, Sangaku will no
+longer attempt to use the LDAP server to check their password.
+</p>
+HTML;
+
+  }
+
+  $edit_url = "user_info.php?id={$u->id}";
+  
+  echo <<<HTML
+<br/>
+<button type="button" onclick="location='$edit_url'">Return to user information page</button>
+
+HTML;
+
+  $N->footer();
+ }
+
+ function delete_password() {
+  global $sangaku,$user;
+  
+  $A = $sangaku->auth;
+  $H = $sangaku->html;
+  $N = $sangaku->nav;
+  $this->load_from_database();
+  $u = $this->object;
+
+  if (! $user->is_admin) { error_page('Not authorised'); exit; }
+  if (! $u) { error_page('No user'); exit; }
+
+  $u->password_hash = '';
+  $u->save();
+  
+  $N->header('Password deleted');
+  echo $N->top_menu();
+
+  echo <<<HTML
+<h1>Password deleted</h1>
+<div class="text">
+<p>
+The password in the Sangaku database for user {$u->username} ($u->full_name)
+was deleted.  If they attempt to log in, then Sangaku will use the LDAP
+server to check their password.
+</p>
+
+HTML;
+
+  $edit_url = "user_info.php?id={$u->id}";
+  
+  echo <<<HTML
+<br/>
+<button type="button" onclick="location='$edit_url'">Return to user information page</button>
+
+HTML;
+
+  $N->footer();
  }
 }
 
