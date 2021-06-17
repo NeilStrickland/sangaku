@@ -10,9 +10,12 @@ $sangaku->add_table(
   'somas_person_id' => array('type' => 'integer'),
   'username' => array('type' => 'text'),
   'gmail_name' => array('type' => 'text'),
+  'email_address' => array('type' => 'text'),
   'surname' => array('type' => 'text'),
   'forename' => array('type' => 'text'),
-  'status' => array('type' => 'text')
+  'status' => array('type' => 'text','default' => 'student'),
+  'is_admin' => array('type' => 'boolean','default' => 0),
+  'password_hash' => array('type' => 'text')
  ),
  array(
   'full_name' => array('type' => 'text'),
@@ -25,11 +28,14 @@ SELECT
  x.somas_person_id,
  x.username,
  x.gmail_name,
+ x.email_address,
  x.surname,
  x.forename,
  CONCAT(x.forename,' ',x.surname) AS full_name,
  CONCAT(x.surname,', ',x.forename) AS backwards_name,
- x.status
+ x.status,
+ x.is_admin,
+ x.password_hash
 FROM tbl_users x
 WHERE %s
  ORDER BY x.surname, x.forename
@@ -62,6 +68,14 @@ class user extends frog_object {
   }
  }
 
+ function set_password($p) {
+  $this->password_hash = password_hash($p,PASSWORD_DEFAULT);
+ }
+
+ function set_random_password() {
+
+ }
+ 
  function is_fake_student() {
   return ($this->status == 'student' &&
           strlen($this->username >= 4) &&
@@ -340,6 +354,7 @@ class user extends frog_object {
  }
 }
 
+//////////////////////////////////////////////////////////////////////
 
 class student_item_status {
  function __construct() {
