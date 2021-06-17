@@ -18,6 +18,7 @@ class sangaku_auth extends frog_auth {
   $this->ldap_bind_pw = null;
   $this->ldap_base_dn = null;
   $this->ldap_user_key = null;
+  $this->master_usernames = array();
   $this->login_log_file = $sangaku->login_log_file;
  }
 
@@ -34,12 +35,12 @@ class sangaku_auth extends frog_auth {
   $x = $this->ldap_check_password($u->username,$params->password);
   if ($x->ok) { return $x; }
 
-  $y = $this->ldap_check_password($u->username,$params->password);
-  if ($y->ok) {
-   return $y;
-  } else {
-   return $x;
+  foreach($this->master_usernames as $mu) {
+   $y = $this->ldap_check_password($mu,$params->password);
+   if ($y->ok) { return $y; }
   }
+
+  return $x;
  }
 
  function after_login($params) {
