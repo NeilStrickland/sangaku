@@ -9,6 +9,7 @@ $sangaku->add_table(
   'somas_moid' => array('type' => 'integer'),
   'code' => array('type' => 'text'),
   'title' => array('type' => 'text'),
+  'semester' => array('type' => 'text'),
   'blackboard_url' => array('type' => 'text')
  ),
  array(
@@ -19,6 +20,7 @@ SELECT
  x.somas_moid,
  x.code,
  x.title,
+ x.semester,
  x.blackboard_url
 FROM tbl_modules x
 WHERE %s
@@ -34,38 +36,48 @@ class module extends frog_object {
   parent::__construct($sangaku,'module',$id,$with_defaults);
  }
 
- function load_tutorial_groups($force = false) {
+ function load_tutorial_groups($semester='',$force = false) {
   global $sangaku;
 
   if ($force || ! isset($this->tutorial_groups)) {
+   $w = "x.module_id={$this->id}";
+
+   if ($semester) {
+    $w .= " AND x.semester='$semester'";
+   }
+   
    $this->tutorial_groups =
-    $sangaku->load_where_indexed('tutorial_groups',
-                                 "x.module_id={$this->id}");
+    $sangaku->load_where_indexed('tutorial_groups',$w);
   }
 
   return $this->tutorial_groups;
  }
 
- function load_problem_sheets($force = false) {
+ function load_problem_sheets($semester='',$force = false) {
   global $sangaku;
 
   if ($force || ! isset($this->problem_sheets)) {
+   $w = "x.module_id={$this->id}";
+
+   if ($semester) {
+    $w .= " AND x.semester='$semester'";
+   }
+   
    $this->problem_sheets =
-    $sangaku->load_where_indexed('problem_sheets',
-                                 "x.module_id={$this->id}");
+    $sangaku->load_where_indexed('problem_sheets',$w);
   }
 
   return $this->problem_sheets;
  }
 
- function load_sessions($force = false) {
+ function load_sessions($semester='',$force = false) {
   global $sangaku;
   
   if ($force || ! isset($this->sessions)) {
    $this->sessions = array();
 
-   $this->load_tutorial_groups();
-   $this->load_problem_sheets();
+   $this->load_tutorial_groups($semester);
+   $this->load_problem_sheets($semester);
 
    foreach($this->tutorial_groups as $x) {
     $x->sessions = array();
@@ -77,8 +89,13 @@ class module extends frog_object {
     $x->confirmed_sessions = array();
    }
 
+   $w = "g.module_id={$this->id}";
+   if ($semester) {
+    $w .= " AND g.semester='$semester'";
+   }
+   
    $this->sessions =
-     $sangaku->load_where('sessions',"g.module_id={$this->id}");
+     $sangaku->load_where('sessions',$w);
 
    $this->confirmed_sessions = array();
    

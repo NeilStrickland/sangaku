@@ -1,9 +1,7 @@
 <?php
 
 require_once('../include/sangaku.inc');
-
-$students = array(
-);
+$students = array();
 
 foreach($students as $s0) {
  $ss = $sangaku->load_where('user',"x.username={$s0[2]}");

@@ -70,8 +70,8 @@ class sangaku_class extends frog {
   if ($student_id == $user->id) {
    $params->user_is_student = true;
   } else {
-   if (! $group->is_teacher_member($user->id)) {
-    $params->error = 'User is not a teacher for this tutorial group';
+   if ($user->status != 'teacher') {
+    $params->error = 'User is not a teacher';
     return $params;
    }
   }
@@ -92,7 +92,8 @@ class sangaku_class extends frog {
 
  function get_date_info() {
   $date_info_file = $this->data_dir . '/date_info.json';
-  if (file_exists($date_info_file)) {
+  if (file_exists($date_info_file) &&
+      time() - filemtime($date_info_file) < 3600) {
    $json = file_get_contents($date_info_file);
   } else {
    $json = file_get_contents('https://maths.shef.ac.uk/maths/date_info.php');

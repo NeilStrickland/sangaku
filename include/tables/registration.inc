@@ -25,6 +25,7 @@ SELECT
  x.module_id,
  m.code AS module_code,
  m.title AS module_title,
+ m.semester,
  m.somas_moid,
  x.student_id,
  s.username,
@@ -53,12 +54,15 @@ class registration extends frog_object {
   return $this->student;
  }
 
- function load_groups() {
+ function load_groups($semester = '') {
   global $sangaku;
-  $this->groups = $sangaku->load_where(
-   'tutorial_group_students',
-   "m.id={$this->module_id} AND x.student_id={$this->student_id}"
-  );
+
+  $w = "m.id={$this->module_id} AND x.student_id={$this->student_id}";
+  if ($semester) {
+   $w .= "AND (g.semester='$semester' OR g.semester='' OR g.semester IS NULL)";
+  }
+  
+  $this->groups = $sangaku->load_where('tutorial_group_students',$w);
 
   $this->groups_by_id   = make_index($this->groups,'tutorial_group_id');
   $this->groups_by_name = make_index($this->groups,'tutorial_group_name');
@@ -97,7 +101,7 @@ class registration extends frog_object {
 
   $this->sheets = $sangaku->load_where(
    'problem_sheets',
-   "module_id={$m->id} AND semester='{$s}' AND week_number={$w}"
+   "x.module_id={$m->id} AND x.semester='{$s}' AND x.week_number={$w}"
   );
 
   foreach($this->sheets as $p) {

@@ -146,13 +146,17 @@ class user extends frog_object {
   }
  }
 
- function load_registrations($force = false) {
+ function load_registrations($semester = '',$force = false) {
   global $sangaku;
 
   if ($force || ! isset($this->registrations)) {
+   $w = "x.student_id={$this->id}";
+   if ($semester) {
+    $w .= " AND (m.semester='$semester' OR m.semester='Year')";
+   }
+   
    $this->registrations =
-    $sangaku->load_where('registrations',
-                         "x.student_id={$this->id}");
+    $sangaku->load_where('registrations',$w);
 
    $this->modules_by_code = array();
    $this->modules_by_id = array();
@@ -166,13 +170,17 @@ class user extends frog_object {
   return $this->modules_by_code;
  }
 
- function load_tutorial_groups($force = false) {
+ function load_tutorial_groups($semester = '',$force = false) {
   global $sangaku;
 
   if ($force || ! isset($this->tutorial_groups)) {
+   $w = "x.student_id={$this->id}";
+   if ($semester) {
+    $w .= " AND (g.semester='$semester' OR g.semester='Year' OR g.semester='' OR g.semester IS NULL)";
+   }
+
    $this->tutorial_groups_links =
-    $sangaku->load_where('tutorial_group_students',
-                         "x.student_id={$this->id}");
+    $sangaku->load_where('tutorial_group_students',$w);
 
    $this->tutorial_groups = array();
    foreach($this->tutorial_groups_links as $l) {
@@ -183,8 +191,8 @@ class user extends frog_object {
   return $this->tutorial_groups;
  }
 
- function load_student_sessions() {
-  $this->load_registrations();
+ function load_student_sessions($semester='') {
+  $this->load_registrations($semester);
 
   $this->sessions = array();
 
@@ -193,9 +201,9 @@ class user extends frog_object {
   }
  }
 
- function load_sessions() {
-  $this->load_registrations();
-  $this->load_tutorial_groups();
+ function load_sessions($semester='') {
+  $this->load_registrations($semester);
+  $this->load_tutorial_groups($semester);
   
   $ss = array();
   foreach($this->tutorial_groups as $g) {
@@ -255,13 +263,17 @@ class user extends frog_object {
   return $this->sessions;
  }
 
- function load_teacher_tutorial_groups($force = false) {
+ function load_teacher_tutorial_groups($semester='',$force = false) {
   global $sangaku;
 
   if ($force || ! isset($this->teacher_tutorial_groups)) {
+   $w = "x.teacher_id={$this->id}";
+   if ($semester) {
+    $w .= " AND (g.semester='$semester' OR g.semester='Year' OR g.semester='' OR g.semester IS NULL)";
+   }
+
    $this->teacher_tutorial_groups_links =
-    $sangaku->load_where('tutorial_group_teachers',
-                         "x.teacher_id={$this->id}");
+    $sangaku->load_where('tutorial_group_teachers',$w);
 
    $this->teacher_tutorial_groups = array();
    foreach($this->teacher_tutorial_groups_links as $l) {
@@ -272,8 +284,8 @@ class user extends frog_object {
   return $this->teacher_tutorial_groups;
  }
 
- function load_teacher_sessions() {
-  $this->load_teacher_tutorial_groups();
+ function load_teacher_sessions($semester='') {
+  $this->load_teacher_tutorial_groups($semester);
   $ss = array();
   foreach($this->teacher_tutorial_groups as $g) {
    $ss = array_merge($ss,$g->load_sessions());

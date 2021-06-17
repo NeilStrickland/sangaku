@@ -16,6 +16,7 @@ $sangaku->add_table(
  array(
   'problem_sheet_title' => array('type' => 'text'),
   'tutorial_group_name' => array('type' => 'text'),
+  'semester' => array('type' => 'text'),
   'module_code' => array('type' => 'text'),
   'module_blackboard_url' => array('type' => 'text')
  ),
@@ -26,6 +27,7 @@ SELECT
  p.title AS problem_sheet_title,
  x.tutorial_group_id,
  g.name AS tutorial_group_name,
+ g.semester,
  m.code AS module_code,
  m.title AS module_title, 
  m.blackboard_url AS module_blackboard_url,

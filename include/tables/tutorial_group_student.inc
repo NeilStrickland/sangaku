@@ -25,6 +25,7 @@ SELECT
  x.tutorial_group_id,
  g.name AS tutorial_group_name,
  g.somas_id AS somas_event_id,
+ g.semester,
  m.id AS module_id,
  m.code AS module_code,
  x.student_id,
