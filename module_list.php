@@ -7,22 +7,22 @@ $params = get_params();
 $N = $sangaku->nav;
 $H = $sangaku->html;
 
-echo $N->header('Modules');
+echo $N->header('Courses');
 
 $c = $params->include_empty ? ' checked="checked"' : '';
 
 echo $N->top_menu();
 
 echo <<<HTML
-<h1>Modules</h1>
+<h1>Courses</h1>
 <br/>
 <form name="control_form">
- Include modules with no Sangaku sessions
+ Include courses with no Sangaku sessions
  <input name="include_empty" type="checkbox"$c
   onclick="document.control_form.submit()"/>
 </form>
 <br/>
-<h2>My modules</h2>
+<h2>My Courses</h2>
 <table class="edged">
 
 HTML;
@@ -37,7 +37,7 @@ foreach($params->user_modules as $m) {
 echo <<<HTML
 </table>
 <br/>
-<h2>Other modules</h2>
+<h2>Other Courses</h2>
 <table class="edged">
 
 HTML;
