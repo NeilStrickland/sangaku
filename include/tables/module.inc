@@ -36,7 +36,7 @@ class module extends frog_object {
   parent::__construct($sangaku,'module',$id,$with_defaults);
  }
 
- function load_tutorial_groups($force = false,$semester='') {
+ function load_tutorial_groups($semester='',$force = false) {
   global $sangaku;
 
   if ($force || ! isset($this->tutorial_groups)) {
@@ -53,7 +53,7 @@ class module extends frog_object {
   return $this->tutorial_groups;
  }
 
- function load_problem_sheets($force = false,$semester='') {
+ function load_problem_sheets($semester='',$force = false) {
   global $sangaku;
 
   if ($force || ! isset($this->problem_sheets)) {
@@ -70,14 +70,14 @@ class module extends frog_object {
   return $this->problem_sheets;
  }
 
- function load_sessions($force = false,$semester='') {
+ function load_sessions($semester='',$force = false) {
   global $sangaku;
   
   if ($force || ! isset($this->sessions)) {
    $this->sessions = array();
 
-   $this->load_tutorial_groups(true,$semester);
-   $this->load_problem_sheets(true,$semester);
+   $this->load_tutorial_groups($semester);
+   $this->load_problem_sheets($semester);
 
    foreach($this->tutorial_groups as $x) {
     $x->sessions = array();
