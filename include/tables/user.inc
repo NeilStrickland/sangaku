@@ -132,7 +132,7 @@ class user extends frog_object {
   }
  }
 
- function load_registrations($force = false,$semester = '') {
+ function load_registrations($semester = '',$force = false) {
   global $sangaku;
 
   if ($force || ! isset($this->registrations)) {
@@ -156,7 +156,7 @@ class user extends frog_object {
   return $this->modules_by_code;
  }
 
- function load_tutorial_groups($force = false,$semester = '') {
+ function load_tutorial_groups($semester = '',$force = false) {
   global $sangaku;
 
   if ($force || ! isset($this->tutorial_groups)) {
@@ -178,7 +178,7 @@ class user extends frog_object {
  }
 
  function load_student_sessions($semester='') {
-  $this->load_registrations(true,$semester);
+  $this->load_registrations($semester);
 
   $this->sessions = array();
 
@@ -188,8 +188,8 @@ class user extends frog_object {
  }
 
  function load_sessions($semester='') {
-  $this->load_registrations(true,$semester);
-  $this->load_tutorial_groups(true,$semester);
+  $this->load_registrations($semester);
+  $this->load_tutorial_groups($semester);
   
   $ss = array();
   foreach($this->tutorial_groups as $g) {
@@ -249,7 +249,7 @@ class user extends frog_object {
   return $this->sessions;
  }
 
- function load_teacher_tutorial_groups($force = false,$semester='') {
+ function load_teacher_tutorial_groups($semester='',$force = false) {
   global $sangaku;
 
   if ($force || ! isset($this->teacher_tutorial_groups)) {
@@ -271,7 +271,7 @@ class user extends frog_object {
  }
 
  function load_teacher_sessions($semester='') {
-  $this->load_teacher_tutorial_groups(true,$semester);
+  $this->load_teacher_tutorial_groups($semester);
   $ss = array();
   foreach($this->teacher_tutorial_groups as $g) {
    $ss = array_merge($ss,$g->load_sessions());
