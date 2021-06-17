@@ -63,6 +63,8 @@ $sangaku->html = new sangaku_html($sangaku);
 $sangaku->nav  = new sangaku_navigator($sangaku);
 $sangaku->auth = new sangaku_auth($sangaku);
                           
+require_once($sangaku->data_dir . '/auth_config.inc');
+
 $f = $_SERVER['PHP_SELF'];
 
 global $allow_bot;
