@@ -28,8 +28,7 @@ function teacher_index_page() {
 
  $force_index = get_optional_parameter('force_index',0) ? 1 : 0;
 
- $user->load_teacher_sessions(true,$semester);
- $user->load_teacher_tutorial_groups(true,$semester);
+ $user->load_teacher_sessions($semester);
 
  if (count($user->current_teacher_sessions) == 1 &&
      ! $force_index) {
