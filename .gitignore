@@ -1,6 +1,7 @@
 z*
 .vscode/
 include/config.inc
+adhoc/
 scratch/
 vendor/
 composer.lock
