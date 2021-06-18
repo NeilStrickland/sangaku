@@ -9,6 +9,7 @@ $sangaku->add_table(
   'somas_id' => array('type' => 'integer'),
   'module_id' => array('type' => 'integer','link' => 'module'),
   'name' => array('type' => 'text'),
+  'is_regular' => array('type' => 'boolean','default' => 1),
   'semester' => array('type' => 'text'),
   'day_number' => array('type' => 'integer'),
   'hour' => array('type' => 'integer'),
@@ -28,6 +29,7 @@ SELECT
  m.title AS module_title,
  m.somas_moid,
  x.name,
+ x.is_regular,
  x.semester,
  x.day_number,
  x.hour,
@@ -45,6 +47,30 @@ class tutorial_group extends frog_object {
   global $sangaku;
 
   parent::__construct($sangaku,'tutorial_group',$id,$with_defaults);
+ }
+
+ function descriptor() {
+  if (isset($this->name) && $this->name) {
+   if (isset($this->module_code) && $this->module_code) {
+    return "{$this->module_code}({$this->name})";
+   } else {
+    return "Group {$this->name}";
+   }
+  } elseif ($this->id) {
+   return("Tutorial group [{$this->id}]");
+  } else {
+   return "New tutorial group";
+  }
+ }
+
+ function module_descriptor() {
+  if (isset($this->name) && $this->name) {
+   return $this->name;
+  } elseif ($this->id) {
+   return("Tutorial group [{$this->id}]");
+  } else {
+   return "New tutorial group";
+  }
  }
 
  function day_letter() {
@@ -180,7 +206,13 @@ class tutorial_group extends frog_object {
   
   return $this->sessions;
  }
- 
+
+ function load_associated() {
+  $this->load_teachers();
+  $this->load_students();
+  $this->load_sessions();
+ }
+
  function is_student_member($student_id) {
   global $sangaku;
   $w = "x.tutorial_group_id={$this->id} AND x.student_id={$student_id}";
