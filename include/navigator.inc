@@ -187,6 +187,7 @@ HTML
   if ($user->status == 'teacher') {
   $html .= <<<HTML
 <button type="button" onclick="location='/sangaku/module_list.php'">Modules</button>
+<button type="button" onclick="location='/sangaku/user_list.php'">Users</button>
 
 HTML
         ;
