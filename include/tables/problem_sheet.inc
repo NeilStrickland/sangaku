@@ -44,15 +44,41 @@ class problem_sheet extends frog_object {
  }
 
  function descriptor() {
-  if ($this->title) {
-   return $this->title;
-  } else if ($this->code) {
-   return $this->code;
-  } else if ($this->id) {
-   return "Problem sheet [{$this->id}]";
+  $d = '';
+  if ($this->code) {
+   if ($this->module_code) {
+    $d = "{$this->module_code}:{$this->code}";
+   } else {
+    $d = $this->code;
+   }
+  } elseif ($this->id) {
+   $d = "Problem sheet [{$this->id}]";
   } else {
-   return "New problem sheet";
+   $d = "New problem sheet";
   }
+
+  if (trim($this->title)) {
+   $d = $d . ' (' . trim($this->title) . ')';
+  }
+
+  return $d;
+ }
+
+ function module_descriptor() {
+  $d = '';
+  if ($this->code) {
+   $d = $this->code;
+  } elseif ($this->id) {
+   $d = "Problem sheet [{$this->id}]";
+  } else {
+   $d = "New problem sheet";
+  }
+
+  if (trim($this->title)) {
+   $d = $d . ' (' . trim($this->title) . ')';
+  }
+
+  return $d;
  }
  
  function add_question_items($item0) {
