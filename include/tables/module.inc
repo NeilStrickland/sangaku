@@ -9,10 +9,12 @@ $sangaku->add_table(
   'somas_moid' => array('type' => 'integer'),
   'code' => array('type' => 'text'),
   'title' => array('type' => 'text'),
+  'is_regular' => array('type' => 'boolean','default' => 1),
   'semester' => array('type' => 'text'),
   'blackboard_url' => array('type' => 'text')
  ),
  array(
+  'coded_title' => array('type' => 'text')
  ),
  <<<SQL
 SELECT
@@ -20,6 +22,8 @@ SELECT
  x.somas_moid,
  x.code,
  x.title,
+ CONCAT(x.code,' (',x.title,')') AS coded_title,
+ x.is_regular,
  x.semester,
  x.blackboard_url
 FROM tbl_modules x
@@ -34,6 +38,22 @@ class module extends frog_object {
   global $sangaku;
 
   parent::__construct($sangaku,'module',$id,$with_defaults);
+ }
+
+ function descriptor() {
+  if ($this->code) {
+   if ($this->title) {
+    return "{$this->code} ({$this->title})";
+   } else {
+    return $this->code
+   }
+  } elseif ($this->title) {
+   return $this->title;
+  } elseif ($this->id) {
+   return "Module [{$this->id}]";
+  } else {
+   return "New module";
+  }
  }
 
  function load_tutorial_groups($semester='',$force = false) {
