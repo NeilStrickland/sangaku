@@ -554,15 +554,26 @@ autosuggest.set_value = function(i) {
 };
 
 autosuggest.known_types = {
- 'user'        : 1
+    'user' : 1,
+    'module' : 1,
+    'tutorial_group' : 1,
+    'problem_sheet' : 1
 };
 
 autosuggest.default_size = {
- 'user' : 50
+    'user' : 50,
+    'module' : 50,
+    'problem_sheet' : 50
+};
+
+autosuggest.extra_params = {
+    'user' : ['module_id','status'],
+    'tutorial_group' : ['module_id'],
+    'problem_sheet' : ['module_id']
 };
 
 autosuggest.setup_all = function() {
- var i,ip,ips,d,s,url,moid;
+ var i,ip,ips,d,s,url,p,v;
  ips = document.getElementsByTagName('INPUT');
 
  for (i in ips) {
@@ -577,9 +588,16 @@ autosuggest.setup_all = function() {
 
    if (this.known_types[s]) {
     url = sangaku.ajax_url + '/suggest.php?type=' + s;
-    if (s == 'user' && (moid = ip.getAttribute('moid'))) {
-     url = url + '&moid=' + moid;
+
+    if (this.extra_params[s]) {
+     for (p of this.extra_params[s]) {
+      v = ip.getAttribute(p);
+      if (v) {
+       url = url + '&' + p + '=' + v;
+      }
+     }
     }
+    
     this.setup_ajax(ip,d,url);
    }
   }
