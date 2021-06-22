@@ -17,15 +17,16 @@ function get_params() {
 
  $m = $sangaku->get_object_parameter('id','module');
  $params->module = $m;
- 
- $params->date_info = $sangaku->get_date_info();
 
- $sem = $params->date_info->semester;
+ $semester = '';
+ $d = $sangaku->get_date_info();
+ if ($d) { $semester = $d->semester; }
+ $semester = get_restricted_parameter('semester',array('','1','2'),$semester);
 
  if ($m) {
-  $m->load_tutorial_groups($sem);
-  $m->load_problem_sheets($sem);
-  $m->load_sessions($sem);
+  $m->load_tutorial_groups($semester);
+  $m->load_problem_sheets($semester);
+  $m->load_sessions($semester);
   $m->load_students();
   
   foreach($m->tutorial_groups as $g) {
@@ -46,7 +47,7 @@ function info_page($params) {
  $H = $sangaku->html;
  $m = $params->module;
  
- echo $N->header($m->code,array('widgets' => array('mathjax','tabber')));
+ echo $N->header($m->code,array('widgets' => array('mathjax','tabber','autosuggest')));
 
  echo $N->top_menu();
  
@@ -207,10 +208,20 @@ HTML
   ;
  
  echo $H->edged_table_start();
- echo $H->spacer_row(60,300,60);
+ echo $H->spacer_row(60,300,60,10);
+ echo $H->row('Username','Name','Group','Edit');
  
  foreach($m->students as $s) {
-  echo $H->row($s->username,$s->full_name,$s->tutorial_group_name);
+  $t = $m->tutorial_group_selector('tutorial_group_id_' . $s->id,
+				   $s->tutorial_group_id
+  );
+  
+  $u = 'user_info.php?id=' . $s->id;
+  echo $H->row($s->username,
+	       $s->full_name,
+	       $t,
+	       $H->icon_popup('edit',$u)
+  );
  }
  
  echo $H->edged_table_end();
