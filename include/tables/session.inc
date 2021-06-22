@@ -80,7 +80,7 @@ class session extends frog_object {
  }
 
  function friendly_start_time() {
-  if ($this->start_time) {
+  if ($this->date && $this->time) {
    return date('H:i D, j/m',$this->start_timestamp());
   } else {
    return '';
@@ -295,8 +295,6 @@ HTML
   $x->id = $this->id;
   $x->problem_sheet_id = $this->problem_sheet_id;
   $x->tutorial_group_id = $this->tutorial_group_id;
-  $x->start_time      = $this->start_time;
-  $x->end_time        = $this->end_time();
   $x->start_timestamp = $this->start_timestamp();
   $x->end_timestamp   = $this->end_timestamp();
   $x->duration        = $this->duration;
@@ -332,3 +330,6 @@ HTML
   return json_encode($this->for_json($with_solutions));
  }
 }
+
+
+// end

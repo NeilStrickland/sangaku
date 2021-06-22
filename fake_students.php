@@ -44,7 +44,7 @@ function choose_student_page($params) {
  
  $h = $session->module_code .
     '(' . $group->name . '): ' . $sheet->title .
-    ' ' . date('D j/n H:i',strtotime($session->start_time));
+    ' ' . date('D j/n H:i',$session->start_timestamp());
  
  echo <<<HTML
 <h1>$h</h1>

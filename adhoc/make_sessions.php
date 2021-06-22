@@ -39,13 +39,16 @@ foreach($slots as $s) {
   } else {
    $h = '' . $s[2];
   }
-  $d1 = date('Y-m-d',$t1) . ' ' . $h . ':00:00';
-  $t2 = strtotime($d1);
-  $d2 = date('Y-m-d H:i:s',$t2);
+  $d1 = date('Y-m-d',$t1);
+  $h1 = $h . ':00:00';
+  $t2 = strtotime($d1 . ' ' . $h1);
+  $d2 = date('Y-m-d',$t2);
+  $h2 = date('H:i:s',$t2);
   $x = $sangaku->new_object('session');
   $x->problem_sheet_id = $k;
   $x->tutorial_group_id = $g->id;
-  $x->start_time = $d1;
+  $x->date = $d2;
+  $x->time = $h2;
   $x->duration = 50;
   $x->save();
   $k++;
@@ -56,13 +59,16 @@ foreach($slots as $s) {
   } else {
    $h = '' . $s[4];
   }
-  $d1 = date('Y-m-d',$t1) . ' ' . $h . ':00:00';
-  $t2 = strtotime($d1);
-  $d2 = date('Y-m-d H:i:s',$t2);
+  $d1 = date('Y-m-d',$t1);
+  $h1 = $h . ':00:00';
+  $t2 = strtotime($d1 . ' ' . $h1);
+  $d2 = date('Y-m-d',$t2);
+  $h2 = date('H:i:s',$t2);
   $x = $sangaku->new_object('session');
   $x->problem_sheet_id = $k;
   $x->tutorial_group_id = $g->id;
-  $x->start_time = $d1;
+  $x->date = $d2;
+  $x->time = $h2;
   $x->duration = 50;
   $x->save();
   $k++;

@@ -651,7 +651,6 @@ sangaku.sheet_viewer.clear_notifier = function() {
 };
 
 sangaku.sheet_viewer.countdown = function() {
- var dd = this.session.start_time;
  var t0 = this.session.start_timestamp * 1000;
  var t1 = Date.now();
  var d0 = (new Date(t0)).toISOString();
