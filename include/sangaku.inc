@@ -2,8 +2,9 @@
 
 //ini_set('display_errors','On');
 
-
-$frog_dir = $_SERVER['DOCUMENT_ROOT'] . '/include/frog';
+$web_dir = $_SERVER['DOCUMENT_ROOT'];
+if (! $web_dir) { $web_dir = getenv('WEBDIR'); }
+$frog_dir =  $web_dir . '/include/frog';
 require_once($frog_dir . '/frog.inc');
 
 require_once('sangaku_class.inc');
