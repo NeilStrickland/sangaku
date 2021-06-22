@@ -23,9 +23,11 @@ function teacher_index_page() {
  $N = $sangaku->nav;
  $H = $sangaku->html;
 
+ $semester = '';
  $d = $sangaku->get_date_info();
- $semester = get_restricted_parameter('semester',array('','1','2'),$d->semester);
-
+ if ($d) { $semester = $d->semester; }
+ $semester = get_restricted_parameter('semester',array('','1','2'),$semester);
+ 
  $force_index = get_optional_parameter('force_index',0) ? 1 : 0;
 
  $user->load_teacher_sessions($semester);
