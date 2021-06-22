@@ -11,7 +11,8 @@ $sangaku->add_table(
   'title' => array('type' => 'text'),
   'is_regular' => array('type' => 'boolean','default' => 1),
   'semester' => array('type' => 'text'),
-  'blackboard_url' => array('type' => 'text')
+  'video_url' => array('type' => 'text'),
+  'video_url_description' => array('type' => 'text')
  ),
  array(
   'coded_title' => array('type' => 'text')
@@ -25,7 +26,8 @@ SELECT
  CONCAT(x.code,' (',x.title,')') AS coded_title,
  x.is_regular,
  x.semester,
- x.blackboard_url
+ x.video_url,
+ x.video_url_description
 FROM tbl_modules x
 WHERE %s
  ORDER BY x.code,x.title,x.id
