@@ -102,12 +102,15 @@ class tutorial_group extends frog_object {
  function load_teachers() {
   global $sangaku;
 
+  $this->teacher_links = array();
+  $this->teachers = array();
+  $this->teachers_by_username = array();
+
+  if (! $this->id) { return $this->teachers; }
+
   $this->teacher_links =
    $sangaku->load_where_indexed('tutorial_group_teachers',
                                 "x.tutorial_group_id={$this->id}");
-
-  $this->teachers = array();
-  $this->teachers_by_username = array();
 
   foreach($this->teacher_links as $x) {
    $teacher = $x->load_teacher();
@@ -121,12 +124,15 @@ class tutorial_group extends frog_object {
  function load_students($include_fake = 1) {
   global $sangaku;
 
+  $this->student_links = array();
+  $this->students = array();
+  $this->students_by_username = array();
+
+  if (! $this->id) { return $this->students; }
+
   $this->student_links =
    $sangaku->load_where_indexed('tutorial_group_students',
                                 "x.tutorial_group_id={$this->id}");
-
-  $this->students = array();
-  $this->students_by_username = array();
 
   foreach($this->student_links as $x) {
    $student = $x->load_student();
@@ -151,14 +157,17 @@ class tutorial_group extends frog_object {
  function load_sessions() {
   global $sangaku;
   
-  $this->sessions =
-   $sangaku->load_where('sessions',"x.tutorial_group_id={$this->id}");
-
+  $this->sessions = array();
   $this->confirmed_sessions = array();
   $this->sessions_by_state = array('unfinished' => array());
   $this->confirmed_sessions_by_state = array('unfinished' => array());
 
-  foreach(session::$time_states as $x) {
+  if (! $this->id) { return $this->sessions; }
+  
+  $this->sessions =
+   $sangaku->load_where('sessions',"x.tutorial_group_id={$this->id}");
+
+   foreach(session::$time_states as $x) {
    $this->sessions_by_state[$x] = array();
    $this->confirmed_sessions_by_state[$x] = array();
   }
