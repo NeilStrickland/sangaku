@@ -1,230 +1,283 @@
 <?php
 
+ini_set('display_errors',1);
+
 require_once('include/sangaku.inc');
 
-$params = get_params();
-
-info_page($params);
- 
-exit;
-
-//////////////////////////////////////////////////////////////////////
-
-function get_params() {
- global $sangaku;
- 
- $params = new stdClass();
-
- $m = $sangaku->get_object_parameter('id','module');
- $params->module = $m;
-
- $semester = '';
- $d = $sangaku->get_date_info();
- if ($d) { $semester = $d->semester; }
- $semester = get_restricted_parameter('semester',array('','1','2'),$semester);
-
- if ($m) {
-  $m->load_tutorial_groups($semester);
-  $m->load_problem_sheets($semester);
-  $m->load_sessions($semester);
-  $m->load_students();
+class module_editor extends frog_object_editor {
+ function __construct() { 
+  global $sangaku;
+  parent::__construct($sangaku,'module');
   
-  foreach($m->tutorial_groups as $g) {
-   $g->load_teachers();
-   $g->load_students();
-  }
+  $this->commands = 
+   array(
+    'load' => true,
+    'suggest_delete' => true,
+    'delete' => true,
+    'save' => true,
+    'new' => true
+    );
+ }
+  
+ function check_authorisation() {
+  global $user;
+  return ($user->status == 'teacher');
+ }
+ 
+ function listing_url() {
+  return '/sangaku/module_list.php';
+ }
+ 
+ function associated_lists() {
+  return(
+   array(
+    array('name' => 'tutorial_group'),
+    array('name' => 'problem_sheet'),
+    array('name' => 'registration')
+   )
+  );
  }
 
- return $params;
-}
+ function edit_page_widgets() {
+  return array('mathjax','tabber','autosuggest','calendar');
+ }
 
-//////////////////////////////////////////////////////////////////////
+ function edit_page() {
+  global $sangaku;
 
-function info_page($params) {
- global $sangaku;
+  $N = $sangaku->nav;
+  $H = $sangaku->html;
+  $m = $this->object;
+  $m->load_sessions();
 
- $N = $sangaku->nav;
- $H = $sangaku->html;
- $m = $params->module;
+  echo $this->edit_page_header();
  
- echo $N->header($m->code,array('widgets' => array('mathjax','tabber','autosuggest')));
-
- echo $N->top_menu();
+  echo $N->top_menu();
+  
+  echo <<< HTML
+ <div class="tabber" id="module_info_tabber_{$m->id}">
  
- echo <<<HTML
-<h1>{$m->code} {$m->title}</h1>
-<br/>
-<div class="tabber" id="module_info_tabber_{$m->id}">
-
 HTML;
 
- groups_tab($params);
- sheets_tab($params);
- sessions_tab($params);
- students_tab($params);
- 
- echo <<<HTML
-</div>
-
-HTML
-  ;
- echo $N->footer();
-}
-
-function groups_tab($params) {
- global $sangaku;
-
- $N = $sangaku->nav;
- $H = $sangaku->html;
- $m = $params->module;
-
- echo $H->tab_start('Tutorial groups');
- echo $H->edged_table_start();
- echo $H->spacer_row(60,90,60,60,60,300,60);
- echo $H->row('Group','Semester','Day','Time','Weeks','Teachers','');
- foreach($m->tutorial_groups as $g) {
-  $tt = array();
-  foreach($g->teachers as $t) {
-   $tt[] = $t->full_name;
-  }
-  $tt = implode(', ',$tt);
-  $url = 'group_info.php?id=' . $g->id;
+  $this->general_tab();
+  $this->groups_tab();
+  $this->sheets_tab();
+  $this->sessions_tab();
+  $this->students_tab();
   
-  echo $H->tr($H->td($g->name) .
-              $H->td($g->semester) .
-              $H->td($g->day_name()) .
-              $H->td('' . $g->hour . ':00') . 
-              $H->td($g->week_parity_long()) .
-              $H->td($tt) .
-              $H->link_td("Details",$url));
+  echo <<< HTML
+ </div>
+ 
+HTML;
+  echo $this->edit_page_footer();
  }
  
- echo $H->edged_table_end();
- echo $H->tab_end();
-}
+ function general_tab() {
+  global $sangaku,$user;
+  
+  $H = $sangaku->html;
+  $N = $sangaku->nav;
+  $m = $this->object;
+  $sz = array('size' => 70);
 
-function sheets_tab($params) {
- global $sangaku;
+  echo $H->tab_start('General');
+  echo $H->edged_table_start();
+  echo $H->spacer_row(150,300);
 
- $N = $sangaku->nav;
- $H = $sangaku->html;
- $m = $params->module;
-
- echo $H->tab_start('Problem sheets');
- echo $H->edged_table_start();
- echo $H->spacer_row(60,60,500,60,60);
-
- echo $H->row('Semester','Week','Title','','');
- foreach ($m->problem_sheets as $s) {
-  echo $H->tr($H->td($s->semester) .
-              $H->td($s->week_number).
-              $H->td($s->title) .
-              $H->link_td("Preview","problem_sheet_info.php?command=display&id={$s->id}") .
-              $H->link_td("Edit","problem_sheet_info.php?id={$s->id}")
-  );
- }
- 
- echo $H->edged_table_end();
-
- $url = "problem_sheet_info.php?module_id={$m->id}&command=new";
- 
- echo <<<HTML
-<br/><br/>
-<button type="button" onclick="location='$url'">Create new problem sheet</button>
-
-HTML
-  ;
- echo $H->tab_end();
-}
-
-function sessions_tab($params) {
- global $sangaku;
-
- $N = $sangaku->nav;
- $H = $sangaku->html;
- $m = $params->module;
-
- echo $H->tab_start('Sessions');
-
- for ($i = 1; $i <= 2; $i++) {
-  if ($m->sessions_by_semester[$i]) {
-   echo <<<HTML
-<h3>Semester $i</h3><br/>
-
-HTML
-;
-   echo $H->edged_table_start();
-   echo $H->spacer_row(60,300,120,60,30);
-    
-   for ($j = 0; $j <= 12; $j++) {
-    if ($m->sessions_by_week[$i][$j]) {
-     echo <<<HTML
+  echo $H->row($H->bold('Code:'),$H->text_input('code',$m->code));
+  echo $H->row($H->bold('Title:'),$H->text_input('title',$m->title,$sz));
+  echo $H->row($H->bold('Regular:'),$H->checkbox('is_regular',$m->is_regular));
+  echo <<<HTML
  <tr>
-  <td colspan="5" style="font-weight:bold; text-align:center; background: #888888;">Week $j</td>
+  <td colspan="2">
+   You should tick the box above if teaching for this module happens regularly, 
+   at fixed times every week or alternate weeks for a full semester.
+   If this module has a different kind of schedule, then you should
+   leave the box unticked and also leave the semester empty.
+   <br/>
+  </td>
  </tr>
+ 
+HTML;
 
-HTML
-      ;
-     foreach($m->sessions_by_week[$i][$j] as $s) {
-      $url = 'session_monitor.php?session_id=' . $s->id;
-      echo $H->tr($H->td($s->tutorial_group_name) . 
-                  $H->td($s->problem_sheet_title) .
-                  $H->td(date('D j/n H:i',$s->start_timestamp)) .
-                  $H->link_td("Monitor",$url) . 
-                  $H->td($H->checkbox(
-                   'session_confirmed_' . $s->id,$s->is_confirmed,
-                   array(
-                    'id' => 'session_confirmed_' . $s->id,
-                    'onclick' => "sangaku.toggle_session_confirmed({$s->id})")))
-      );
-     }
-    }
+  echo $H->row($H->bold('Semester:'),$H->semester_selector('semester',$m->semester));
+
+  echo <<<HTML
+ <tr>
+  <td colspan="2">
+   Sangaku is designed to be used alongside a video meeting system such as 
+   Zoom, Google Meet or Blackboard Collaborate.  In the first box below you can
+   enter a URL for such a system.  If there are individual URLs for each session,
+   and no useful URL for the module as a whole, then you can leave this box blank.
+   <br/><br/>
+   In the second box you should enter a phrase like "Zoom meeting" or 
+   "Blackboard page" which will be used to describe the links to users.
+  </td>
+ </tr>
+ 
+HTML;
+
+  echo $H->row($H->bold('Video URL:'),$H->text_input('video_url',$m->video_url,$sz));
+  echo $H->row($H->bold('Description:'),$H->text_input('video_url',$m->video_url,$sz));
+  echo $H->edged_table_end();
+
+  echo $H->tab_end();
+
+ }
+
+ function groups_tab() {
+  global $sangaku;
+ 
+  $N = $sangaku->nav;
+  $H = $sangaku->html;
+  $m = $this->object;
+ 
+  echo $H->tab_start('Tutorial groups');
+  echo $H->edged_table_start();
+  echo $H->spacer_row(60,90,60,60,60,300,60);
+  echo $H->row('Group','Semester','Day','Time','Weeks','Teachers','');
+  foreach($m->tutorial_groups as $g) {
+   $g->load_teachers();
+   $uu = array();
+
+   foreach($g->teachers as $u) { 
+    $n = $u->full_name;
+    $uu[] = $n; 
    }
 
-   echo $H->edged_table_end();
+   $uu = implode(', ',$uu);
+   $url = 'group_info.php?id=' . $g->id;
+   
+   echo $H->tr($H->td($g->name) .
+               $H->td($g->semester) .
+               $H->td($g->day_name()) .
+               $H->td('' . $g->hour . ':00') . 
+               $H->td($g->week_parity_long()) .
+               $H->td($uu) .
+               $H->link_td("Edit",$url));
   }
- }
- 
- echo $H->tab_end();
-}
-
-function students_tab($params) {
- global $sangaku;
-
- $N = $sangaku->nav;
- $H = $sangaku->html;
- $m = $params->module;
-
- $n = count($m->students);
- 
- echo $H->tab_start('Students');
-
- echo <<<HTML
-<br/>
-There are $n registered students.
-<br/>
-
-HTML
-  ;
- 
- echo $H->edged_table_start();
- echo $H->spacer_row(60,300,60,10);
- echo $H->row('Username','Name','Group','Edit');
- 
- foreach($m->students as $s) {
-  $t = $m->tutorial_group_selector('tutorial_group_id_' . $s->id,
-				   $s->tutorial_group_id
-  );
   
-  $u = 'user_info.php?id=' . $s->id;
-  echo $H->row($s->username,
-	       $s->full_name,
-	       $t,
-	       $H->icon_popup('edit',$u)
-  );
+  echo $H->edged_table_end();
+
+  $url = "group_info.php?module_id={$m->id}&command=new";
+  
+  echo "<br/>" . $H->button_link('Create new tutorial group',$url);
+
+  echo $H->tab_end();
  }
  
- echo $H->edged_table_end();
- echo $H->tab_end();
+ function sheets_tab() {
+  global $sangaku;
+ 
+  $N = $sangaku->nav;
+  $H = $sangaku->html;
+  $m = $this->object;
+ 
+  echo $H->tab_start('Problem sheets');
+  echo $H->edged_table_start();
+  echo $H->spacer_row(60,60,500,60,60);
+ 
+  echo $H->row('Semester','Week','Title','','');
+  foreach ($m->problem_sheets as $s) {
+   echo $H->tr($H->td($s->semester) .
+               $H->td($s->week_number).
+               $H->td($s->title) .
+               $H->link_td("Preview","problem_sheet_info.php?command=display&id={$s->id}") .
+               $H->link_td("Edit","problem_sheet_info.php?id={$s->id}")
+   );
+  }
+  
+  echo $H->edged_table_end();
+ 
+  $url = "problem_sheet_info.php?module_id={$m->id}&command=new";
+  
+  echo "<br/>" . $H->button_link('Create new problem sheet',$url);
+
+  echo $H->tab_end();
+ }
+ 
+ function sessions_tab() {
+  global $sangaku;
+ 
+  $N = $sangaku->nav;
+  $H = $sangaku->html;
+  $m = $this->object;
+ 
+  echo $H->tab_start('Sessions');
+ 
+  for ($i = 1; $i <= 2; $i++) {
+   if ($m->sessions_by_semester[$i]) {
+    echo <<< HTML
+ <h3>Semester $i</h3><br/>
+ 
+HTML;
+    echo $H->edged_table_start();
+    echo $H->spacer_row(60,300,120,60,30);
+     
+    for ($j = 0; $j <= 12; $j++) {
+     if ($m->sessions_by_week[$i][$j]) {
+      echo <<< HTML
+  <tr>
+   <td colspan="5" style="font-weight:bold; text-align:center; background: #888888;">Week $j</td>
+  </tr>
+ 
+HTML;
+      foreach($m->sessions_by_week[$i][$j] as $s) {
+       $url = 'session_monitor.php?session_id=' . $s->id;
+       echo $H->tr($H->td($s->tutorial_group_name) . 
+                   $H->td($s->problem_sheet_title) .
+                   $H->td(date('D j/n H:i',$s->start_timestamp)) .
+                   $H->link_td("Monitor",$url) . 
+                   $H->td($H->checkbox(
+                    'session_confirmed_' . $s->id,$s->is_confirmed,
+                    array(
+                     'id' => 'session_confirmed_' . $s->id,
+                     'onclick' => "sangaku.toggle_session_confirmed({$s->id})")))
+       );
+      }
+     }
+    }
+ 
+    echo $H->edged_table_end();
+   }
+  }
+  
+  echo $H->tab_end();
+ }
+ 
+ function students_tab() {
+  global $sangaku;
+ 
+  $N = $sangaku->nav;
+  $H = $sangaku->html;
+  $m = $this->object;
+ 
+  $n = count($m->registrations);
+  
+  echo $H->tab_start('Students');
+ 
+  echo <<< HTML
+ <br/>
+ There are $n registered students.
+ <br/>
+ 
+HTML;
+  
+  echo $H->edged_table_start();
+  echo $H->spacer_row(60,300,30);
+  echo $H->row('Username','Name','Edit');
+  
+  foreach($m->registrations as $s) {
+   $u = 'user_info.php?id=' . $s->id;
+   echo $H->row($s->username,
+         $s->full_name,
+         $H->icon_popup('edit',$u)
+   );
+  }
+  
+  echo $H->edged_table_end();
+  echo $H->tab_end();
+ }
 }
 
+(new module_editor())->run();
