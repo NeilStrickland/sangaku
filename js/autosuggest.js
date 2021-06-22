@@ -28,6 +28,8 @@ autosuggest.setup = function(type,hidden,display,key,value) {
   url = sangaku.ajax_url + '/suggest.php?type=' + type;
   hidden.value = key;
   display.value = value;
+  size = this.default_size[type];
+  if (size) { display.setAttribute('size',size); }
   return(this.setup_ajax(hidden,display,url));
  } else if (window[type + '_keys'] && window[type_ + 'vals']) {
   keys = window[type + '_keys'];
@@ -563,7 +565,8 @@ autosuggest.known_types = {
 autosuggest.default_size = {
     'user' : 50,
     'module' : 50,
-    'problem_sheet' : 50
+    'problem_sheet' : 30,
+    'tutorial_group' : 10
 };
 
 autosuggest.extra_params = {
@@ -573,7 +576,7 @@ autosuggest.extra_params = {
 };
 
 autosuggest.setup_all = function() {
- var i,ip,ips,d,s,url,p,v;
+    var i,ip,ips,d,s,url,p,v,size;
  ips = document.getElementsByTagName('INPUT');
 
  for (i in ips) {
@@ -597,7 +600,10 @@ autosuggest.setup_all = function() {
       }
      }
     }
-    
+       
+    size = this.default_size[s];
+    if (size) { d.setAttribute('size',size); }
+
     this.setup_ajax(ip,d,url);
    }
   }
