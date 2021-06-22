@@ -400,6 +400,9 @@ frog.todays_date = function() {
 frog.check_date = function(id) {
  var e = document.getElementById(id);
  var d = e.value;
+
+ if (! d) { return; }
+ 
  var n,m,day,month,year;
 
  if (d == '=') {
@@ -445,6 +448,21 @@ frog.check_date = function(id) {
   e.value = this.saved_values[id];
  }
 };
+
+frog.check_time = function(id) {
+ var e = document.getElementById(id);
+ if (! e.value) { return; }
+ var d = e.value.split(':');
+ var h = d.length > 0 ? parseInt(d[0]) : 0;
+ var m = d.length > 1 ? parseInt(d[1]) : 0;
+ var s = d.length > 2 ? parseInt(d[2]) : 0;
+ h = '' + ((h < 10) ? '0' : '') + h;
+ m = '' + ((m < 10) ? '0' : '') + m;
+ s = '' + ((s < 10) ? '0' : '') + s;
+ d = h + ':' + m + ':' : s;
+ e.value = d;
+ this.saved_values[id] = d;
+}
 
 //////////////////////////////////////////////////////////////////////
 // Form element functions
