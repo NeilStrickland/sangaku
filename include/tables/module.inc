@@ -45,7 +45,7 @@ class module extends frog_object {
    if ($this->title) {
     return "{$this->code} ({$this->title})";
    } else {
-    return $this->code
+    return $this->code;
    }
   } elseif ($this->title) {
    return $this->title;
@@ -184,12 +184,16 @@ class module extends frog_object {
   foreach($this->registrations as $r) {
    $s = $r->load_link('student');
    if (! $s) { $r->delete(); continue; }
+   $s->registration = $r;
    $s->tutorial_group_id = null;
    $s->tutorial_group_name = '';
+   $s->tutorial_group_membership = null;
    $this->students[] = $s;
    $this->students_by_id[$s->id] = $s;
    $this->students_by_username[$s->username] = $s;
-   $this->students_by_somas_id[$s->somas_student_id] = $s;
+   if ($s->somas_student_id) {
+    $this->students_by_somas_id[$s->somas_student_id] = $s;
+   }
   }
 
   $this->group_memberships = $sangaku->load_where(
@@ -200,10 +204,69 @@ class module extends frog_object {
   foreach($this->group_memberships as $m) {
    if (isset($this->students_by_id[$m->student_id])) {
     $s = $this->students_by_id[$m->student_id];
+    $s->tutorial_group_membership = $m;
     $m->student = $s;
     $s->tutorial_group_id = $m->tutorial_group_id;
     $s->tutorial_group_name = $m->tutorial_group_name;
    }
   }
+ }
+
+ function add_student($student_id) {
+  global $sangaku;
+
+  $q = <<<SQL
+x.module_id={$this->id} AND
+x.student_id={$student_id}  
+SQL;
+  
+  $rr = $sangaku->load_where('registration',$q);
+
+  if ($rr) {
+   return $rr[0];
+  } else {
+   $r = $sangaku->new_object('registration');
+   $r->module_id = $this->id;
+   $r->student_id = $student_id;
+   $r->save();
+   return $r;
+  }
+ }
+
+ function tutorial_group_selector($field_name,$id='',$opts=null) {
+  global $sangaku;
+  $H = $sangaku->html;
+
+  $semester = '';
+  if (isset($opts['semester'])) {
+   $semester = $opts['semester'];
+  }
+
+  $groups = $this->load_tutorial_groups($semester);
+
+  $opts0 = array(
+   'onchange' => '',
+   'onfocus' => '',
+   'onblur' => '',
+   'width' => '',
+   'mode' => 'indirect',
+   'index' => 'id',
+   'display' => 'name',
+   'empty_option' => true,
+   'disabled' => '',
+   'style' => ''
+  );
+
+  foreach($opts0 as $k => $v) {
+   if (isset($opts[$k])) {
+    $opts0[$k] = $opts[$k];
+   }
+  }
+
+  return $H->selector($field_name,
+		      $groups,
+		      $id,
+		      $opts0
+  );
  }
 }
