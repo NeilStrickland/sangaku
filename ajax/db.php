@@ -4,8 +4,6 @@ require_once('../include/sangaku.inc');
 
 $debug = get_optional_parameter('debug',0);
 
-if ($user->username != $u->username) { $debug = 0; }
- 
 if (function_exists('xdebug_disable') && ! $debug) {
  xdebug_disable();
 }
