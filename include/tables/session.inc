@@ -8,18 +8,20 @@ $sangaku->add_table(
   'id' => array('type' => 'integer','notnull' => 'true'),
   'problem_sheet_id' => array('type' => 'integer','link' => 'problem_sheet'),
   'tutorial_group_id' => array('type' => 'integer','link' => 'tutorial_group'),
-  'date' => array('type' => 'text'),
-  'time' => array('type' => 'text'),
+  'date' => array('type' => 'date'),
+  'time' => array('type' => 'time'),
   'duration' => array('type' => 'integer','default' => 50,'notnull' => true),
   'is_confirmed' => array('type' => 'boolean','default' => 0,'notnull' => true),
-  'solutions_shown' => array('type' => 'text')
+  'solutions_shown' => array('type' => 'text'),
+  'video_url' => array('type' => 'text')
  ),
  array(
   'problem_sheet_title' => array('type' => 'text'),
   'tutorial_group_name' => array('type' => 'text'),
   'semester' => array('type' => 'text'),
   'module_code' => array('type' => 'text'),
-  'module_blackboard_url' => array('type' => 'text')
+  'module_video_url' => array('type' => 'text'),
+  'video_url_description' => array('type' => 'text')
  ),
  <<<SQL
 SELECT
@@ -31,12 +33,14 @@ SELECT
  g.semester,
  m.code AS module_code,
  m.title AS module_title, 
- m.blackboard_url AS module_blackboard_url, 
  x.date,
  x.time,
  x.duration,
  x.is_confirmed,
- x.solutions_shown
+ x.solutions_shown,
+ x.video_url,
+ m.video_url AS module_video_url,
+ m.video_url_description
 FROM tbl_sessions x
  LEFT JOIN tbl_problem_sheets p ON x.problem_sheet_id = p.id 
   LEFT JOIN tbl_tutorial_groups g ON x.tutorial_group_id = g.id
@@ -70,7 +74,16 @@ class session extends frog_object {
   }
  }
 
- function end_time() {
+ function start_time() {
+   $t = $this->start_timestamp();
+   if ($t) {
+    return date('Y-m-d H:i:s',$t);
+   } else {
+    return null;
+   }
+  }
+ 
+  function end_time() {
   $t = $this->end_timestamp();
   if ($t) {
    return date('Y-m-d H:i:s',$t);
@@ -160,6 +173,10 @@ class session extends frog_object {
   return '/sangaku/session_monitor.php' .
          '?session_id=' . $this->id .
           '&teacher_id=' . $user->id;
+ }
+
+ function effective_video_url() {
+  return $this->video_url ? $this->video_url : $this->module_video_url; 
  }
 
  function load_snapshots() {
