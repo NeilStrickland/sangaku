@@ -4,8 +4,10 @@ require_once('include/sangaku.inc');
 
 $module = $sangaku->get_object_parameter('module');
 
+$semester = '';
 $d = $sangaku->get_date_info();
-$semester = get_restricted_parameter('semester',array('','1','2'),$d->semester);
+if ($d) { $semester = $d->semester; }
+$semester = get_restricted_parameter('semester',array('','1','2'),$semester);
 
 if (! $module) { error_page('Module not found'); exit; }
 
