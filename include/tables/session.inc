@@ -8,7 +8,8 @@ $sangaku->add_table(
   'id' => array('type' => 'integer','notnull' => 'true'),
   'problem_sheet_id' => array('type' => 'integer','link' => 'problem_sheet'),
   'tutorial_group_id' => array('type' => 'integer','link' => 'tutorial_group'),
-  'start_time' => array('type' => 'text'),
+  'date' => array('type' => 'text'),
+  'time' => array('type' => 'text'),
   'duration' => array('type' => 'integer','default' => 50,'notnull' => true),
   'is_confirmed' => array('type' => 'boolean','default' => 0,'notnull' => true),
   'solutions_shown' => array('type' => 'text')
@@ -30,8 +31,9 @@ SELECT
  g.semester,
  m.code AS module_code,
  m.title AS module_title, 
- m.blackboard_url AS module_blackboard_url,
- x.start_time,
+ m.blackboard_url AS module_blackboard_url, 
+ x.date,
+ x.time,
  x.duration,
  x.is_confirmed,
  x.solutions_shown
@@ -40,7 +42,7 @@ FROM tbl_sessions x
   LEFT JOIN tbl_tutorial_groups g ON x.tutorial_group_id = g.id
    LEFT JOIN tbl_modules m ON p.module_id = m.id
 WHERE %s
- ORDER BY x.start_time,m.code,g.name
+ ORDER BY x.date,x.time,m.code,g.name
  
 SQL
 );
@@ -53,15 +55,15 @@ class session extends frog_object {
  }
 
  function start_timestamp() {
-  if ($this->start_time) {
-   return strtotime($this->start_time);
+  if ($this->date && $this->time) {
+   return strtotime($this->date . ' ' . $this->time);
   } else {
    return 0;
   }
  }
  
  function end_timestamp() {
-  if ($this->start_time && $this->duration) {
+  if ($this->date && $this->time && $this->duration) {
    return $this->start_timestamp() + 60 * $this->duration;
   } else {
    return 0;
@@ -71,7 +73,7 @@ class session extends frog_object {
  function end_time() {
   $t = $this->end_timestamp();
   if ($t) {
-   return date('Y-m-d H:m:s',$t);
+   return date('Y-m-d H:i:s',$t);
   } else {
    return null;
   }
@@ -139,7 +141,7 @@ class session extends frog_object {
  }
 
  function is_unlimited() {
-  return ($this->start_time == '');
+  return ($this->date == '' && $this->time == '');
  }
 
  function url($student_id = 0) {
