@@ -14,6 +14,13 @@ table.edged td {
  vertical-align: top;
 }
 
+table.plain td {
+ padding: 1px;
+ margin-left: 1px;
+ border: none;
+ vertical-align: top;
+}
+
 tr.spacer { height: 1px; }
 tr.spacer td {  border: none; }
 
@@ -427,3 +434,7 @@ div.preview_solution {
     padding: 3px;
     background: #CCDDFF
 }
+
+input.date { width: 70px; }
+input.time { width: 50px; }
+
