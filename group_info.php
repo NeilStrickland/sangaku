@@ -1,7 +1,5 @@
 <?php
 
-ini_set('display_errors',1);
-
 require_once('include/sangaku.inc');
 
 class tutorial_group_editor extends frog_object_editor {
@@ -36,13 +34,14 @@ class tutorial_group_editor extends frog_object_editor {
   return(
    array(
     array('name' => 'tutorial_group_student','link' => 'tutorial_group_id'),
-    array('name' => 'tutorial_group_teacher','link' => 'tutorial_group_id')
+    array('name' => 'tutorial_group_teacher','link' => 'tutorial_group_id'),
+    array('name' => 'session',               'link' => 'tutorial_group_id')
    )
   );
  }
 
  function edit_page_widgets() {
-  return array('mathjax','tabber','autosuggest');
+  return array('mathjax','tabber','autosuggest','calendar');
  }
  
  function edit_page() {
@@ -165,7 +164,7 @@ HTML;
   
   $H = $sangaku->html;
 
-  $g->extend_list('sessions');
+  $g->extend_list('sessions',2);
   
   echo $H->tab_start('Sessions');
 
