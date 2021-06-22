@@ -16,7 +16,9 @@ $sangaku->add_table(
   'username' => array('type' => 'text'), 
   'gmail_name' => array('type' => 'text'), 
   'surname' => array('type' => 'text'), 
-  'forename' => array('type' => 'text')
+  'forename' => array('type' => 'text'),
+  'full_name' => array('type' => 'text'),
+  'backwards_name' => array('type' => 'text')
  ),
  <<<SQL
 SELECT
@@ -31,7 +33,9 @@ SELECT
  s.username,
  s.gmail_name,
  s.surname,
- s.forename
+ s.forename,
+ CONCAT(s.forename,' ',s.surname) AS full_name,
+ CONCAT(s.surname,', ',s.forename) AS backwards_name
 FROM tbl_registrations x
  LEFT JOIN tbl_users s ON x.student_id = s.id
   LEFT JOIN tbl_modules m ON x.module_id = m.id
