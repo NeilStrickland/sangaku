@@ -32,14 +32,12 @@ function show_status_page($session) {
  $u = 'https://' . $_SERVER['HTTP_HOST'] . '/sangaku/' . $session->id;
 
  $bb = '';
- if ($session->module_blackboard_url) {
+ $u = $session->effective_video_url();
+ if ($u) {
   $bb = <<<HTML
     <br/>
     <div style="width:700px">
-     <button type="button"
-       onclick="window.open('{$session->module_blackboard_url}')">
-       Open module Blackboard page
-     </button>
+     <button type="button" onclick="window.open('{$u}')">{$session->video_url_description}</button>
     </div>
     <br/>
 HTML
