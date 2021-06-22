@@ -459,7 +459,7 @@ frog.check_time = function(id) {
  h = '' + ((h < 10) ? '0' : '') + h;
  m = '' + ((m < 10) ? '0' : '') + m;
  s = '' + ((s < 10) ? '0' : '') + s;
- d = h + ':' + m + ':' : s;
+ d = h + ':' + m + ':' + s;
  e.value = d;
  this.saved_values[id] = d;
 }
