@@ -187,8 +187,7 @@ class tutorial_group extends frog_object {
   }
 
   foreach($this->sessions as $s) {
-   $s->start_timestamp = strtotime($s->start_time);
-   $w = $sangaku->week_number($s->start_timestamp);
+   $w = $sangaku->week_number($s->start_timestamp());
    if ($w == false) {
     $s->semester = null;
     $s->week_number = null;
