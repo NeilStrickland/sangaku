@@ -20,7 +20,8 @@ class sangaku_navigator extends frog_navigator {
   $this->standard_styles  = array('sangaku');
 
   $this->standard_body_scripts = array(
-   'autosuggest_setup'
+   'autosuggest_setup',
+   'calendar_setup'
   );
 
   $this->available_widgets['mathjax'] = $this->mathjax_script();
