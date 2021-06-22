@@ -1,6 +1,10 @@
 <?php
 
 class sangaku_class extends frog {
+ var $name = 'sangaku';
+ var $data_dir = null;
+ var $db_port = null;
+ var $date_info_url = null;
 
  function time() {
   if (isset($this->fake_time) && $this->fake_time) {
@@ -92,15 +96,25 @@ class sangaku_class extends frog {
 
  function get_date_info() {
   $date_info_file = $this->data_dir . '/date_info.json';
-  if (file_exists($date_info_file) &&
-      time() - filemtime($date_info_file) < 3600) {
+  $this->date_info = null;
+  $is_stale = 1;
+  if (file_exists($date_info_file)) {
    $json = file_get_contents($date_info_file);
-  } else {
-   $json = file_get_contents('https://maths.shef.ac.uk/maths/date_info.php');
-   file_put_contents($date_info_file,$json);
+   $is_stale = time() - filemtime($date_info_file) >= 3600;
+  }
+
+  if ($is_stale && $this->date_info_url) {
+   $json0 = file_get_contents($this->date_info_url);
+   if ($json0) {
+    $json = $json0;
+    file_put_contents($date_info_file,$json);
+   }
+  }
+
+  if ($json) {
+   $this->date_info = json_decode($json);
   }
   
-  $this->date_info = json_decode($json);
   return $this->date_info;
  }
 
@@ -110,7 +124,8 @@ class sangaku_class extends frog {
   if (! isset($this->date_info)) { $this->get_date_info(); }
 
   $d = $this->date_info;
-
+  if (! $d) { return 0; }
+  
   for ($i = 1; $i <= 2; $i++) {
    for ($j = 0; $j <= 12; $j++) {
     $t0 = $d->week_start_time[$i][$j];
@@ -125,14 +140,17 @@ class sangaku_class extends frog {
 
  function academic_timestamp($semester,$week_number,$day_number,$hour) {
   if (! isset($this->date_info)) { $this->get_date_info(); }
+  $d = $this->date_info;
+  if (! $d) { return 0; }
 
-  $t0 = $this->date_info->week_start_time[$semester][$week_number];
+  $t0 = $d->week_start_time[$semester][$week_number];
   $t1 = strtotime("+" . ($day_number - 1) . " days +" . $hour . " hours",$t0);
 
   return $t1;
  }
 
  function academic_time($semester,$week_number,$day_number,$hour) {
-  return date('Y-m-d H:i:s',$this->academic_timestamp($semester,$week_number,$day_number,$hour));
+  $t = $this->academic_timestamp($semester,$week_number,$day_number,$hour);
+  return $t ? date('Y-m-d H:i:s',$t) : '';
  }
 }
