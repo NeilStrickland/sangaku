@@ -197,6 +197,14 @@ HTML;
  }
  
  function sessions_tab() {
+  if ($this->object->is_regular) {
+   $this->regular_sessions_tab();
+  } else {
+   $this->irregular_sessions_tab();
+  }
+ }
+
+ function regular_sessions_tab() {
   global $sangaku;
  
   $N = $sangaku->nav;
@@ -243,6 +251,38 @@ HTML;
   }
   
   echo $H->tab_end();
+ }
+ 
+ function irregular_sessions_tab() {
+  global $sangaku;
+ 
+  $N = $sangaku->nav;
+  $H = $sangaku->html;
+  $m = $this->object;
+ 
+  echo $H->tab_start('Sessions');
+ 
+  echo $H->edged_table_start();
+  echo $H->spacer_row(40,300,150,60,30);
+  echo $H->row('Group','Problem sheet','Time','','Confirmed');
+
+  foreach($m->sessions as $s) {
+   $url = 'session_monitor.php?session_id=' . $s->id;
+   echo $H->tr($H->td($s->tutorial_group_name) . 
+   $H->td($s->problem_sheet_title) .
+   $H->td($s->friendly_start_time()) .
+   $H->link_td("Monitor",$url) . 
+   $H->td($H->checkbox(
+    'session_confirmed_' . $s->id,$s->is_confirmed,
+    array(
+     'id' => 'session_confirmed_' . $s->id,
+     'onclick' => "sangaku.toggle_session_confirmed({$s->id})")))
+   );
+  }
+ 
+  echo $H->edged_table_end();
+  echo $H->tab_end();
+
  }
  
  function students_tab() {
