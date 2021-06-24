@@ -58,6 +58,13 @@ class module extends frog_object {
   }
  }
 
+ function load_associated() {
+  $this->load_tutorial_groups();
+  $this->load_problem_sheets();
+  $this->load_sessions();
+  $this->load_students();
+ }
+
  function load_tutorial_groups($semester='',$force = false) {
   global $sangaku;
 
