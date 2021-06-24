@@ -1,12 +1,3 @@
--- phpMyAdmin SQL Dump
--- version 4.8.5
--- https://www.phpmyadmin.net/
---
--- Host: 127.0.0.1:3306
--- Generation Time: Jun 22, 2021 at 02:48 PM
--- Server version: 5.7.26
--- PHP Version: 7.2.18
-
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET AUTOCOMMIT = 0;
 START TRANSACTION;
@@ -52,7 +43,8 @@ CREATE TABLE IF NOT EXISTS `tbl_modules` (
   `title` varchar(255) DEFAULT NULL,
   `is_regular` tinyint(1) NOT NULL DEFAULT '1',
   `semester` varchar(255) DEFAULT NULL,
-  `blackboard_url` varchar(255) DEFAULT NULL,
+  `video_url` varchar(255) DEFAULT NULL,
+  `video_url_description` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -176,6 +168,7 @@ CREATE TABLE IF NOT EXISTS `tbl_sessions` (
   `duration` int(11) DEFAULT '50',
   `is_confirmed` tinyint(1) NOT NULL DEFAULT '0',
   `solutions_shown` varchar(255) DEFAULT NULL,
+  `video_url` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
