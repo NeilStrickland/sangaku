@@ -87,7 +87,7 @@ HTML;
  echo $H->row($H->bold('Module:'),
 	      $H->module_selector('module_id',$params->module_id));
  echo $H->row($H->bold('File:'),
-	      $H->file_input('user_file',$params->user_file) .
+	      $H->file_input('user_file') .
 	      $H->submit_button('Go'));
  
  echo $H->edged_table_end();
