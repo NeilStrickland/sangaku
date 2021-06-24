@@ -159,9 +159,12 @@ HTML;
   
   echo $H->edged_table_end();
 
-  $url = "group_info.php?module_id={$m->id}&command=new";
+  $url0 = "group_info.php?module_id={$m->id}&command=new";
+  $url1 = "assign_groups.php?module_id={$m->id}";
   
-  echo "<br/>" . $H->button_link('Create new tutorial group',$url);
+  echo "<br/>" . 
+   $H->button_link('Create new tutorial group',$url0) .
+   $H->button_link('Assign students to groups',$url1);
 
   echo $H->tab_end();
  }
@@ -295,10 +298,15 @@ HTML;
   $n = count($m->registrations);
   
   echo $H->tab_start('Students');
- 
+
+  $url = "assign_groups.php?module_id={$m->id}";
+  $b = $H->button_link('Assign students to tutorial groups',$url);
+
   echo <<< HTML
  <br/>
  There are $n registered students.
+ <br/>
+ $b
  <br/>
  
 HTML;
