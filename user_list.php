@@ -30,6 +30,7 @@ You can enter <tt>Smith,John</tt> or <tt>John Smith</tt> or
 <br/>
 <br/>
 <button type="button" onclick="sangaku.do_command('new')">Add a new user</button>
+<button type="button" onclick="location='upload_users.php'">Upload a list of users</button>
 </form>
 
 HTML;
