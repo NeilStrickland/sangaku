@@ -72,7 +72,6 @@ class sangaku_renderer extends PhpLatex_Renderer_Abstract {
    } elseif ($t == 'itemize environment') {
     $item->children = array();
     $C = $node->getChildren();
-    foreach
    }
    $item->intro .= PhpLatex_Renderer_Abstract::toLatex($node);
   } elseif ($item->state == 'started itemize') {
