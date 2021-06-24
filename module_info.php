@@ -118,7 +118,7 @@ HTML;
 HTML;
 
   echo $H->row($H->bold('Video URL:'),$H->text_input('video_url',$m->video_url,$sz));
-  echo $H->row($H->bold('Description:'),$H->text_input('video_url',$m->video_url,$sz));
+  echo $H->row($H->bold('Description:'),$H->text_input('video_url_description',$m->video_url,$sz));
   echo $H->edged_table_end();
 
   echo $H->tab_end();
