@@ -6,6 +6,8 @@ $params = get_params();
 
 if ($params->is_valid) {
  upload_page($params);
+} else {
+ error_page('Invalid parameters');
 }
 
 exit;

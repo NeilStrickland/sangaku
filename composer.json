@@ -1,5 +1,6 @@
 { "require" : {
-        "xemlock/php-latex": "dev-master",
-                "google/apiclient": "^2.8",
-                "league/oauth2-google": "^3.0"
-    } }
+    "xemlock/php-latex": "dev-master",
+    "google/apiclient": "^2.8",
+    "league/oauth2-google": "^3.0",
+    "phpmailer/phpmailer": "^6.0"
+} }

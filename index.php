@@ -267,8 +267,7 @@ HTML
       if ($p->alternatives) {
        $msg = <<<HTML
 You are registered for group {$p->group->name}, but no Sangaku session has been scheduled for
-this group.  Nonetheless, there may be a Blackboard Collaborate session without Sangaku for group 
-{$p->group->name} that you should attend.  However, there are various alternative Sangaku
+this group.  However, there are various alternative Sangaku
 sessions that you could attend if necessary.
 
 HTML
@@ -277,8 +276,6 @@ HTML
        $msg = <<<HTML
 You are registered for group {$p->group->name}, but no Sangaku session has been scheduled for
 this group, and no other group has upcoming Sangaku sessions for this problem sheet either.
-Nonetheless, there may be a Blackboard Collaborate session without Sangaku for group 
-{$p->group->name} that you should attend.  
 
 HTML
            ;
@@ -294,8 +291,7 @@ HTML
       } else { // no alternatives
        $msg = <<<HTML
 It seems that you have not been allocated to a tutorial group for this problem sheet.
-Moreover, there are no upcoming Sangaku sessions for any group.  Nonetheless, there 
-may be Blackboard Collaborate sessions without Sangaku that you could attend.  You
+Moreover, there are no upcoming Sangaku sessions for any group.    You
 should consult with the lecturer.
 
 HTML

@@ -4,7 +4,6 @@ include/config.inc
 adhoc/
 scratch/
 vendor/
-composer.lock
 js/ckeditor/
 js/qrcodejs/
 js/scratch/
