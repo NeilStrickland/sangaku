@@ -311,16 +311,19 @@ HTML;
  
 HTML;
   
+  $m->extend_list('registrations',2);
+  
   echo $H->edged_table_start();
-  echo $H->spacer_row(60,300,30);
-  echo $H->row('Username','Name','Edit');
   
   foreach($m->registrations as $s) {
+   $p = $s->set_prefix();
+   
    $u = 'user_info.php?id=' . $s->id;
-   echo $H->row($s->username,
-         $s->full_name,
-         $H->icon_popup('edit',$u)
-   );
+
+   $h = $H->td($H->user_selector($p . '_student_id',$s->student_id));
+   $h = $s->new_object_marker . "<table class=\"plain\"><tr>" . $h . "</table>";
+   $h = $s->wrap_remover($h);
+   echo $h;
   }
   
   echo $H->edged_table_end();
