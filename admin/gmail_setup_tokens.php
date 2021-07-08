@@ -2,13 +2,13 @@
 
 require_once('../vendor/autoload.php');
 require_once('../include/sangaku.inc');
-require_once('../../include/frog/googler.inc');
+require_once($sangaku->frog_dir . '/googler.inc');
 
 $goog = new frog_googler();
 $goog->log_file = $sangaku->data_dir . '/google/log.txt';
 $goog->credentials_dir = $sangaku->data_dir . '/google';
-$goog->auth_uris['gmail'] = 'https://aim.shef.ac.uk/sangaku/admin/gmail_setup_tokens.php';
- 
+$goog->auth_uris['gmail'] = 'https://' . $_SERVER['HTTP_HOST'] .
+                                '/sangaku/admin/gmail_setup_tokens.php';
 $key = 'gmail';
 
 $client = $goog->get_client($key);
@@ -59,8 +59,7 @@ function show_help_page($goog) {
 
 <div class="text">
 Use this page to set up OAuth tokens for the Sangaku web pages
-to access email sent to sangaku@sheffield.ac.uk.  In principle it
-should only be necessary to
+to use GMail.  In principle it should only be necessary to
 use this page once.
 </div>
 <br/><br/>
