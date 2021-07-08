@@ -29,6 +29,8 @@ class sangaku_class extends frog {
   if (! $student_id) {
    $student_id = $user->id;
   }
+
+  $params->student_id = $student_id;
   
   $student = $this->load('user',$student_id);
   if (! $student) {
@@ -76,6 +78,7 @@ class sangaku_class extends frog {
   } else {
    if ($user->status != 'teacher') {
     $params->error = 'User is not a teacher';
+    $params->user_id = $user->id;
     return $params;
    }
   }

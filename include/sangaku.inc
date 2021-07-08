@@ -2,6 +2,8 @@
 
 //ini_set('display_errors','On');
 
+require_once('/var/www/html/sangaku/vendor/autoload.php');
+
 $web_dir = $_SERVER['DOCUMENT_ROOT'];
 if (! $web_dir) { $web_dir = getenv('WEBDIR'); }
 $frog_dir =  $web_dir . '/include/frog';
@@ -12,6 +14,7 @@ require_once('sangaku_class.inc');
 $sangaku = new sangaku_class();
 $sangaku->name = 'sangaku';
 $sangaku->include_dir = dirname(__FILE__);
+$sangaku->frog_dir = $frog_dir;
 
 require_once('config.inc');
 
@@ -60,10 +63,12 @@ require_once('auth.inc');
 require_once('html.inc');
 require_once('navigator.inc');
 
+$sangaku->mailer = new frog_gmailer($sangaku->data_dir . '/google');
+
 $sangaku->html = new sangaku_html($sangaku);
 $sangaku->nav  = new sangaku_navigator($sangaku);
 $sangaku->auth = new sangaku_auth($sangaku);
-                          
+
 require_once($sangaku->data_dir . '/auth_config.inc');
 
 $f = $_SERVER['PHP_SELF'];
