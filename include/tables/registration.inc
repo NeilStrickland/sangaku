@@ -103,10 +103,16 @@ class registration extends frog_object {
 
   $m = $this->load_link('module');
 
-  $this->sheets = $sangaku->load_where(
-   'problem_sheets',
-   "x.module_id={$m->id} AND x.semester='{$s}' AND x.week_number={$w}"
-  );
+  if ($s && $w) {
+   $this->sheets = $sangaku->load_where(
+    'problem_sheets',
+    "x.module_id={$m->id} AND x.semester='{$s}' AND x.week_number={$w}"
+   );
+  } else {
+   $this->sheets = $sangaku->load_where(
+    'problem_sheets',"x.module_id={$m->id}"
+   );
+  }
 
   foreach($this->sheets as $p) {
    $p->load_sessions();
