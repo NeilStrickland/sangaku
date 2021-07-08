@@ -137,7 +137,8 @@ class tutorial_group extends frog_object {
   foreach($this->student_links as $x) {
    $student = $x->load_student();
    if (! $student) {
-    $x->dump(); exit;
+    $x->delete();
+    continue;
    }
    $this->students[] = $student;
    $this->students_by_username[$student->username] = $student;
