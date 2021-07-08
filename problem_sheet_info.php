@@ -283,6 +283,8 @@ HTML
  
   $this->display_page_header();
 
+  echo $sangaku->nav->top_menu();
+  
   echo $s->preview();  
 
   $this->display_page_footer();
