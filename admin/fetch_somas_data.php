@@ -3,8 +3,9 @@
 require_once('../include/sangaku.inc');
 require_once('../include/somas_agent.inc');
 
-$session = 2020;
-$semester = '2';
+$di = $sangaku->get_date_info();
+$session = (int) $di->session;
+$semester = $di->semester;
 
 $a = new somas_agent();
 $a->connect();
