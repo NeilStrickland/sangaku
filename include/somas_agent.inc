@@ -10,7 +10,8 @@ class somas_agent {
  static $engl1_modules = array();
  static $engl1_moids = array();
  static $engl1_moids_string = '';
- 
+ static $blackboard_room_id = 451;
+                           
  function __construct() {
   $w = array();
   foreach(somas_agent::$engl1_codes as $c) { $w[] = "'{$c}'"; }
@@ -35,6 +36,7 @@ class somas_agent {
  }
 
  function get_all($q) {
+  // echo "Query:<br/>\n<pre>\n{$q}\n</pre>\n";
   $result = $this->db->query($q);
 
   if ($result === false) {
@@ -142,6 +144,8 @@ SQL;
    $m->load_tutorial_groups();
    $m->tgbsi = make_index($m->tutorial_groups,'somas_id');
   }
+
+  $bri = somas_agent::$blackboard_room_id;
   
   $q = <<<SQL
 SELECT 
@@ -160,7 +164,7 @@ FROM `tbl_teaching_events` g
 WHERE o.session=$session
 AND m.credit_level <= 2
 AND g.type IN ('tutorial','lab session')
-AND g.room_id=451
+AND g.room_id=$bri
 AND (o.semester = '$semester' OR (o.semester = 'Year' AND (g.semester = '$semester' OR g.semester = 'Year')))
 ORDER BY m.code,g.tutorial_group
 SQL;
