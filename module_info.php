@@ -223,7 +223,7 @@ HTML;
  
 HTML;
     echo $H->edged_table_start();
-    echo $H->spacer_row(60,300,120,60,30);
+    echo $H->spacer_row(60,300,150,60,30);
      
     for ($j = 0; $j <= 12; $j++) {
      if ($m->sessions_by_week[$i][$j]) {
@@ -237,7 +237,7 @@ HTML;
        $url = 'session_monitor.php?session_id=' . $s->id;
        echo $H->tr($H->td($s->tutorial_group_name) . 
                    $H->td($s->problem_sheet_title) .
-                   $H->td(date('D j/n H:i',$s->start_timestamp)) .
+                   $H->td($s->friendly_start_time()) .
                    $H->link_td("Monitor",$url) . 
                    $H->td($H->checkbox(
                     'session_confirmed_' . $s->id,$s->is_confirmed,
