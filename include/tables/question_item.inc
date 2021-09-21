@@ -13,8 +13,8 @@ $sangaku->add_table(
   'title' => array('type' => 'text'),
   'level' => array('type' => 'integer'),
   'is_bottom' => array('type' => 'boolean'),
-  'problem' => array('type' => 'text'),
-  'solution' => array('type' => 'text')
+  'problem' => array('type' => 'text','default' => ''),
+  'solution' => array('type' => 'text','default' => '')
  ),
  array(),
  <<<SQL
