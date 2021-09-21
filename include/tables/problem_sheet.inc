@@ -203,9 +203,11 @@ class problem_sheet extends frog_object {
     $s = $sangaku->new_object('session');
     $s->problem_sheet_id = $this->id;
     $s->tutorial_group_id = $g->id;
-    $s->start_time = $sangaku->academic_time(
+    $t = $sangaku->academic_timestamp(
      $this->semester,$this->week_number,$g->day_number,$g->hour
     );
+    $s->date = date('Y-m-d',$t);
+    $s->time = date('H:i:s',$t);
     $s->duration = 50;
     $s->save();
     $s->load();
