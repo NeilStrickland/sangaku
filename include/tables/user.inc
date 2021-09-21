@@ -277,7 +277,12 @@ class user extends frog_object {
 
    $this->teacher_tutorial_groups = array();
    foreach($this->teacher_tutorial_groups_links as $l) {
-    $this->teacher_tutorial_groups[] = $l->load_link('tutorial_group');
+    $g = $l->load_link('tutorial_group');
+    if ($g) {
+     $this->teacher_tutorial_groups[] = $g;
+    } else {
+     $l->delete();
+    }
    }
   }
   
