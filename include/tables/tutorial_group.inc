@@ -37,7 +37,7 @@ SELECT
 FROM tbl_tutorial_groups x
  LEFT JOIN tbl_modules m ON x.module_id = m.id
 WHERE %s
- ORDER BY m.code, x.name
+ ORDER BY m.code, x.day_number, x.hour, x.name
  
 SQL
 );
