@@ -53,7 +53,9 @@ SELECT
  g.hour AS tutorial_group_hour,
  g.week_parity AS tutorial_group_week_parity,
  x.title,
- x.intro
+ x.intro,
+ x.is_judgemental,
+ x.is_multiple
 FROM tbl_polls x
  LEFT JOIN tbl_modules m ON x.module_id=m.id
   LEFT JOIN tbl_problem_sheets p ON x.problem_sheet_id=p.id
@@ -94,6 +96,8 @@ class poll extends frog_object {
    }
    $i++;
   }
+
+  $this->items_by_id = make_index($this->items,'id');
  }
 
  function create_instances() {
