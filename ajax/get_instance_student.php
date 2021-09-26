@@ -12,6 +12,11 @@ if (! ($instance && $student)) {
 
 $poll = $instance->load_link('poll');
 $poll->load_items();
+
+if ($instance->state == 'count' || $instance->state == 'correct') {
+ $instance->count_responses();
+}
+
 $x = $instance->for_json();
 
 $x->student = $student->for_json();
