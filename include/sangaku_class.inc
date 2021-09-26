@@ -106,6 +106,8 @@ class sangaku_class extends frog {
    $is_stale = time() - filemtime($date_info_file) >= 3600;
   }
 
+  $json = null;
+  
   if ($is_stale && $this->date_info_url) {
    $json0 = file_get_contents($this->date_info_url);
    if ($json0) {
