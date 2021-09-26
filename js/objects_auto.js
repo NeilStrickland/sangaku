@@ -55,7 +55,7 @@ sangaku.user.fields = {"id":{"type":"integer","notnull":"true"},"somas_student_i
 sangaku.poll = Object.create(sangaku.object);
 sangaku.poll.object_type = 'poll';
 sangaku.poll.key = 'id';
-sangaku.poll.fields = {"id":{"type":"integer","notnull":"true"},"module_id":{"type":"integer","link":"module"},"problem_sheet_id":{"type":"integer","link":"problem_sheet"},"session_id":{"type":"integer","link":"session"},"title":{"type":"text"},"intro":{"type":"text"}};
+sangaku.poll.fields = {"id":{"type":"integer","notnull":"true"},"module_id":{"type":"integer","link":"module"},"problem_sheet_id":{"type":"integer","link":"problem_sheet"},"session_id":{"type":"integer","link":"session"},"title":{"type":"text"},"intro":{"type":"text"},"is_judgemental":{"type":"boolean","default":0},"is_multiple":{"type":"boolean","default":0}};
 sangaku.poll_instance = Object.create(sangaku.object);
 sangaku.poll_instance.object_type = 'poll_instance';
 sangaku.poll_instance.key = 'id';
@@ -63,11 +63,11 @@ sangaku.poll_instance.fields = {"id":{"type":"integer","notnull":"true"},"poll_i
 sangaku.poll_item = Object.create(sangaku.object);
 sangaku.poll_item.object_type = 'poll_item';
 sangaku.poll_item.key = 'id';
-sangaku.poll_item.fields = {"id":{"type":"integer","notnull":"true"},"poll_id":{"type":"integer","link":"poll"},"sequence_number":{"type":"integer"},"code":{"type":"text"},"text":{"type":"text"}};
+sangaku.poll_item.fields = {"id":{"type":"integer","notnull":"true"},"poll_id":{"type":"integer","link":"poll"},"sequence_number":{"type":"integer"},"code":{"type":"text"},"text":{"type":"text"},"is_correct":{"type":"boolean"}};
 sangaku.poll_response = Object.create(sangaku.object);
 sangaku.poll_response.object_type = 'poll_response';
 sangaku.poll_response.key = 'id';
-sangaku.poll_response.fields = {"id":{"type":"integer","notnull":"true"},"poll_id":{"type":"integer","link":"poll"},"user_id":{"type":"integer","link":"user"},"poll_item_id":{"type":"integer","link":"poll_item"},"response_timestamp":{"type":"integer"}};
+sangaku.poll_response.fields = {"id":{"type":"integer","notnull":"true"},"instance_id":{"type":"integer","link":"poll_instance"},"user_id":{"type":"integer","link":"user"},"response_text":{"type":"text"},"response_timestamp":{"type":"integer"}};
 sangaku.statuses=[
     {"id":0,
      "code":"not_started",
