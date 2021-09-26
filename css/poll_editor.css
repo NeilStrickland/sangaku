@@ -1,0 +1,86 @@
+div.edit_item {
+    margin: 5px;
+    border: 1px solid black;
+}
+
+div.edit_item_headers {
+    position: relative;
+    background: #BBBBFF;
+    padding: 2px;
+}
+
+div.edit_item_seq {
+    display: inline-block;
+    width: 200px;
+}
+
+div.edit_item_code {
+    display: inline-block;
+    width: 200px;
+}
+
+div.edit_question_header {
+    display: inline-block;
+    width: 160px;
+}
+
+div.edit_question_title {
+    display: inline-block;
+}
+
+img.edit_item_delete_icon {
+    width: 16px;
+    position: absolute;
+    top: 4px;
+    right: 24px;
+}
+
+img.right_help_toggler {
+    width: 16px;
+    position: absolute;
+    top: 4px;
+    right: 4px;
+}
+
+img.right_help_toggler:hover {
+    cursor: pointer;
+}
+
+
+div.edit_item_text_label {
+    position: relative;
+    background: #CCCCFF;
+    padding: 2px;
+    border-top: 1px solid #888888;
+}
+
+textarea.edit_item_text_area {
+    margin-left: 3px;
+}
+
+button.edit_item_preview_button {
+    margin-left: 3px;
+}
+
+button.edit_item_preview_button:hover {
+    cursor: pointer;
+}
+
+div.edit_item_text_display {
+    margin-left: 3px;
+    margin-bottom: 8px;
+    background: #DDDDDD;
+    padding: 3px;
+}
+
+img.add_item {
+    width: 16px;
+    position: absolute;
+    top: 4px;
+    right: 4px;
+}
+
+img.add_item:hover {
+    cursor: pointer;
+}
+
