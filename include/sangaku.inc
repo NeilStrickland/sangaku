@@ -56,6 +56,11 @@ $sangaku->register('tutorial_group_teacher');
 $sangaku->register('upload');
 $sangaku->register('user');
 
+$sangaku->register('poll');
+$sangaku->register('poll_instance');
+$sangaku->register('poll_item');
+$sangaku->register('poll_response');
+
 $sangaku->load_table('status');
 $sangaku->load_all('status');
 
