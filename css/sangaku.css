@@ -488,8 +488,9 @@ button.poll_submit:hover {
 button.poll_submitted {
     margin : 3px;
     padding : 5px;
-    background : #B0E0B0;
+    background : #D0FFD0;
     border : 1px solid #508050;
+    color : #888888;
     border-radius: 3px;
 }
 
@@ -497,3 +498,15 @@ button.poll_submitted:hover {
     cursor : pointer;
     background : #C0F0C0;
 }
+
+div.poll_count_bar {
+    width : 1px;
+    height : 10px;
+    background : #8888DD;
+}
+
+div.poll_count_box {
+    position : absolute;
+    right : 5px;
+}
+
