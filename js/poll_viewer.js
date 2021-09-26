@@ -17,6 +17,9 @@ sangaku.poll_viewer.init = function(instance_id,student_id) {
  this.message_for_state['revealed'] = 'You cannot respond to this poll yet.';
  this.message_for_state['open'    ] = 'You can respond to this poll now.';
  this.message_for_state['closed'  ] = 'This poll has now closed.';
+ this.message_for_state['count'   ] = 'This poll has now closed.';
+ this.message_for_state['correct' ] = 'This poll has now closed.';
+ this.message_for_state['after'   ] = 'This poll is no longer available.';
 
  var url = '/sangaku/ajax/get_instance_student.php' +
      '?instance_id=' + instance_id + '&student_id=' + student_id;
@@ -52,7 +55,7 @@ sangaku.poll_viewer.init_data = function(x) {
 
  this.intro_div = document.createElement('div');
  this.intro_div.className = 'poll_intro';
- if (this.instance.state == 'before') {
+ if (this.instance.state == 'before' || this.instance.state == 'after') {
   this.intro_div.style.display = 'none';
  }
  this.intro_div.innerHTML = this.poll.intro;
@@ -60,7 +63,7 @@ sangaku.poll_viewer.init_data = function(x) {
 
  this.items_div = document.createElement('div');
  this.items_div.className = 'poll_items';
- if (this.instance.state == 'before') {
+ if (this.instance.state == 'before' || this.instance.state == 'after') {
   this.items_div.style.display = 'none';
  }
  this.poll_div.appendChild(this.items_div);
@@ -70,8 +73,12 @@ sangaku.poll_viewer.init_data = function(x) {
 
  this.items_tbody = document.createElement('tbody');
  this.items_table.appendChild(this.items_tbody);
+
+ this.poll.items_by_id = {};
  
  for (var item of this.poll.items) {
+  this.poll.items_by_id[item.id] = item;
+  
   item.tr = document.createElement('tr');
   item.tr.className = 'poll_item';
   item.box_td = document.createElement('td');
@@ -95,6 +102,20 @@ sangaku.poll_viewer.init_data = function(x) {
   item.text_td.innerHTML = item.text;
   item.tr.appendChild(item.text_td);
   this.items_tbody.appendChild(item.tr);
+
+  item.result_tr = document.createElement('tr');
+  item.result_tr.style.display = 'none';
+  item.result_tr.appendChild(document.createElement('td'));
+  item.result_td = document.createElement('td');
+  item.result_tr.appendChild(item.result_td);
+  item.count_bar = document.createElement('div');
+  item.count_bar.className = 'poll_count_bar';
+  item.result_td.appendChild(item.count_bar);
+  item.count_box = document.createElement('div');
+  item.count_box.className = 'poll_count_box';
+  item.result_td.appendChild(item.count_box);
+  
+  this.items_tbody.appendChild(item.result_tr);
  }
 
  this.state_div = document.createElement('div');
@@ -118,7 +139,7 @@ sangaku.poll_viewer.init_data = function(x) {
 };
 
 sangaku.poll_viewer.set_state = function(state) {
- if (state != 'revealed' && state != 'open' && state != 'closed') {
+ if (! (state in this.message_for_state)) {
   state = 'before';
  }
 
@@ -126,24 +147,25 @@ sangaku.poll_viewer.set_state = function(state) {
 
  this.state_div.innerHTML = this.message_for_state[state];
  
- if (state == 'before') {
+ if (state == 'before' || state == 'after') {
   this.intro_div.style.display = 'none';
   this.items_div.style.display = 'none';
-  this.submit_button.style.display = 'none';
- } else if (state == 'revealed' || state == 'closed') {
-  this.intro_div.style.display = 'block';
-  this.items_div.style.display = 'block';
-  for (var item of this.poll.items) {
-   item.box.disabled = 1;
-  }
   this.submit_button.style.display = 'none';
  } else {
   this.intro_div.style.display = 'block';
   this.items_div.style.display = 'block';
+  this.submit_button.style.display =
+   (state == 'open') ? 'inline' : 'none';
+
   for (var item of this.poll.items) {
-   item.box.disabled = 0;
+   item.box.disabled = (state == 'open') ? 0 : 1;
+
+   if (state == 'count' || state == 'correct') {
+    item.result_tr.style.display = 'table-row';
+   } else {
+    item.result_tr.style.display = 'none';
+   }
   }
-  this.submit_button.style.display = 'inline';
  }
 }
 
@@ -171,6 +193,28 @@ sangaku.poll_viewer.update = function() {
 };
 
 sangaku.poll_viewer.update_data = function(x) {
+ if (x.state == 'count' || x.state == 'correct') {
+  if ('total_count' in x) {
+   this.poll.total_count = parseInt(x.total_count);
+
+   for (var item0 of x.items) {
+    if (! (item0.id in this.poll.items_by_id)) { continue; }
+    var item = this.poll.items.id[item0.id];
+
+    item.count = ('count' in item0) ? item0.count : 0;
+    if (this.poll.total_count > 0) {
+     w = Math.round(400 * item.count / this.poll.total_count);
+     item.count_bar.style.width = '' + w + 'px';
+     item.count_box.innerHTML =
+      '' + item.count + '/' + this.poll.total_count;
+    } else {
+     item.count_bar.style.width = '1px';
+     item.count_box.innerHTML = '0/0';
+    }
+   }
+  }
+ }
+ 
  this.set_state(x.state);
 };
 
@@ -197,8 +241,10 @@ sangaku.poll_viewer.submit_response = function() {
      '&response=' + response;
  
  fetch(url).then(
-  x => me.submit_button.className = 'poll_submitted';
- ) 
+  function(x) {
+   me.submit_button.className = 'poll_submitted';
+  }
+ ); 
 }
 
 sangaku.poll_viewer.show_error = function(x) {
