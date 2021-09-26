@@ -11,7 +11,7 @@ sangaku.problem_sheet.fields = {"id":{"type":"integer","notnull":"true"},"module
 sangaku.question_item = Object.create(sangaku.object);
 sangaku.question_item.object_type = 'question_item';
 sangaku.question_item.key = 'id';
-sangaku.question_item.fields = {"id":{"type":"integer","notnull":"true"},"problem_sheet_id":{"type":"integer","link":"problem_sheet"},"parent_id":{"type":"integer","link":"question_item"},"position":{"type":"integer"},"header":{"type":"text"},"title":{"type":"text"},"level":{"type":"integer"},"is_bottom":{"type":"boolean"},"problem":{"type":"text"},"solution":{"type":"text"}};
+sangaku.question_item.fields = {"id":{"type":"integer","notnull":"true"},"problem_sheet_id":{"type":"integer","link":"problem_sheet"},"parent_id":{"type":"integer","link":"question_item"},"position":{"type":"integer"},"header":{"type":"text"},"title":{"type":"text"},"level":{"type":"integer"},"is_bottom":{"type":"boolean"},"problem":{"type":"text","default":""},"solution":{"type":"text","default":""}};
 sangaku.registration = Object.create(sangaku.object);
 sangaku.registration.object_type = 'registration';
 sangaku.registration.key = 'id';
@@ -52,8 +52,78 @@ sangaku.user = Object.create(sangaku.object);
 sangaku.user.object_type = 'user';
 sangaku.user.key = 'id';
 sangaku.user.fields = {"id":{"type":"integer","notnull":"true"},"somas_student_id":{"type":"integer"},"somas_person_id":{"type":"integer"},"username":{"type":"text"},"gmail_name":{"type":"text"},"email_address":{"type":"text"},"surname":{"type":"text"},"forename":{"type":"text"},"status":{"type":"text","default":"student"},"is_admin":{"type":"boolean","default":0},"password_hash":{"type":"text"}};
-
-
-sangaku.statuses=[{"id":0,"code":"not_started","icon":" ","text":"I have not looked at this yet","tutor_text":"Not started","message":"","action":""},{"id":1,"code":"current","icon":"\u2699\ufe0f","text":"I am working on this","tutor_text":"Working on it","message":"","action":""},{"id":2,"code":"finished","icon":"\u2705","text":"I have finished and am happy with my answer","tutor_text":"Finished","message":"","action":"step"},{"id":3,"code":"to_check","icon":"\u2753","text":"I have finished and want to check my answer","tutor_text":"Finished, wants check","message":"The teacher will see that you have asked for a check, and will talk to you when they can.","action":"step"},{"id":4,"code":"stuck","icon":"\u274c","text":"I am stuck and would like some help","tutor_text":"Wants help","message":"The teacher will see that you have asked for help, and will talk to you when they can.","action":""},{"id":5,"code":"move","icon":"\u2b55","text":"I am stuck and just want to move on","tutor_text":"Got stuck and skipped","message":"","action":"step"},{"id":6,"code":"defer","icon":"\u23e9","text":"I want to skip this and try the next question","tutor_text":"Skipped","message":"","action":"step"},{"id":7,"code":"responded","icon":"\u27b0","text":"Please read the teacher's response, then choose another status","tutor_text":"Response entered","message":null,"action":null}].map(function(x) {
+sangaku.poll = Object.create(sangaku.object);
+sangaku.poll.object_type = 'poll';
+sangaku.poll.key = 'id';
+sangaku.poll.fields = {"id":{"type":"integer","notnull":"true"},"module_id":{"type":"integer","link":"module"},"problem_sheet_id":{"type":"integer","link":"problem_sheet"},"session_id":{"type":"integer","link":"session"},"title":{"type":"text"},"intro":{"type":"text"}};
+sangaku.poll_instance = Object.create(sangaku.object);
+sangaku.poll_instance.object_type = 'poll_instance';
+sangaku.poll_instance.key = 'id';
+sangaku.poll_instance.fields = {"id":{"type":"integer","notnull":"true"},"poll_id":{"type":"integer","link":"poll"},"session_id":{"type":"integer","link":"session"},"state":{"type":"text"},"start_timestamp":{"type":"integer"},"end_timestamp":{"type":"integer"}};
+sangaku.poll_item = Object.create(sangaku.object);
+sangaku.poll_item.object_type = 'poll_item';
+sangaku.poll_item.key = 'id';
+sangaku.poll_item.fields = {"id":{"type":"integer","notnull":"true"},"poll_id":{"type":"integer","link":"poll"},"sequence_number":{"type":"integer"},"code":{"type":"text"},"text":{"type":"text"}};
+sangaku.poll_response = Object.create(sangaku.object);
+sangaku.poll_response.object_type = 'poll_response';
+sangaku.poll_response.key = 'id';
+sangaku.poll_response.fields = {"id":{"type":"integer","notnull":"true"},"poll_id":{"type":"integer","link":"poll"},"user_id":{"type":"integer","link":"user"},"poll_item_id":{"type":"integer","link":"poll_item"},"response_timestamp":{"type":"integer"}};
+sangaku.statuses=[
+    {"id":0,
+     "code":"not_started",
+     "icon":" ",
+     "text":"I have not looked at this yet",
+     "tutor_text":"Not started",
+     "message":"",
+     "action":""},
+    {"id":1,"code":"current",
+     "icon":"\u2699\ufe0f",
+     "text":"I am working on this",
+     "tutor_text":"Working on it",
+     "message":"",
+     "action":""},
+    {"id":2,
+     "code":"finished",
+     "icon":"\u2705",
+     "text":"I have finished and am happy with my answer",
+     "tutor_text":"Finished",
+     "message":"",
+     "action":"step"},
+    {"id":3,
+     "code":"to_check",
+     "icon":"\u2753",
+     "text":"I have finished and want to check my answer",
+     "tutor_text":"Finished, wants check",
+     "message":"The teacher will see that you have asked for a check, and will talk to you when they can.",
+     "action":"step"},
+    {"id":4,
+     "code":"stuck",
+     "icon":"\u274c",
+     "text":"I am stuck and would like some help",
+     "tutor_text":"Wants help",
+     "message":"The teacher will see that you have asked for help, and will talk to you when they can.",
+     "action":""},
+    {"id":5,
+     "code":"move",
+     "icon":"\u2b55",
+     "text":"I am stuck and just want to move on",
+     "tutor_text":"Got stuck and skipped",
+     "message":"",
+     "action":"step"},
+    {"id":6,
+     "code":"defer",
+     "icon":"\u23e9",
+     "text":"I want to skip this and try the next question",
+     "tutor_text":"Skipped",
+     "message":"",
+     "action":"step"},
+    {"id":7,
+     "code":"responded",
+     "icon":"\u27b0",
+     "text":"Please read the teacher's response, then choose another status",
+     "tutor_text":"Response entered",
+     "message":null,
+     "action":null}
+].map(function(x) {
 return Object.assign(Object.create(sangaku.status),x);
 });
