@@ -64,7 +64,7 @@ class poll_response extends frog_object {
    }
   } else {
    $this->response = null;
-   $i = (int) $this->response;
+   $i = (int) $this->response_text;
    if ($i && array_key_exists($i,$this->poll->items_by_id)) {
     $this->response = $i;
    }
