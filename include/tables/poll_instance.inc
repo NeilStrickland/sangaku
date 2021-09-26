@@ -97,4 +97,22 @@ class poll_instance extends frog_object {
    return '';
   }
  }
+
+ function for_json() {
+  $x = new stdClass();
+
+  foreach (array('id','poll_id','session_id','state','start_timestamp','end_timestamp') as $k) {
+   $x->$k = $this->$k;
+  }
+
+  $poll = $this->load_link('poll');
+  $poll->load_items();
+  $x->poll = $poll->for_json();
+  
+  return $x;
+ }
+
+ function to_json() {
+  return json_encode($this->for_json());
+ }
 }
