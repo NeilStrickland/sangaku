@@ -144,14 +144,14 @@ class poll_instance extends frog_object {
   foreach (array('id','poll_id','session_id','state','start_timestamp','end_timestamp') as $k) {
    $x->$k = $this->$k;
 
-   if ($this->stage == 'count' || $this->stage == 'correct') {
+   if ($this->state == 'count' || $this->state == 'correct') {
     $x->total_count = isset($this->total_count) ? $this->total_count : 0;
    }
   }
 
   $poll = $this->load_link('poll');
   $poll->load_items();
-  $x->poll = $poll->for_json($this->stage);
+  $x->poll = $poll->for_json($this->state);
   
   return $x;
  }

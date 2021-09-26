@@ -104,7 +104,7 @@ class poll extends frog_object {
   // STUB
  }
 
- function for_json($stage = 'before') {
+ function for_json($state = 'before') {
   $x = new stdClass();
   foreach (array('id','module_id','problem_sheet_id','session_id','title','intro') as $k) {
    $x->$k = $this->$k;
@@ -112,13 +112,13 @@ class poll extends frog_object {
 
   $x->items = array();
   foreach ($this->items as $i) {
-   $x->items[] = $i->for_json($stage);
+   $x->items[] = $i->for_json($state);
   }
 
   return $x;
  }
 
- function to_json($stage = 'before') {
-  return json_encode($this->for_json($stage));
+ function to_json($state = 'before') {
+  return json_encode($this->for_json($state));
  }
 }

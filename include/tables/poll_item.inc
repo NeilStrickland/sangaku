@@ -36,24 +36,24 @@ class poll_item extends frog_object {
   parent::__construct($sangaku,'poll_item',$id,$with_defaults);
  }
 
- function for_json($stage = 'before') {
+ function for_json($state = 'before') {
   $x = new stdClass();
   foreach(array('id','poll_id','sequence_number','code','text','is_correct') as $k) {
    $x->$k = $this->$k;
   }
 
-  if ($stage == 'count' || $stage == 'correct') {
+  if ($state == 'count' || $state == 'correct') {
    $x->count = isset($this->count) ? $this->count : 0;
   }
 
-  if ($stage == 'correct') {
+  if ($state == 'correct') {
    $x->is_correct = $this->is_correct;
   }
   
   return $x;
  }
 
- function to_json($stage = 'before') {
-  return json_encode($this->for_json($stage));
+ function to_json($state = 'before') {
+  return json_encode($this->for_json($state));
  }
 }
