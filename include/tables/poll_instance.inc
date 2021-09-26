@@ -56,6 +56,46 @@ class poll_instance extends frog_object {
   parent::__construct($sangaku,'poll_instance',$id,$with_defaults);
  }
 
+ function count_responses() {
+  global $sangaku;
+  
+  $poll = $this->load_link('poll');
+  $poll->load_items();
+  foreach($poll->items as $item) {
+   $item->count = 0;
+  }
+
+  $w = 'x.instance_id=' . $this->id;
+  
+  $responses = $sangaku->load_where('poll_responses',$w);
+
+  foreach($responses as $r) {
+   if ($poll->is_multiple) {
+    $ii = json_decode($r->response_text);
+    if (! is_array($ii)) {
+     $ii = array((int) $ii);
+    }
+    foreach($ii as $i) {
+     if (array_key_exists($i,$poll->items_by_id)) {
+      $item = $poll->items_by_id[$i];
+      $item->count++;
+     }
+    }
+   } else {
+    $i = (int) $r->response_text;
+    if (array_key_exists($i,$poll->items_by_id)) {
+     $item = $poll->items_by_id[$i];
+     $item->count++;
+    }
+   }
+  }
+
+  $this->total_count = 0;
+  foreach($poll->items as $item) {
+   $this->total_count += $item->count;
+  }
+ }
+ 
  function start_timestamp() {
   if ($this->session_date && $this->session_time) {
    return strtotime($this->session_date . ' ' . $this->session_time);
@@ -103,11 +143,15 @@ class poll_instance extends frog_object {
 
   foreach (array('id','poll_id','session_id','state','start_timestamp','end_timestamp') as $k) {
    $x->$k = $this->$k;
+
+   if ($this->stage == 'count' || $this->stage == 'correct') {
+    $x->total_count = isset($this->total_count) ? $this->total_count : 0;
+   }
   }
 
   $poll = $this->load_link('poll');
   $poll->load_items();
-  $x->poll = $poll->for_json();
+  $x->poll = $poll->for_json($this->stage);
   
   return $x;
  }
