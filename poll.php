@@ -23,11 +23,22 @@ function get_params() {
  $params->instance = $sangaku->load('poll_instance',$params->instance_id);
  if (! $params->instance) {
   $params->instance_id = 0;
+  $params->is_valid = 0;
+  $params->error = 'Poll instance not found';
   return $params;
  }
 
  $params->poll = $params->instance->load_link('poll');
+
+ if (! $params->poll) {
+  $params->is_valid = 0;
+  $params->error = 'Poll not found';
+  return $params;  
+ }
+ 
  $params->poll->load_items();
+
+ $params->is_valid = 1;
  
  return($params);
 }
