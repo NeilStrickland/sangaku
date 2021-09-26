@@ -2,7 +2,7 @@
 
 require_once('../include/sangaku.inc');
 
-$instance = $sangaku->get_object_parameter('poll_instance','instance');
+$instance = $sangaku->get_object_parameter('instance','poll_instance');
 $student  = $sangaku->get_object_parameter('student','user');
 
 if (! ($instance && $student)) {
