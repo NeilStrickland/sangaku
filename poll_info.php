@@ -9,9 +9,8 @@ class poll_editor extends frog_object_editor {
 
   $this->commands = 
    array(
-    'display' => true,
     'load' => true,
-    'create_sessions' => true,
+    'create_instances' => true,
     'suggest_delete' => true,
     'delete' => true,
     'save' => true,
@@ -80,8 +79,7 @@ HTML
   if ($this->object->id) {
    $html .= <<<HTML
   <td id="load_td" class="command" width="100" onclick="frog.do_command('load');">Restore</td>
-  <td id="load_td" class="command" width="100" onclick="frog.do_command('display');">View</td>
-  <td id="load_td" class="command" width="100" onclick="frog.do_command('create_instances');">Create instances</td>
+  <td id="load_td" class="command" width="150" onclick="frog.do_command('create_instances');">Create instances</td>
 
 HTML
         ;
@@ -133,7 +131,7 @@ HTML
   $items = json_decode($items);
   foreach($items as $item0) {
    $item = $sangaku->new_object('poll_item');
-   $keys = array('id','poll_id','sequence_number','code','text');
+   $keys = array('id','poll_id','sequence_number','code','text','is_correct');
    foreach ($keys as $k) { $item->$k = $item0->$k; }
    $item->save();
   }
@@ -193,10 +191,13 @@ HTML;
   echo $H->row($H->bold('Title:'),
                $H->text_input('title',$s->title,array('size' => 60)));
   echo $H->row($H->bold('Judgemental:'),
-               $H->checkbox('is_judgemental',$s->is_judgemental));
+               $H->checkbox('is_judgemental',
+                            $s->is_judgemental,
+                            array('id' => 'is_judgemental_cb')));
   echo $H->row('',$explain_judgemental);
   echo $H->row($H->bold('Multiple:'),
-               $H->checkbox('is_multiple',$s->is_multiple));
+               $H->checkbox('is_multiple',
+                            $s->is_multiple));
   echo $H->row('',$explain_multiple);
   
   echo $H->edged_table_end();
