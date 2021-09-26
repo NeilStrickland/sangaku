@@ -19,6 +19,11 @@ div.edit_item_code {
     width: 200px;
 }
 
+div.edit_item_is_correct {
+    display: inline-block;
+    width: 150px;
+}
+
 div.edit_question_header {
     display: inline-block;
     width: 160px;
