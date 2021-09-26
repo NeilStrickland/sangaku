@@ -12,6 +12,11 @@ sangaku.poll_editor.init = function(id) {
   return 0;
  }
 
+ this.is_judgemental_cb = document.getElementById('is_judgemental_cb');
+ this.is_judgemental_cb.onclick = function() {
+  me.set_is_judgemental();
+ }
+ 
  this.items_element = document.main_form.items;
  this.items_div = document.getElementById('items_div');
 
@@ -22,6 +27,8 @@ sangaku.poll_editor.init = function(id) {
  for (i of this.poll.items) {
   this.items_div.appendChild(this.create_item_dom(i));
  }
+
+ this.set_is_judgemental();
  
  this.poll.items_by_id = {};
  this.poll.deletions = [];
@@ -81,6 +88,20 @@ sangaku.poll_editor.create_item_dom = function(item) {
  };
  item.code_div.appendChild(item.code_input);
  item.headers_div.appendChild(item.code_div);
+
+ item.is_correct_div = document.createElement('div');
+ item.is_correct_div.className = 'edit_item_is_correct';
+ var s = document.createElement('span');
+ s.innerHTML = 'Correct: ';
+ item.is_correct_div.appendChild(s);
+ item.is_correct_cb = document.createElement('input');
+ item.is_correct_cb.type = 'checkbox';
+ item.is_correct_cb.checked = item.is_correct ? 'checked' : '';
+ item.is_correct_cb.onclick = function() {
+  item.is_correct = item.is_correct_cb.checked ? 1 : 0;
+ };
+ item.is_correct_div.appendChild(item.is_correct_cb);
+ item.headers_div.appendChild(item.is_correct_div);
 
  item.delete_icon = document.createElement('img');
  item.delete_icon.className = 'edit_item_delete_icon';
@@ -174,6 +195,14 @@ sangaku.poll_editor.create_item_dom = function(item) {
  MathJax.typeset([item.text_display_div]);
  
  return item.div;
+};
+
+sangaku.poll_editor.set_is_judgemental = function() {
+ for (var item of this.poll.items) {
+  item.is_correct_div.style.visibility =
+   this.is_judgemental_cb.checked ?
+   'visible' : 'hidden';
+ }
 };
 
 sangaku.poll_editor.delete_item = function(item) {
