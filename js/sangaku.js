@@ -316,6 +316,46 @@ sangaku.question_item.header_tag = function() {
 
 //////////////////////////////////////////////////////////////////////
 
+sangaku.poll.munch = function(x) {
+ for (var k of ['id','module_id','problem_sheet_id','session_id',
+                'title','intro','is_judgemental','is_multiple']) {
+  if (k in x) { this[k] = x[k]; }
+ }
+
+ this.items = [];
+
+ if ('items' in x) {
+  for (i of x.items) {
+   this.items.push(sangaku.poll_item.scrunch(i));
+  }
+ }
+}
+
+//////////////////////////////////////////////////////////////////////
+
+sangaku.poll_instance.munch = function(x) {
+ for (var k of ['id','poll_id','session_id','state',
+                'start_timestamp','end_timestamp',
+                'total_count']) {
+  if (k in x) { this[k] = x[k]; }
+ }
+
+ if ('poll' in x) {
+  this.poll = sangaku.poll.scrunch(x.poll);
+ }
+}
+
+//////////////////////////////////////////////////////////////////////
+
+sangaku.poll_item.munch = function(x) {
+ for (var k of ['id','poll_id','sequence_number','code',
+                'text','is_correct','count']) {
+  if (k in x) { this[k] = x[k]; }
+ }
+}
+
+//////////////////////////////////////////////////////////////////////
+
 sangaku.session.munch = function(x) {
  for (var k of ['id','problem_sheet_id','tutorial_group_id',
                 'start_time','end_time',
@@ -359,6 +399,13 @@ sangaku.session.munch = function(x) {
   this.snapshots = [];
   for (s of x.snapshots) {
    this.snapshots.push(sangaku.snapshot.scrunch(s));
+  }
+ }
+
+ if ('poll_instance' in x) {
+  this.poll_instances = [];
+  for (i of x.poll_instances) {
+   this.poll_instances.push(sangaku.poll_instance.scrunch(i));
   }
  }
 };
