@@ -10,6 +10,7 @@ sangaku.session_monitor.init = function(session_id) {
 		 'monitor_tab',
 		 'sheet_tab',
 		 'snapshots_tab',
+		 'polls_tab',
 		 'help_tab']) {
   this[id] = document.getElementById(id);
  }
@@ -33,61 +34,69 @@ sangaku.session_monitor.init_data = function(x) {
  var sheet = this.session.problem_sheet;
  var group = this.session.tutorial_group;
  var students = this.session.students;
+ var poll_instances = this.session.poll_instances;
+ 
  this.students_by_id = {};
- 
- this.status_table = document.createElement('table');
- this.status_table.className = 'edged';
- this.monitor_tab.appendChild(this.status_table);
- 
- this.header_tr = document.createElement('tr');
- this.status_table.appendChild(this.header_tr);
- this.header_tr.appendChild(document.createElement('td'));
- 
- sheet.bottom_items_by_id = {};
- 
- for (var item of sheet.bottom_items) {
-  item.header_td = document.createElement('td');
-  item.header_td.className = 'item_header';
-  item.header_td.innerHTML = item.full_header();
-  this.header_tr.appendChild(item.header_td);
 
-  sheet.bottom_items_by_id[item.id] = item;
- }
-
- sheet.has_solutions = false;
- for (var item of sheet.bottom_items) {
-  if (item.solution) {
-   sheet.has_solutions = true;
-  }
- }
-
- if (sheet.has_solutions) {
-  this.solutions_tr = document.createElement('tr');
-  this.status_table.appendChild(this.solutions_tr);
-  this.solutions_td = document.createElement('td');
-  this.solutions_td.innerHTML = 'Show solution to students';
-  this.solutions_tr.appendChild(this.solutions_td);
+ if (this.monitor_tab) {
+  this.status_table = document.createElement('table');
+  this.status_table.className = 'edged';
+  this.monitor_tab.appendChild(this.status_table);
+ 
+  this.header_tr = document.createElement('tr');
+  this.status_table.appendChild(this.header_tr);
+  this.header_tr.appendChild(document.createElement('td'));
+ 
+  sheet.bottom_items_by_id = {};
+ 
   for (var item of sheet.bottom_items) {
-   item.show_solution_td = document.createElement('td');
-   this.solutions_tr.appendChild(item.show_solution_td);
+   item.header_td = document.createElement('td');
+   item.header_td.className = 'item_header';
+   item.header_td.innerHTML = item.full_header();
+   this.header_tr.appendChild(item.header_td);
+
+   sheet.bottom_items_by_id[item.id] = item;
+  }
+
+  sheet.has_solutions = false;
+  for (var item of sheet.bottom_items) {
    if (item.solution) {
-    item.solution_shown = this.session.solutions_shown_array.includes(item.id);
-    var cb = document.createElement('input');
-    item.show_solution_cb = cb;
-    cb.type = 'checkbox';
-    cb.checked = item.solution_shown;
-    cb.onclick = function() { me.save_solutions_shown(); };
-    item.show_solution_td.appendChild(cb);
-   } else {
-    item.show_solution_td.innerHTML = '&nbsp;';
+    sheet.has_solutions = true;
    }
   }
+
+  if (sheet.has_solutions) {
+   this.solutions_tr = document.createElement('tr');
+   this.status_table.appendChild(this.solutions_tr);
+   this.solutions_td = document.createElement('td');
+   this.solutions_td.innerHTML = 'Show solution to students';
+   this.solutions_tr.appendChild(this.solutions_td);
+   for (var item of sheet.bottom_items) {
+    item.show_solution_td = document.createElement('td');
+    this.solutions_tr.appendChild(item.show_solution_td);
+    if (item.solution) {
+     item.solution_shown = this.session.solutions_shown_array.includes(item.id);
+     var cb = document.createElement('input');
+     item.show_solution_cb = cb;
+     cb.type = 'checkbox';
+     cb.checked = item.solution_shown;
+     cb.onclick = function() { me.save_solutions_shown(); };
+     item.show_solution_td.appendChild(cb);
+    } else {
+     item.show_solution_td.innerHTML = '&nbsp;';
+    }
+   }
+  }
+
+  for (var student of students) {
+   this.add_student(student);
+  }
  }
 
- for (var student of students) {
-  this.add_student(student);
+ if (poll_instances) {
+  // UNFINISHED
  }
-
+ 
  var me = this;
  setTimeout(function() { me.update(); },me.interval);
 };
@@ -247,12 +256,22 @@ sangaku.session_monitor.update = function() {
  )
 };
 
+sangaku.session_monitor.poll = {
+ poll : null,
+ instance : null
+};
+
+sangaku.session_monitor.poll.create_dom = function() {
+
+};
+
 sangaku.session_monitor.update_data = function(x) {
  var session = this.session;
  var sheet = session.problem_sheet;
  var group = session.tutorial_group;
  var students = session.students;
-
+ var poll_instances = session.poll_instances;
+ 
  session.solutions_shown = x.solution_shown;
  session.solutions_shown_array = JSON.parse(x.solutions_shown);
  if (! session.solutions_shown_array) {
