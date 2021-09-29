@@ -13,7 +13,8 @@ $sangaku->add_table(
   'duration' => array('type' => 'integer','default' => 50,'notnull' => true),
   'is_confirmed' => array('type' => 'boolean','default' => 0,'notnull' => true),
   'solutions_shown' => array('type' => 'text'),
-  'video_url' => array('type' => 'text')
+  'video_url' => array('type' => 'text'),
+  'is_online' => array('type' => 'boolean')
  ),
  array(
   'problem_sheet_title' => array('type' => 'text'),
@@ -176,7 +177,15 @@ class session extends frog_object {
  }
 
  function effective_video_url() {
-  return $this->video_url ? $this->video_url : $this->module_video_url; 
+  if ($this->is_online) {
+   if ($this->video_url) {
+    return $this->video_url;
+   } else {
+    return $this->module_video_url;
+   }
+  } else {
+   return null;
+  }
  }
 
  function load_snapshots() {
@@ -186,6 +195,23 @@ class session extends frog_object {
   $this->snapshots_by_id = make_index($this->snapshots,'id');
  }
  
+ function load_poll_instances() {
+  global $sangaku;
+  
+  $w = "x.session_id={$this->id}";
+
+  if ($this->problem_sheet_id) {
+   $w .= " OR p.problem_sheet_id={$this->problem_sheet_id}";
+  }
+
+  $this->poll_instances = $sangaku->load_where('poll_instances',$w);
+
+  foreach($this->poll_instances as $inst) {
+   $poll = $inst->load_link('poll');
+   $poll->load_items();
+  }
+ }
+
  function load_associated() {
   global $sangaku;
   
@@ -228,6 +254,7 @@ SQL
   }
 
   $this->load_snapshots();
+  $this->load_poll_instances();
  } 
 
  function clear_fake_data() {
