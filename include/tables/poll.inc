@@ -9,6 +9,7 @@ $sangaku->add_table(
   'module_id' => array('type' => 'integer','link' => 'module'),
   'problem_sheet_id' => array('type' => 'integer','link' => 'problem_sheet'),
   'session_id' => array('type' => 'integer','link' => 'session'),
+  'code' => array('type' => 'text'),
   'title' => array('type' => 'text'),
   'intro' => array('type' => 'text'),
   'is_judgemental' => array('type' => 'boolean','default' => 0),
@@ -52,6 +53,7 @@ SELECT
  g.day_number AS tutorial_group_day_number,
  g.hour AS tutorial_group_hour,
  g.week_parity AS tutorial_group_week_parity,
+ x.code,
  x.title,
  x.intro,
  x.is_judgemental,
@@ -62,7 +64,7 @@ FROM tbl_polls x
    LEFT JOIN tbl_sessions s ON x.session_id=s.id
     LEFT JOIN tbl_tutorial_groups g ON s.tutorial_group_id=g.id
 WHERE %s
- ORDER BY m.code,p.week_number,s.date,s.time,x.id
+ ORDER BY m.code,p.week_number,s.date,s.time,x.code,x.id
  
 SQL
 );
@@ -80,6 +82,11 @@ class poll extends frog_object {
   $this->instances =
    $sangaku->load_where('poll_instances',"x.poll_id=" . ((int) $this->id));
 
+  $this->instances_by_group_id =
+   make_index($this->instances,'session_tutorial_group_id');
+
+  $this->instances_by_session_id =
+   make_index($this->instances,'session_id');
  }
 
  function load_items() {
@@ -101,7 +108,70 @@ class poll extends frog_object {
  }
 
  function create_instances() {
-  // STUB
+  global $sangaku;
+  
+  $sheet = $this->load_link('problem_sheet');
+
+  if (! $sheet) { return false; }
+  if (! $this->id) { return false; }
+  
+  $this->load_instances();
+  
+  $sheet->load_sessions();
+  foreach ($sheet->sessions as $s) {
+   if (! array_key_exists($s->id,$this->instances_by_session_id)) {
+    $inst = $sangaku->new_object('poll_instance');
+    $inst->poll_id = $this->id;
+    $inst->session_id = $s->id;
+    $inst->state = 'before';
+    $inst->save();
+   }
+  }
+
+  $this->load_instances();
+ }
+
+ function preview() {
+  global $sangaku;
+  
+  $H = $sangaku->html;
+
+  $html = <<<HTML
+  <div>
+   <h1>{$this->title}</h1>
+   <div class="poll_intro">
+{$this->intro}    
+   </div>
+   <div class="poll_items">
+    <table>
+HTML
+  ;
+
+  foreach($this->items as $item) {
+   if ($this->is_multiple) {
+    $ip = '<input type="checkbox"/>';
+   } else {
+    $ip = '<input type="radio" name="fake"/>';
+   }
+   
+   $html .= <<<HTML
+     <tr class="poll_item">
+      <td class="poll_item_box">$ip</td>
+      <td class="poll_item_text">{$item->text}</td>
+     </tr>
+HTML
+  ;
+  }
+  
+  $html .= <<<HTML
+    </table>
+   </div>   
+  </div>
+  
+HTML
+  ;
+
+  return $html;
  }
 
  function for_json($state = 'before') {
