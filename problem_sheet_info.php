@@ -80,8 +80,8 @@ HTML
   if ($this->object->id) {
    $html .= <<<HTML
   <td id="load_td" class="command" width="100" onclick="frog.do_command('load');">Restore</td>
-  <td id="load_td" class="command" width="100" onclick="frog.do_command('display');">View</td>
-  <td id="load_td" class="command" width="100" onclick="frog.do_command('create_sessions');">Create sessions</td>
+  <td id="view_td" class="command" width="100" onclick="frog.do_command('display');">View</td>
+  <td id="create_td" class="command" width="100" onclick="frog.do_command('create_sessions');">Create sessions</td>
 
 HTML
         ;
