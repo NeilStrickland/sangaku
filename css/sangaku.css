@@ -499,13 +499,19 @@ button.poll_submitted:hover {
     background : #C0F0C0;
 }
 
+td.poll_result {
+    position : relative;
+}
+
 div.poll_count_bar {
+    display : inline-block;
     width : 1px;
     height : 10px;
     background : #8888DD;
 }
 
 div.poll_count_box {
+    display : inline-block;
     position : absolute;
     right : 5px;
 }
