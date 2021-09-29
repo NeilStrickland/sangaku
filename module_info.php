@@ -33,6 +33,7 @@ class module_editor extends frog_object_editor {
    array(
     array('name' => 'tutorial_group'),
     array('name' => 'problem_sheet'),
+    array('name' => 'poll'),
     array('name' => 'registration')
    )
   );
@@ -62,6 +63,7 @@ HTML;
   $this->general_tab();
   $this->groups_tab();
   $this->sheets_tab();
+  $this->polls_tab();
   $this->sessions_tab();
   $this->students_tab();
   
@@ -195,6 +197,39 @@ HTML;
   $url = "problem_sheet_info.php?module_id={$m->id}&command=new";
   
   echo "<br/>" . $H->button_link('Create new problem sheet',$url);
+
+  echo $H->tab_end();
+ }
+ 
+ function polls_tab() {
+  global $sangaku;
+ 
+  $N = $sangaku->nav;
+  $H = $sangaku->html;
+  $m = $this->object;
+ 
+  echo $H->tab_start('Polls');
+  echo $H->edged_table_start();
+  echo $H->spacer_row(60,120,120,300,60,60);
+ 
+  echo $H->row('ID','Problem sheet','Code','Title','','');
+  foreach ($m->polls as $p) {
+   $sheet = $p->problem_sheet_code;
+   if (! $sheet) { $sheet = $p->problem_sheet_title; }
+   echo $H->tr($H->td($p->id) .
+               $H->td($sheet) .
+               $H->td($p->code).
+               $H->td($p->title) .
+               $H->link_td("Preview","poll_info.php?command=display&id={$p->id}") .
+               $H->link_td("Edit","poll_info.php?id={$p->id}")
+   );
+  }
+  
+  echo $H->edged_table_end();
+ 
+  $url = "poll_info.php?module_id={$m->id}&command=new";
+  
+  echo "<br/>" . $H->button_link('Create new poll',$url);
 
   echo $H->tab_end();
  }
