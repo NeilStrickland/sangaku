@@ -9,6 +9,7 @@ class poll_editor extends frog_object_editor {
 
   $this->commands = 
    array(
+    'display' => true,
     'load' => true,
     'create_instances' => true,
     'suggest_delete' => true,
@@ -72,21 +73,22 @@ class poll_editor extends frog_object_editor {
   $html = <<<HTML
 <table>
  <tr>
-  <td id="save_td" class="command" width="100" onclick="frog.do_command('save');">Save</td>
+  <td id="save_td" class="command" width="80" onclick="frog.do_command('save');">Save</td>
 HTML
         ;
 
   if ($this->object->id) {
    $html .= <<<HTML
-  <td id="load_td" class="command" width="100" onclick="frog.do_command('load');">Restore</td>
-  <td id="load_td" class="command" width="150" onclick="frog.do_command('create_instances');">Create instances</td>
+  <td id="load_td" class="command" width="80" onclick="frog.do_command('load');">Restore</td>
+  <td id="view_td" class="command" width="80" onclick="frog.do_command('display');">View</td>
+  <td id="create_td" class="command" width="150" onclick="frog.do_command('create_instances');">Create instances</td>
 
 HTML
         ;
 
    if (isset($this->commands['suggest_delete'])) {
     $html .= <<<HTML
-  <td id="suggest_delete_td" class="command" width="100" onclick="frog.do_command('suggest_delete');">Delete</td>
+  <td id="suggest_delete_td" class="command" width="80" onclick="frog.do_command('suggest_delete');">Delete</td>
 
 HTML
          ;
@@ -96,7 +98,7 @@ HTML
   $u = $this->listing_url();
   if ($u) {
    $html .= <<<HTML
-  <td id="listing_td" class="command" width="100" onclick="location='$u';">Index</td>
+  <td id="listing_td" class="command" width="80" onclick="location='$u';">Index</td>
 
 HTML
          ;
@@ -172,6 +174,13 @@ HTML
 
   echo $N->top_menu();
 
+  $explain_code = <<<HTML
+Here you can enter a short code to identify this poll.
+Polls wil be sorted alphabetically by code in various places,
+so if you want polls to appear in a particular order then 
+you should set the codes accordingly.
+HTML;
+  
   $explain_judgemental = <<<HTML
 You should mark the poll as judgemental if you want to classify 
 some responses as correct and others as incorrect.
@@ -185,9 +194,10 @@ HTML;
   echo $H->edged_table_start();
   echo $H->spacer_row(160,440);
   echo $H->row($H->bold('Module:'),$module_selector);
-  echo $H->row($H->bold('Semester:'),
-               $H->semester_selector('semester',$s->semester));
   echo $H->row($H->bold('Problem sheet:'),$sheet_selector);
+  echo $H->row($H->bold('Code:'),
+               $H->text_input('code',$s->code,array('size' => 10)));
+  echo $H->row('',$explain_code);
   echo $H->row($H->bold('Title:'),
                $H->text_input('title',$s->title,array('size' => 60)));
   echo $H->row($H->bold('Judgemental:'),
@@ -303,7 +313,7 @@ HTML
 
   echo $H->edged_table_start();
   echo $H->spacer_row(30,60,180);
-  echo $H->row('id','Group','Time','','Confirm');
+  echo $H->row('id','Group','Time');
   foreach($s->instances as $x) {
    echo $H->tr($H->td($x->id) .
                $H->td($x->tutorial_group_name) .
