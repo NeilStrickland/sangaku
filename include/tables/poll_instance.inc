@@ -4,7 +4,7 @@ global $sangaku;
 
 $sangaku->add_table(
  'poll_instance','poll_instances',
-  array(		
+ array(		
   'id' => array('type' => 'integer','notnull' => 'true'),
   'poll_id' => array('type' => 'integer','link' => 'poll'),
   'session_id' => array('type' => 'integer','link' => 'session'),
@@ -13,6 +13,9 @@ $sangaku->add_table(
   'end_timestamp' => array('type' => 'integer')  
  ),
  array(
+  'poll_code' => array('type' => 'text'),
+  'poll_title' => array('type' => 'text'),
+  'problem_sheet_id' => array('type' => 'integer'),
   'session_tutorial_group_id' => array('type' => 'integer','link' => 'tutorial_group'),
   'session_date' => array('type' => 'date'),
   'session_time' => array('type' => 'time'),
@@ -27,6 +30,9 @@ $sangaku->add_table(
 SELECT
  x.id,
  x.poll_id,
+ p.code AS poll_code,
+ p.title AS poll_title,
+ p.problem_sheet_id,
  x.session_id,
  x.state,
  x.start_timestamp,
@@ -43,6 +49,7 @@ SELECT
 FROM tbl_poll_instances x
  LEFT JOIN tbl_sessions s ON x.session_id=s.id
   LEFT JOIN tbl_tutorial_groups g ON s.tutorial_group_id=g.id
+   LEFT JOIN tbl_polls p ON x.poll_id=p.id
 WHERE %s
  ORDER BY x.poll_id,g.day_number,g.hour,g.name,x.session_id,x.id 
 
@@ -58,9 +65,17 @@ class poll_instance extends frog_object {
 
  function count_responses() {
   global $sangaku;
+
+  if (! isset($this->poll)) {
+   $this->load_link('poll');
+  }
   
-  $poll = $this->load_link('poll');
-  $poll->load_items();
+  $poll = $this->poll;
+
+  if (! isset($poll->items)) {
+   $poll->load_items();
+  }
+  
   foreach($poll->items as $item) {
    $item->count = 0;
   }
@@ -141,16 +156,18 @@ class poll_instance extends frog_object {
  function for_json() {
   $x = new stdClass();
 
-  foreach (array('id','poll_id','session_id','state','start_timestamp','end_timestamp') as $k) {
-   $x->$k = $this->$k;
-
-   if ($this->state == 'count' || $this->state == 'correct') {
-    $x->total_count = isset($this->total_count) ? $this->total_count : 0;
-   }
-  }
-
   $poll = $this->load_link('poll');
   $poll->load_items();
+
+  foreach (array('id','poll_id','session_id','state','start_timestamp','end_timestamp') as $k) {
+   $x->$k = $this->$k;
+  }
+
+  if ($this->state == 'count' || $this->state == 'correct') {
+   $this->count_responses();
+   $x->total_count = isset($this->total_count) ? $this->total_count : 0;
+  }
+
   $x->poll = $poll->for_json($this->state);
   
   return $x;
