@@ -2,7 +2,7 @@
 
 require_once('include/sangaku.inc');
 
-$session_id = (int) get_required_parameter('session_id');
+$session_id = (int) get_optional_parameter('session_id',0);
 if ($session_id) {
  $session = $sangaku->load('session',$session_id);
  $session->load_associated();
@@ -30,21 +30,8 @@ function show_status_page($session) {
  $b = $sangaku->nav->top_session_menu($session->id);
  $m = $sangaku->nav->mathjax_script();
  $u = 'https://' . $_SERVER['HTTP_HOST'] . '/sangaku/' . $session->id;
-
- $bb = '';
- $u = $session->effective_video_url();
- if ($u) {
-  $bb = <<<HTML
-    <br/>
-    <div style="width:700px">
-     <button type="button" onclick="window.open('{$u}')">{$session->video_url_description}</button>
-    </div>
-    <br/>
-HTML
-      ;
- }
  
-  echo <<<HTML
+ echo <<<HTML
 <!DOCTYPE html>
 <html>
  <head>
@@ -62,45 +49,30 @@ $m
  <body style="width:100%">
 $b<br/><br/>
   <div class="tabber" id="session_monitor_tabber_{$session->id}">
-   <div class="tabbertab" id="session_tab">
-    <h2>Session</h2>
-    <br/><br/>
-    <div id="session_header">
-     {$session->problem_sheet->title} 
-     <br/>
-     Group {$session->tutorial_group->module_code} 
-     ({$session->tutorial_group->name})
-    </div>
-    <br/><br/>
-    <div style="width:700px">
-     Student login URL:
-     <code id="login_url" style="color: blue; font-size: 150%">{$u}</code>
-     <button type="button" onclick="copy_login_url()">Copy</button>
-     <br/><br/>
-     Share this URL in Blackboard Collaborate chat.  Remember that students
-     cannot see messages posted before they joined the session, so you should
-     share the URL several times.
-    </div>
-$bb
-   </div>
-   <div class="tabbertab" id="monitor_tab">
-    <h2>Monitor</h2>
-   </div>
-   <div class="tabbertab" id="sheet_tab">
-    <h2>Problem Sheet</h2>
-    <br/><br/>
-    <div style="max-width:800px">
-     {$session->problem_sheet->preview()}
-    </div>
-   </div>
-<!--
-   <div class="tabbertab" id="snapshots_tab">
-    <h2>Snapshots</h2>
-   </div>
-   <div class="tabbertab" id="help_tab">
-    <h2>Help</h2>
-   </div>
--->
+
+HTML;
+
+ session_tab($session);
+
+ if ($session->is_online) {
+  monitor_tab($session);
+ }
+
+ if ($session->problem_sheet) {
+  sheet_tab($session);
+ }
+
+ if ($session->polls) {
+  polls_tab($session);
+ }
+
+ if (false) {
+  // This is disabled as it is heavily reliant on additional
+  // software on NPS's home PC.
+  snapshots_tab($session);
+ }
+ 
+ echo <<<HTML
   </div>
   <script>
    var v = Object.create(sangaku.session_monitor);
@@ -123,4 +95,117 @@ $bb
 
 HTML
 ;
+}
+
+//////////////////////////////////////////////////////////////////////
+
+function session_tab($session) {
+ $bb = '';
+ $video_url = $session->effective_video_url();
+ if ($video_url) {
+  $bb = <<<HTML
+    <br/>
+    <div style="width:700px">
+     <button type="button" onclick="window.open('{$video_url}')">{$session->video_url_description}</button>
+    </div>
+    <br/>
+HTML
+      ;
+ }
+
+ if ($session->is_online) {
+  $bb_msg = <<<HTML
+     <br/><br/>
+     Share this URL in Blackboard Collaborate chat.  Remember that students
+     cannot see messages posted before they joined the session, so you should
+     share the URL several times.
+
+HTML;
+ } else {
+  $bb_msg = '';
+ }
+
+ $student_login_url =
+   'https://' . $_SERVER['HTTP_HOST'] . '/sangaku/' . $session->id;
+
+ echo <<<HTML
+   <div class="tabbertab" id="session_tab">
+    <h2>Session</h2>
+    <br/><br/>
+    <div id="session_header">
+     {$session->problem_sheet->title} 
+     <br/>
+     Group {$session->tutorial_group->module_code} 
+     ({$session->tutorial_group->name})
+    </div>
+    <br/><br/>
+    <div style="width:700px">
+     Student login URL:
+     <code id="login_url" style="color: blue; font-size: 150%">{$student_login_url}</code>
+     <button type="button" onclick="copy_login_url()">Copy</button>
+     $bb_msg
+    </div>
+$bb
+   </div>
+
+HTML;
+}
+
+//////////////////////////////////////////////////////////////////////
+
+function monitor_tab($session) {
+ echo <<<HTML
+   <div class="tabbertab" id="monitor_tab">
+    <h2>Monitor</h2>
+   </div>
+
+HTML;
+}
+
+//////////////////////////////////////////////////////////////////////
+
+function sheet_tab($session) {
+ echo <<<HTML
+   <div class="tabbertab" id="sheet_tab">
+    <h2>Problem Sheet</h2>
+    <br/><br/>
+    <div style="max-width:800px">
+     {$session->problem_sheet->preview()}
+    </div>
+   </div>
+
+HTML;
+}
+
+//////////////////////////////////////////////////////////////////////
+
+function snapshots_tab($session) {
+ echo <<<HTML
+   <div class="tabbertab" id="snapshots_tab">
+    <h2>Snapshots</h2>
+   </div>
+
+HTML;
+}
+
+//////////////////////////////////////////////////////////////////////
+
+function polls_tab($session) {
+ echo <<<HTML
+   <div class="tabbertab" id="polls_tab">
+    <h2>Polls</h2>
+   </div>
+
+HTML;
+}
+
+//////////////////////////////////////////////////////////////////////
+
+function help_tab($session) {
+ echo <<<HTML
+   <div class="tabbertab" id="help_tab">
+    <h2>Help</h2>
+   </div>
+
+HTML;
 }
