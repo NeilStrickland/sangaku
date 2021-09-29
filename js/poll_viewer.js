@@ -107,6 +107,7 @@ sangaku.poll_viewer.init_data = function(x) {
   item.result_tr.style.display = 'none';
   item.result_tr.appendChild(document.createElement('td'));
   item.result_td = document.createElement('td');
+  item.result_td.className = 'poll_result';
   item.result_tr.appendChild(item.result_td);
   item.count_bar = document.createElement('div');
   item.count_bar.className = 'poll_count_bar';
@@ -197,9 +198,9 @@ sangaku.poll_viewer.update_data = function(x) {
   if ('total_count' in x) {
    this.poll.total_count = parseInt(x.total_count);
 
-   for (var item0 of x.items) {
+   for (var item0 of x.poll.items) {
     if (! (item0.id in this.poll.items_by_id)) { continue; }
-    var item = this.poll.items.id[item0.id];
+    var item = this.poll.items_by_id[item0.id];
 
     item.count = ('count' in item0) ? item0.count : 0;
     if (this.poll.total_count > 0) {
