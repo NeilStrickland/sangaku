@@ -61,6 +61,7 @@ class module extends frog_object {
  function load_associated() {
   $this->load_tutorial_groups();
   $this->load_problem_sheets();
+  $this->load_polls();
   $this->load_sessions();
   $this->load_students();
  }
@@ -97,6 +98,23 @@ class module extends frog_object {
   }
 
   return $this->problem_sheets;
+ }
+
+ function load_polls($semester='',$force = false) {
+  global $sangaku;
+
+  if ($force || ! isset($this->polls)) {
+   $w = "x.module_id={$this->id}";
+
+   if ($semester) {
+    $w .= " AND p.semester='$semester'";
+   }
+   
+   $this->polls = $sangaku->load_where('polls',$w);
+   $this->polls_by_id = make_index($this->polls,'id');
+  }
+
+  return $this->polls;
  }
 
  function load_sessions($semester='',$force = false) {
