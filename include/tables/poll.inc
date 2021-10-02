@@ -176,7 +176,8 @@ HTML
 
  function for_json($state = 'before') {
   $x = new stdClass();
-  foreach (array('id','module_id','problem_sheet_id','session_id','title','intro') as $k) {
+  foreach (array('id','module_id','problem_sheet_id','session_id',
+                 'title','intro','is_judgemental','is_multiple') as $k) {
    $x->$k = $this->$k;
   }
 
