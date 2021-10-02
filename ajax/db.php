@@ -112,6 +112,9 @@ if ($command == 'load') {
   $obj->load_question_items();
  } elseif ($obj->object_type == 'poll') {
   $obj->load_items();
+ } elseif ($obj->object_type == 'poll_instance') {
+  $obj->load_link('poll');
+  $obj->poll->load_items();
  }
  
  echo $obj->to_json();
