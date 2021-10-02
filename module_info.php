@@ -133,33 +133,98 @@ HTML;
   $N = $sangaku->nav;
   $H = $sangaku->html;
   $m = $this->object;
- 
-  echo $H->tab_start('Tutorial groups');
-  echo $H->edged_table_start();
-  echo $H->spacer_row(60,90,60,60,60,300,60);
-  echo $H->row('Group','Semester','Day','Time','Weeks','Teachers','');
-  foreach($m->tutorial_groups as $g) {
+  $m->load_tutorial_groups();
+
+  foreach ($m->tutorial_groups as $g) {
    $g->load_teachers();
    $uu = array();
-
+    
    foreach($g->teachers as $u) { 
     $n = $u->full_name;
     $uu[] = $n; 
    }
 
-   $uu = implode(', ',$uu);
-   $url = 'group_info.php?id=' . $g->id;
-   
-   echo $H->tr($H->td($g->name) .
-               $H->td($g->semester) .
-               $H->td($g->day_name()) .
-               $H->td('' . $g->hour . ':00') . 
-               $H->td($g->week_parity_long()) .
-               $H->td($uu) .
-               $H->link_td("Edit",$url));
+   $g->teachers_string = implode(', ',$uu);
+   $g->info_url = 'group_info.php?id=' . $g->id;
   }
   
-  echo $H->edged_table_end();
+  echo $H->tab_start('Tutorial groups');
+
+  if ($m->online_tutorials) {
+   echo "<br/><span class=\"group_table_header\">Online tutorials</span><br/>";
+   echo $H->edged_table_start();
+   echo $H->spacer_row(60,90,60,60,60,300,60);
+   echo $H->row('Group','Semester','Day','Time','Weeks','Teachers','');
+   foreach($m->online_tutorials as $g) {
+   
+    echo $H->tr($H->td($g->name) .
+                $H->td($g->semester) .
+                $H->td($g->day_name()) .
+                $H->td('' . $g->hour . ':00') . 
+                $H->td($g->week_parity_long()) .
+                $H->td($g->teachers_string) .
+                $H->link_td("Edit",$g->info_url));
+   }
+  
+   echo $H->edged_table_end();
+  }
+  
+  if ($m->offline_tutorials) {
+   echo "<br/><span class=\"group_table_header\">Offline tutorials</span><br/>";
+   echo $H->edged_table_start();
+   echo $H->spacer_row(60,60,90,60,60,60,300,60);
+   echo $H->row('Group','Room','Semester','Day','Time','Weeks','Teachers','');
+   foreach($m->offline_tutorials as $g) {
+   
+    echo $H->tr($H->td($g->name) .
+                $H->td($g->room_code) . 
+                $H->td($g->semester) .
+                $H->td($g->day_name()) .
+                $H->td('' . $g->hour . ':00') . 
+                $H->td($g->week_parity_long()) .
+                $H->td($g->teachers_string) .
+                $H->link_td("Edit",$g->info_url));
+   }
+  
+   echo $H->edged_table_end();
+  }
+
+  if ($m->online_lectures) {
+   echo "<br/><span class=\"group_table_header\">Online lectures</span><br/>";
+   echo $H->edged_table_start();
+   echo $H->spacer_row(90,60,60,60,300,60);
+   echo $H->row('Semester','Day','Time','Weeks','Teachers','');
+   foreach($m->online_lectures as $g) {
+   
+    echo $H->tr($H->td($g->semester) .
+                $H->td($g->day_name()) .
+                $H->td('' . $g->hour . ':00') . 
+                $H->td($g->week_parity_long()) .
+                $H->td($g->teachers_string) .
+                $H->link_td("Edit",$g->info_url));
+   }
+  
+   echo $H->edged_table_end();
+  }
+
+  if ($m->offline_lectures) {
+   echo "<br/><span class=\"group_table_header\">Offline lectures</span><br/>";
+   echo $H->edged_table_start();
+   echo $H->spacer_row(60,90,60,60,60,300,60);
+   echo $H->row('Room','Semester','Day','Time','Weeks','Teachers','');
+   foreach($m->offline_lectures as $g) {
+   
+    echo $H->tr($H->td($g->room_code) . 
+                $H->td($g->semester) .
+                $H->td($g->day_name()) .
+                $H->td('' . $g->hour . ':00') . 
+                $H->td($g->week_parity_long()) .
+                $H->td($g->teachers_string) .
+                $H->link_td("Edit",$g->info_url));
+   }
+  
+   echo $H->edged_table_end();
+  }
 
   $url0 = "group_info.php?module_id={$m->id}&command=new";
   $url1 = "assign_groups.php?module_id={$m->id}";
