@@ -62,7 +62,7 @@ HTML;
   sheet_tab($session);
  }
 
- if ($session->polls) {
+ if ($session->poll_instances) {
   polls_tab($session);
  }
 
@@ -194,6 +194,7 @@ function polls_tab($session) {
  echo <<<HTML
    <div class="tabbertab" id="polls_tab">
     <h2>Polls</h2>
+    <br/>
    </div>
 
 HTML;
