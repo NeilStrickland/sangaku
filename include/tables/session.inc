@@ -199,11 +199,6 @@ class session extends frog_object {
   global $sangaku;
   
   $w = "x.session_id={$this->id}";
-
-  if ($this->problem_sheet_id) {
-   $w .= " OR p.problem_sheet_id={$this->problem_sheet_id}";
-  }
-
   $this->poll_instances = $sangaku->load_where('poll_instances',$w);
 
   foreach($this->poll_instances as $inst) {
@@ -350,6 +345,14 @@ HTML
 
   if (isset($this->problem_sheet)) {
    $x->problem_sheet = $this->problem_sheet->for_json($with_solutions,$sols_array);
+  }
+
+  if (isset($this->poll_instances)) {
+   $x->poll_instances = array();
+
+   foreach($this->poll_instances as $i) {
+    $x->poll_instances[] = $i->for_json();
+   }
   }
 
   if (isset($this->tutorial_group)) {
