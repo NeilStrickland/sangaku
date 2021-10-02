@@ -9,11 +9,14 @@ $sangaku->add_table(
   'somas_id' => array('type' => 'integer'),
   'module_id' => array('type' => 'integer','link' => 'module'),
   'name' => array('type' => 'text'),
+  'is_lecture' => array('type' => 'boolean','default' => 0),
+  'is_online' => array('type' => 'boolean','default' => 1),
   'is_regular' => array('type' => 'boolean','default' => 1),
   'semester' => array('type' => 'text'),
   'day_number' => array('type' => 'integer'),
   'hour' => array('type' => 'integer'),
-  'week_parity' => array('type' => 'text')
+  'week_parity' => array('type' => 'text'),
+  'room_code' => array('type' => 'text')
  ),
  array(
   'module_code' => array('type' => 'text'),
@@ -29,11 +32,14 @@ SELECT
  m.title AS module_title,
  m.somas_moid,
  x.name,
+ x.is_lecture,
+ x.is_online,
  x.is_regular,
  x.semester,
  x.day_number,
  x.hour,
- x.week_parity
+ x.week_parity,
+ x.room_code
 FROM tbl_tutorial_groups x
  LEFT JOIN tbl_modules m ON x.module_id = m.id
 WHERE %s
