@@ -12,15 +12,6 @@ sangaku.poll_viewer = {
 sangaku.poll_viewer.init = function(instance_id,student_id) {
  var me = this;
  
- this.message_for_state = {};
- this.message_for_state['before'  ] = 'This poll has not been revealed yet.';
- this.message_for_state['revealed'] = 'You cannot respond to this poll yet.';
- this.message_for_state['open'    ] = 'You can respond to this poll now.';
- this.message_for_state['closed'  ] = 'This poll has now closed.';
- this.message_for_state['count'   ] = 'This poll has now closed.';
- this.message_for_state['correct' ] = 'This poll has now closed.';
- this.message_for_state['after'   ] = 'This poll is no longer available.';
-
  var url = '/sangaku/ajax/get_instance_student.php' +
      '?instance_id=' + instance_id + '&student_id=' + student_id;
  
@@ -47,92 +38,12 @@ sangaku.poll_viewer.init_data = function(x) {
  this.poll_div = document.createElement('div');
  document.body.appendChild(this.poll_div);
 
- this.h1 = document.createElement('h1');
- var title = this.poll.title;
- if (! title) { title = 'Poll ' + this.poll.id; }
- this.h1.innerHTML = title;
- this.poll_div.appendChild(this.h1);
+ this.instance.create_dom(this.poll_div);
 
- this.intro_div = document.createElement('div');
- this.intro_div.className = 'poll_intro';
- if (this.instance.state == 'before' || this.instance.state == 'after') {
-  this.intro_div.style.display = 'none';
- }
- this.intro_div.innerHTML = this.poll.intro;
- this.poll_div.appendChild(this.intro_div);
+ this.instance.submit_button.onclick =
+  function() { me.submit_response(); }
 
- this.items_div = document.createElement('div');
- this.items_div.className = 'poll_items';
- if (this.instance.state == 'before' || this.instance.state == 'after') {
-  this.items_div.style.display = 'none';
- }
- this.poll_div.appendChild(this.items_div);
-
- this.items_table = document.createElement('table');
- this.items_div.appendChild(this.items_table);
-
- this.items_tbody = document.createElement('tbody');
- this.items_table.appendChild(this.items_tbody);
-
- this.poll.items_by_id = {};
- 
- for (var item of this.poll.items) {
-  this.poll.items_by_id[item.id] = item;
-  
-  item.tr = document.createElement('tr');
-  item.tr.className = 'poll_item';
-  item.box_td = document.createElement('td');
-  item.box_td.className = 'poll_item_box';
-  item.tr.appendChild(item.box_td);
-  item.box = document.createElement('input');
-  item.box_td.appendChild(item.box);
-  item.box.id = 'select_item_' + item.id;
-  if (this.instance.state != 'open') {
-   item.box.disabled = 1;
-  }
-  if (this.poll.multiple) {
-   item.box.type = 'checkbox';
-   item.box.name = 'select_item_' + item.id;
-  } else {
-   item.box.type = 'radio';
-   item.box.name = 'select_item';
-  }
-  item.text_td = document.createElement('td');
-  item.text_td.className = 'poll_item_text';
-  item.text_td.innerHTML = item.text;
-  item.tr.appendChild(item.text_td);
-  this.items_tbody.appendChild(item.tr);
-
-  item.result_tr = document.createElement('tr');
-  item.result_tr.style.display = 'none';
-  item.result_tr.appendChild(document.createElement('td'));
-  item.result_td = document.createElement('td');
-  item.result_td.className = 'poll_result';
-  item.result_tr.appendChild(item.result_td);
-  item.count_bar = document.createElement('div');
-  item.count_bar.className = 'poll_count_bar';
-  item.result_td.appendChild(item.count_bar);
-  item.count_box = document.createElement('div');
-  item.count_box.className = 'poll_count_box';
-  item.result_td.appendChild(item.count_box);
-  
-  this.items_tbody.appendChild(item.result_tr);
- }
-
- this.state_div = document.createElement('div');
- this.state_div.className = 'poll_state';
- this.state_div.innerHTML = this.message_for_state[this.instance.state];
- this.poll_div.appendChild(this.state_div);
-
- this.submit_button = document.createElement('button');
- this.submit_button.type = 'button';
- this.submit_button.className = 'poll_submit';
- this.submit_button.innerHTML = 'Submit response';
- this.submit_button.onclick = function() { me.submit_response(); }
- if (this.instance.state != 'open') {
-  this.submit_button.style.display = 'none';
- }
- this.poll_div.appendChild(this.submit_button);
+ this.set_state(this.instance.state);
  
  MathJax.typeset([this.poll_div]);
 
@@ -140,34 +51,40 @@ sangaku.poll_viewer.init_data = function(x) {
 };
 
 sangaku.poll_viewer.set_state = function(state) {
- if (! (state in this.message_for_state)) {
+ if (! (state in this.instance.message_for_state)) {
   state = 'before';
  }
 
  this.instance.state = state;
 
- this.state_div.innerHTML = this.message_for_state[state];
- 
- if (state == 'before' || state == 'after') {
-  this.intro_div.style.display = 'none';
-  this.items_div.style.display = 'none';
-  this.submit_button.style.display = 'none';
- } else {
-  this.intro_div.style.display = 'block';
-  this.items_div.style.display = 'block';
-  this.submit_button.style.display =
-   (state == 'open') ? 'inline' : 'none';
+ var opts = {
+  show             : 0,
+  show_title       : 0,
+  show_content     : 0,
+  show_intro       : 0,
+  show_items       : 0,
+  show_count       : 0,
+  show_results     : 0,
+  show_correctness : 0,
+  show_state       : 0,
+  show_button      : 0,
+  enable           : 0
+ };
 
-  for (var item of this.poll.items) {
-   item.box.disabled = (state == 'open') ? 0 : 1;
-
-   if (state == 'count' || state == 'correct') {
-    item.result_tr.style.display = 'table-row';
-   } else {
-    item.result_tr.style.display = 'none';
-   }
-  }
+ if (! (state == 'before' || state == 'after')) {
+  opts.show = 1;
+  opts.show_title = 1;
+  opts.show_content = 1;
+  opts.show_intro = 1;
+  opts.show_items = 1;
+  opts.show_state = 1;
+  opts.enable = (state == 'reveal' || state == 'open') ? 1 : 0;
+  opts.show_button = (state == 'open') ? 1 : 0;
+  opts.show_results = (state == 'results' || state == 'correct') ? 1 : 0;
+  opts.show_correctness = (state == 'correct') ? 1 : 0;
  }
+
+ this.instance.set_dom_opts(opts);
 }
 
 sangaku.poll_viewer.update = function() {
