@@ -438,6 +438,12 @@ div.preview_solution {
 input.date { width: 70px; }
 input.time { width: 55px; }
 
+h1.poll_list_title {
+    font-weight: normal;
+    font-size: 16px;
+    font-family: georgia, sans-serif;
+}
+
 div.poll_state {
     width : 650px;
     background-color: #DDEEFF;
@@ -499,6 +505,34 @@ button.poll_submitted:hover {
     background : #C0F0C0;
 }
 
+button.poll_state {
+    width : 50px;
+    font-weight: normal;
+    color : #888888;
+    background: #EEEEFF;
+}
+
+button.poll_state_active {
+    width : 50px;
+    font-weight: bold;
+    color : #000000;
+    background: #DDDDEE;
+}
+
+button.poll_mode {
+    width : 80px;
+    font-weight: normal;
+    color : #888888;
+    background: #EEEEFF;
+}
+
+button.poll_mode_active {
+    width : 80px;
+    font-weight: bold;
+    color : #000000;
+    background: #DDDDEE;
+}
+
 td.poll_result {
     position : relative;
 }
@@ -516,3 +550,14 @@ div.poll_count_box {
     right : 5px;
 }
 
+div.mode_help {
+    display : none;
+    width : 600px;
+    background : #EEEEDD;
+}
+
+span.group_table_header {
+    font-size: 18px;
+    font-weight: bold;
+    margin-top: 10px;
+}
