@@ -114,10 +114,6 @@ HTML
   return $html;
  }
 
- function display_page_widgets() {
-  return array('mathjax');
- }
-
  function load_from_database() {
   $ok = parent::load_from_database();
   if ($ok) { $this->object->load_items(); }
@@ -258,6 +254,20 @@ HTML
   $this->edit_page_footer();
  }
 
+ function display_page_widgets() {
+  return array('mathjax');
+ }
+
+ function display_page_scripts() {
+  return array('poll_display');
+ }
+ 
+ function display_page_onload() {
+  $id = $this->object->id;
+  if (! $id) { $id = 0; }
+  return "sangaku.poll_display.init($id)";
+ }
+
  function display_page() {
   global $sangaku;
   
@@ -268,8 +278,12 @@ HTML
 
   echo $sangaku->nav->top_menu();
   
-  echo $s->preview();  
+  echo <<<HTML
+<br/>
+<div id="poll_div"></div>
 
+HTML
+;
   $this->display_page_footer();
  }
 
