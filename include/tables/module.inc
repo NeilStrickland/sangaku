@@ -79,6 +79,31 @@ class module extends frog_object {
    $this->tutorial_groups =
     $sangaku->load_where_indexed('tutorial_groups',$w);
   }
+  
+  $this->tutorials = array();
+  $this->online_tutorials = array();
+  $this->offline_tutorials = array();
+  $this->lectures = array();
+  $this->online_lectures = array();
+  $this->offline_lectures = array();
+
+  foreach ($this->tutorial_groups as $g) {
+   if ($g->is_lecture) {
+    $this->lectures[] = $g;
+    if ($g->is_online) {
+     $this->online_lectures[] = $g;
+    } else {
+     $this->offline_lectures[] = $g;
+    }
+   } else {
+    $this->tutorials[] = $g;
+    if ($g->is_online) {
+     $this->online_tutorials[] = $g;
+    } else {
+     $this->offline_tutorials[] = $g;
+    }
+   }
+  }
 
   return $this->tutorial_groups;
  }
