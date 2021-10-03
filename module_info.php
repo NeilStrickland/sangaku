@@ -15,8 +15,9 @@ class module_editor extends frog_object_editor {
     'suggest_delete' => true,
     'delete' => true,
     'save' => true,
-    'new' => true
-    );
+    'new' => true,
+    'create_lecture_sessions' => true
+   );
  }
   
  function check_authorisation() {
@@ -335,8 +336,15 @@ HTML;
 HTML;
       foreach($m->sessions_by_week[$i][$j] as $s) {
        $url = 'session_monitor.php?session_id=' . $s->id;
-       echo $H->tr($H->td($s->tutorial_group_name) . 
-                   $H->td($s->problem_sheet_title) .
+       $group = $s->tutorial_group_name;
+       $title = $s->problem_sheet_title;
+       if ($s->is_lecture) {
+        $title = 'Lecture';
+        if (! $group) { $group = 'All'; }
+       }
+       
+       echo $H->tr($H->td($group) . 
+                   $H->td($title) .
                    $H->td($s->friendly_start_time()) .
                    $H->link_td("Monitor",$url) . 
                    $H->td($H->checkbox(
@@ -351,6 +359,16 @@ HTML;
  
     echo $H->edged_table_end();
    }
+  }
+
+  if ($m->lectures) {
+   echo <<<HTML
+<br/>
+<button type="button" onclick="sangaku.do_command('create_lecture_sessions')">
+Create sessions for all lectures
+</button>
+<br/>
+HTML;
   }
   
   echo $H->tab_end();
@@ -428,6 +446,15 @@ HTML;
   
   echo $H->edged_table_end();
   echo $H->tab_end();
+ }
+
+ function handle_command() {
+  if ($this->command == 'create_lecture_sessions') {
+   $this->object->create_lecture_sessions();
+
+   $url = 'module_info.php?id=' . $this->object->id;
+   header('Location: ' . $url);
+  }
  }
 }
 
