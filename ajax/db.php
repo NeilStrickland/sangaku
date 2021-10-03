@@ -110,6 +110,11 @@ if ($command == 'load') {
  if ($obj->object_type == 'problem_sheet') {
   $obj->with_solutions = 1;
   $obj->load_question_items();
+ } elseif ($obj->object_type == 'poll') {
+  $obj->load_items();
+ } elseif ($obj->object_type == 'poll_instance') {
+  $obj->load_link('poll');
+  $obj->poll->load_items();
  }
  
  echo $obj->to_json();

@@ -61,6 +61,7 @@ class module extends frog_object {
  function load_associated() {
   $this->load_tutorial_groups();
   $this->load_problem_sheets();
+  $this->load_polls();
   $this->load_sessions();
   $this->load_students();
  }
@@ -77,6 +78,31 @@ class module extends frog_object {
    
    $this->tutorial_groups =
     $sangaku->load_where_indexed('tutorial_groups',$w);
+  }
+  
+  $this->tutorials = array();
+  $this->online_tutorials = array();
+  $this->offline_tutorials = array();
+  $this->lectures = array();
+  $this->online_lectures = array();
+  $this->offline_lectures = array();
+
+  foreach ($this->tutorial_groups as $g) {
+   if ($g->is_lecture) {
+    $this->lectures[] = $g;
+    if ($g->is_online) {
+     $this->online_lectures[] = $g;
+    } else {
+     $this->offline_lectures[] = $g;
+    }
+   } else {
+    $this->tutorials[] = $g;
+    if ($g->is_online) {
+     $this->online_tutorials[] = $g;
+    } else {
+     $this->offline_tutorials[] = $g;
+    }
+   }
   }
 
   return $this->tutorial_groups;
@@ -99,6 +125,23 @@ class module extends frog_object {
   return $this->problem_sheets;
  }
 
+ function load_polls($semester='',$force = false) {
+  global $sangaku;
+
+  if ($force || ! isset($this->polls)) {
+   $w = "x.module_id={$this->id}";
+
+   if ($semester) {
+    $w .= " AND p.semester='$semester'";
+   }
+   
+   $this->polls = $sangaku->load_where('polls',$w);
+   $this->polls_by_id = make_index($this->polls,'id');
+  }
+
+  return $this->polls;
+ }
+
  function load_sessions($semester='',$force = false) {
   global $sangaku;
   
@@ -110,6 +153,7 @@ class module extends frog_object {
 
    foreach($this->tutorial_groups as $x) {
     $x->sessions = array();
+    $x->sessions_by_datetime = array();
     $x->confirmed_sessions = array();
    }
 
@@ -123,8 +167,7 @@ class module extends frog_object {
     $w .= " AND g.semester='$semester'";
    }
    
-   $this->sessions =
-     $sangaku->load_where('sessions',$w);
+   $this->sessions = $sangaku->load_where('sessions',$w);
 
    $this->confirmed_sessions = array();
    
@@ -136,6 +179,7 @@ class module extends frog_object {
     if (isset($this->tutorial_groups[$s->tutorial_group_id])) {
      $g = $this->tutorial_groups[$s->tutorial_group_id];
      $g->sessions[] = $s;
+     $g->sessions_by_datetime[$s->date . ' ' . $s->time] = $s;
      if ($s->is_confirmed) {
       $g->confirmed_sessions[] = $s;
      }
@@ -174,6 +218,54 @@ class module extends frog_object {
   return $this->sessions;
  }
 
+ function create_lecture_sessions($semester = '') {
+  global $sangaku;
+
+  $new_sessions = array();
+  
+  if (! $semester) {
+   $ns1 = $this->create_lecture_sessions('1');
+   $ns2 = $this->create_lecture_sessions('2');
+   return array_merge($ns1,$ns2);
+  }
+
+  $t = $sangaku->load('module',$this->id);
+  $t->load_tutorial_groups($semester);
+  $t->load_sessions($semester);
+  
+  if ($semester == '1') {
+   $weeks = array(1,2,3,4,5,6,8,9,10,11,12);
+  } else {
+   $weeks = array(1,2,3,4,5,6,7,8,9,10,11);
+  }
+
+  $lecture_sessions = array();
+  
+  foreach ($t->lectures as $g) {
+   if (! ($g->day_number && $g->hour)) { continue; }
+   
+   foreach($weeks as $w) {
+    $ts = $sangaku->academic_timestamp(
+     $semester,$w,$g->day_number,$g->hour
+    );
+    $dt = date('Y-m-d H:i:s',$ts);
+    if (! array_key_exists($dt,$g->sessions_by_datetime)) {
+     $s = $sangaku->new_object('session');
+     $s->tutorial_group_id = $g->id;
+     $s->date = date('Y-m-d',$ts);
+     $s->time = date('H:i:s',$ts);
+     $s->duration = 50;
+     $s->save();
+     $s->load();
+     $g->sessions_by_datetime[$dt] = $s;
+     $new_sessions[] = $s;
+    }
+   }
+  }
+
+  return $new_sessions;
+ }
+ 
  function load_students() {
   global $sangaku;
   

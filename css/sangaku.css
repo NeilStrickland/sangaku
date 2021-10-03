@@ -438,3 +438,139 @@ div.preview_solution {
 input.date { width: 70px; }
 input.time { width: 55px; }
 
+h1.poll_list_title {
+    font-weight: normal;
+    font-size: 16px;
+    font-family: georgia, sans-serif;
+}
+
+div.poll_state {
+    width : 650px;
+    background-color: #DDEEFF;
+    padding : 5px;
+    margin_bottom: 10px;
+}
+
+div.poll_intro {
+    width : 650px;
+    border : 1px solid black;
+    border-radius : 4px;
+    padding : 5px;
+    margin_bottom: 10px;
+}
+
+div.poll_items table { 
+    border-collapse: collapse;
+}
+
+div.poll_items td {
+    padding: 3px 0.5em;
+    margin-left: 3px;
+    border: 1px solid #CCCCCC;
+    vertical-align: top;
+}
+
+td.poll_item_box {
+    width : 20px;
+}
+
+td.poll_item_box.correct {
+    background : #33A532;
+}
+
+td.poll_item_box.incorrect {
+    background : #BB1E10;
+}
+
+td.poll_item_text {
+    width : 605px;
+}
+
+button.poll_submit {
+    margin : 3px;
+    padding : 5px;
+    background : #B0E0B0;
+    border : 1px solid #70A070;
+    border-radius: 3px;
+}
+
+button.poll_submit:hover {
+    cursor : pointer;
+    background : #C0F0C0;
+}
+
+button.poll_submitted {
+    margin : 3px;
+    padding : 5px;
+    background : #D0FFD0;
+    border : 1px solid #508050;
+    color : #888888;
+    border-radius: 3px;
+}
+
+button.poll_submitted:hover {
+    cursor : pointer;
+    background : #C0F0C0;
+}
+
+button.poll_state {
+    width : 60px;
+    font-weight: normal;
+    color : #888888;
+    background: #EEEEFF;
+}
+
+button.poll_state_active {
+    width : 60px;
+    font-weight: bold;
+    color : #000000;
+    background: #DDDDEE;
+}
+
+button.poll_mode {
+    width : 80px;
+    font-weight: normal;
+    color : #888888;
+    background: #EEEEFF;
+}
+
+button.poll_mode_active {
+    width : 80px;
+    font-weight: bold;
+    color : #000000;
+    background: #DDDDEE;
+}
+
+div.poll_items td.poll_result {
+    position : relative;
+    border-bottom : 2px solid black;
+}
+
+div.poll_items td.poll_mark {
+    border-bottom : 2px solid black;
+}
+
+div.poll_count_bar {
+    display : inline-block;
+    width : 1px;
+    height : 10px;
+    background : #8888DD;
+}
+
+div.poll_count_box {
+    display : inline-block;
+    position : absolute;
+    right : 5px;
+}
+
+div.mode_help {
+    display : none;
+    width : 600px;
+    background : #EEEEDD;
+}
+
+span.group_table_header {
+    font-size: 18px;
+    font-weight: bold;
+    margin-top: 10px;
+}

@@ -302,12 +302,12 @@ sangaku.question_item.titled_header = function() {
  } else {
   return this.auto_header();
  }
-}
+};
 
 sangaku.question_item.full_header = function() {
  var h = this.parent ? this.parent.full_header() : '';
  return h + this.auto_header();
-}
+};
 
 sangaku.question_item.header_tag = function() {
  var i = 1 + this.level;
@@ -316,11 +316,304 @@ sangaku.question_item.header_tag = function() {
 
 //////////////////////////////////////////////////////////////////////
 
+sangaku.poll.munch = function(x) {
+ for (var k of ['id','module_id','problem_sheet_id','session_id',
+                'title','intro','is_judgemental','is_multiple']) {
+  if (k in x) { this[k] = x[k]; }
+ }
+
+ this.items = [];
+ this.items_by_id = {};
+
+ if ('items' in x) {
+  for (var i of x.items) {
+   var i0 = sangaku.poll_item.scrunch(i);
+   this.items.push(i0);
+   this.items_by_id[i0.id] = i0;
+  }
+ }
+};
+
+//////////////////////////////////////////////////////////////////////
+
+sangaku.poll_instance.munch = function(x) {
+ for (var k of ['id','poll_id','session_id','state',
+                'start_timestamp','end_timestamp',
+                'total_count']) {
+  if (k in x) { this[k] = x[k]; }
+ }
+
+ this.mode = 'projector';
+
+ if ('poll' in x) {
+  this.poll = sangaku.poll.scrunch(x.poll);
+ }
+
+ if ('student' in x) {
+  this.student = sangaku.student.scrunch(x.student);
+ }
+};
+
+//////////////////////////////////////////////////////////////////////
+
+sangaku.poll_item.munch = function(x) {
+ for (var k of ['id','poll_id','sequence_number','code',
+                'text','is_correct','count']) {
+  if (k in x) { this[k] = x[k]; }
+ }
+};
+
+//////////////////////////////////////////////////////////////////////
+
+sangaku.poll_item.create_dom = function(is_multiple) {
+ this.tr = document.createElement('tr');
+ this.tr.className = 'poll_item';
+ this.box_td = document.createElement('td');
+ this.box_td.className = 'poll_item_box';
+ this.tr.appendChild(this.box_td);
+ this.box = document.createElement('input');
+ this.box_td.appendChild(this.box);
+ this.box.id = 'select_item_' + this.id;
+ this.box.disabled = 1;
+ if (is_multiple) {
+  this.box.type = 'checkbox';
+  this.box.name = 'select_item_' + this.id;
+ } else {
+  this.box.type = 'radio';
+  this.box.name = 'select_item';
+ }
+ this.text_td = document.createElement('td');
+ this.text_td.className = 'poll_item_text';
+ this.text_td.innerHTML = this.text;
+ this.tr.appendChild(this.text_td);
+
+ this.result_tr = document.createElement('tr');
+ this.result_tr.className = 'poll_item_result';
+ this.result_tr.style.display = 'none';
+ this.mark_td = document.createElement('td');
+ this.mark_td.className = 'poll_mark';
+ this.result_tr.appendChild(this.mark_td);
+ this.result_td = document.createElement('td');
+ this.result_td.className = 'poll_result';
+ this.result_tr.appendChild(this.result_td);
+ this.count_bar = document.createElement('div');
+ this.count_bar.className = 'poll_count_bar';
+ this.result_td.appendChild(this.count_bar);
+ this.count_box = document.createElement('div');
+ this.count_box.className = 'poll_count_box';
+ this.result_td.appendChild(this.count_box);
+}
+
+//////////////////////////////////////////////////////////////////////
+
+sangaku.poll_instance.states = [
+ 'before',
+ 'reveal',
+ 'open',
+ 'closed',
+ 'count',
+ 'correct',
+ 'after'
+];
+
+sangaku.poll_instance.message_for_state = {
+ before   : 'This poll has not been revealed yet.',
+ reveal   : 'You cannot respond to this poll yet.',
+ open     : 'You can respond to this poll now.',
+ closed   : 'This poll has now closed.',
+ count    : 'This poll has now closed.',
+ correct  : 'This poll has now closed.',
+ after    : 'This poll is no longer available.'
+};
+
+sangaku.poll_instance.explain_state = {
+ before   : 'Poll is invisible.',
+ reveal   : 'Poll is visible but students cannot respond.',
+ open     : 'Students can respond.',
+ closed   : 'Students can no longer respond.',
+ count    : 'Show counts of responses.',
+ correct  : 'Show which responses are correct.',
+ after    : 'Poll is invisible again.'
+};
+
+//////////////////////////////////////////////////////////////////////
+
+sangaku.poll_instance.create_dom = function(parent) {
+ this.div = document.createElement('div');
+ this.div.style.display = 'none';
+ parent.appendChild(this.div);
+
+ this.title = document.createElement('h1');
+ var title = this.poll.title;
+ if (! title) { title = 'Poll ' + this.poll.id; }
+ this.title.innerHTML = title;
+ this.div.appendChild(this.title);
+
+ this.content_div = document.createElement('div');
+ this.div.appendChild(this.content_div);
+ 
+ this.intro_div = document.createElement('div');
+ this.intro_div.className = 'poll_intro';
+ this.intro_div.innerHTML = this.poll.intro;
+ this.content_div.appendChild(this.intro_div);
+
+ this.items_div = document.createElement('div');
+ this.items_div.className = 'poll_items';
+ this.content_div.appendChild(this.items_div);
+
+ this.items_table = document.createElement('table');
+ this.items_div.appendChild(this.items_table);
+
+ this.items_tbody = document.createElement('tbody');
+ this.items_table.appendChild(this.items_tbody);
+
+ for (item of this.poll.items) {
+  item.create_dom();
+  this.items_tbody.appendChild(item.tr);
+  this.items_tbody.appendChild(item.result_tr);
+ }
+
+ this.state_div = document.createElement('div');
+ this.state_div.className = 'poll_state';
+ this.state_div.innerHTML = this.message_for_state[this.state];
+ this.content_div.appendChild(this.state_div);
+
+ this.submit_button = document.createElement('button');
+ this.submit_button.type = 'button';
+ this.submit_button.className = 'poll_submit';
+ this.submit_button.innerHTML = 'Submit response';
+ this.content_div.appendChild(this.submit_button);
+  
+ MathJax.typeset([this.div]);
+};
+
+//////////////////////////////////////////////////////////////////////
+
+sangaku.poll_instance.set_dom_opts = function(opts) {
+ var opts0 = {
+  show             : 0,
+  show_title       : 0,
+  show_content     : 0,
+  show_intro       : 0,
+  show_items       : 0,
+  show_count       : 0,
+  show_results     : 0,
+  show_correctness : 0,
+  show_state       : 0,
+  show_button      : 0,
+  enable           : 0
+ };
+
+ for (k in opts0) {
+  if (k in opts) { opts0[k] = opts[k]; }
+ }
+
+ for (item of this.poll.items) {
+  if (this.poll.is_judgemental && opts0.show_correctness) {
+   if (item.is_correct) {
+    item.result_tr.className = 'poll_item_result correct';
+    item.box_td.className = 'poll_item_box correct';
+    item.mark_td.innerHTML = '&#x2713;';
+   } else {
+    item.result_tr.className = 'poll_item_result incorrect';
+    item.box_td.className = 'poll_item_box incorrect'; 
+    item.mark_td.innerHTML = '&#x2717;';
+   }
+  } else {
+   item.result_tr.className = 'poll_item_result';
+   item.box_td.className = 'poll_item_box'; 
+   item.mark_td.innerHTML = '';
+  }
+
+  item.box.disabled = opts0.enable ? 0 : 1;
+  
+  item.result_tr.style.display = opts0.show_results ? 'table-row' : 'none';
+ }
+ 
+ this.title.style.display = opts0.show_title ? 'block' : 'none';
+ this.content_div.style.display = opts0.show_content ? 'block' : 'none';
+ this.intro_div.style.display = opts0.show_intro ? 'block' : 'none';
+ this.items_div.style.display = opts0.show_items ? 'block' : 'none';
+ this.state_div.style.display = opts0.show_state ? 'block' : 'none';
+ this.submit_button.style.display = opts0.show_button ? 'block' : 'none';
+
+ this.div.style.display = opts0.show ? 'block' : 'none';
+};
+
+//////////////////////////////////////////////////////////////////////
+
+sangaku.poll_instance.set_state = function(state = null) {
+ if (this.states.includes(state)) {
+  this.state = state;
+ }
+
+ this.state_div.innerHTML = this.message_for_state[this.state];
+
+ var opts = {
+  show             : 0,
+  show_title       : 0,
+  show_content     : 0,
+  show_intro       : 0,
+  show_items       : 0,
+  show_count       : 0,
+  show_results     : 0,
+  show_correctness : 0,
+  show_state       : 0,
+  show_button      : 0,
+  enable           : 0
+ }; 
+
+ if (! (this.state == 'before' || this.state == 'after')) {
+  opts.show = 1;
+  opts.show_title = 1;
+  opts.show_content = 1;
+  opts.show_intro = 1;
+  opts.show_items = 1;
+  opts.show_state = 1;
+  opts.enable = (this.state == 'reveal' || this.state == 'open') ? 1 : 0;
+  opts.show_button = (this.state == 'open') ? 1 : 0;
+  opts.show_results = (this.state == 'count' || this.state == 'correct') ? 1 : 0;
+  opts.show_correctness = (this.state == 'correct') ? 1 : 0;
+ }
+
+ this.set_dom_opts(opts);
+}
+
+//////////////////////////////////////////////////////////////////////
+
+sangaku.poll_instance.show_counts = function() {
+ var total_count = 0;
+ 
+ for (var item of this.poll.items) {
+  total_count += item.count;
+ }
+
+ this.total_count = total_count;
+ 
+ for (var item of this.poll.items) {
+  if (! (item.count_bar && item.count_box)) { continue; }
+  if (total_count > 0) {
+   w = Math.round(400 * item.count / total_count);
+   item.count_bar.style.width = '' + w + 'px';
+   item.count_box.innerHTML = '' + item.count + '/' + total_count;
+  } else {
+   item.count_bar.style.width = '1px';
+   item.count_box.innerHTML = '0/0';
+  }
+ }
+}
+
+//////////////////////////////////////////////////////////////////////
+
 sangaku.session.munch = function(x) {
- for (var k of ['id','problem_sheet_id','tutorial_group_id',
+ for (var k of ['id','problem_sheet_id',
+                'tutorial_group_id','is_lecture','is_online',
                 'start_time','end_time',
                 'start_timestamp','end_timestamp',
-                'duration','has_snapshots','solutions_shown']) {
+                'duration',
+                'has_problem_sheet','has_snapshots',
+                'has_tutorial_group','has_poll_instances',
+                'solutions_shown']) {
   if (k in x) { this[k] = x[k]; }
  }
 
@@ -350,15 +643,26 @@ sangaku.session.munch = function(x) {
 
  if ('students' in x) {
   this.students = [];
-  for (s of x.students) {
+  for (var s of x.students) {
    this.students.push(sangaku.student.scrunch(s));
   }
  }
 
  if ('snapshots' in x) {
   this.snapshots = [];
-  for (s of x.snapshots) {
+  for (var s of x.snapshots) {
    this.snapshots.push(sangaku.snapshot.scrunch(s));
+  }
+ }
+
+ if ('poll_instances' in x) {
+  this.poll_instances = [];
+  this.poll_instances_by_id = {};
+  
+  for (var i of x.poll_instances) {
+   var i0 = sangaku.poll_instance.scrunch(i);
+   this.poll_instances.push(i0);
+   this.poll_instances_by_id[i0.id] = i0;
   }
  }
 };

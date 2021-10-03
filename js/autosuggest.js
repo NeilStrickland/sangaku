@@ -565,7 +565,7 @@ autosuggest.known_types = {
 autosuggest.default_size = {
     'user' : 50,
     'module' : 50,
-    'problem_sheet' : 30,
+    'problem_sheet' : 50,
     'tutorial_group' : 10
 };
 

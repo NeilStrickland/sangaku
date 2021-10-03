@@ -153,19 +153,21 @@ SELECT
  g.id AS somas_id,
  o.id AS moid,
  g.tutorial_group AS name,
+ g.type,
  teacher_id,
  assistant_id,
  g.semester,
  day_number,
  time_slot_id AS hour,
- week_parity 
+ week_parity,
+ g.room_id,
+ r.name AS room_code
 FROM `tbl_teaching_events` g 
  LEFT JOIN tbl_module_occurrences o ON g.module_occurrence_id=o.id
   LEFT JOIN tbl_modules m ON o.module_code=m.code
+   LEFT JOIN tbl_teaching_rooms r ON g.room_id=r.id
 WHERE o.session=$session
-AND m.credit_level <= 2
-AND g.type IN ('tutorial','lab session')
-AND g.room_id=$bri
+AND m.credit_level <= 4
 AND (o.semester = '$semester' OR (o.semester = 'Year' AND (g.semester = '$semester' OR g.semester = 'Year')))
 ORDER BY m.code,g.tutorial_group
 SQL;
@@ -175,6 +177,10 @@ SQL;
   $changes = array();
   
   foreach($xx as $x) {
+   $x->is_lecture = ($x->type == 'lecture') ? 1 : 0;
+   $x->is_online = ($x->room_id == somas_agent::$blackboard_room_id) ? 1 : 0;
+   $x->is_regular = 1;
+   
    $needs_update = false;
 
    if (in_array($x->moid,somas_agent::$engl1_moids)) {
@@ -200,7 +206,8 @@ SQL;
 
    $y->module_id = $m->id;
    
-   foreach (array('name','semester','day_number','hour','week_parity') as $k) {
+   foreach (array('name','is_lecture','is_online','semester',
+                  'day_number','hour','week_parity','room_code') as $k) {
     if ($y->$k != $x->$k) {
      $y->$k = $x->$k;
      $needs_update = true;

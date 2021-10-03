@@ -15,8 +15,9 @@ class module_editor extends frog_object_editor {
     'suggest_delete' => true,
     'delete' => true,
     'save' => true,
-    'new' => true
-    );
+    'new' => true,
+    'create_lecture_sessions' => true
+   );
  }
   
  function check_authorisation() {
@@ -33,6 +34,7 @@ class module_editor extends frog_object_editor {
    array(
     array('name' => 'tutorial_group'),
     array('name' => 'problem_sheet'),
+    array('name' => 'poll'),
     array('name' => 'registration')
    )
   );
@@ -62,6 +64,7 @@ HTML;
   $this->general_tab();
   $this->groups_tab();
   $this->sheets_tab();
+  $this->polls_tab();
   $this->sessions_tab();
   $this->students_tab();
   
@@ -131,33 +134,98 @@ HTML;
   $N = $sangaku->nav;
   $H = $sangaku->html;
   $m = $this->object;
- 
-  echo $H->tab_start('Tutorial groups');
-  echo $H->edged_table_start();
-  echo $H->spacer_row(60,90,60,60,60,300,60);
-  echo $H->row('Group','Semester','Day','Time','Weeks','Teachers','');
-  foreach($m->tutorial_groups as $g) {
+  $m->load_tutorial_groups();
+
+  foreach ($m->tutorial_groups as $g) {
    $g->load_teachers();
    $uu = array();
-
+    
    foreach($g->teachers as $u) { 
     $n = $u->full_name;
     $uu[] = $n; 
    }
 
-   $uu = implode(', ',$uu);
-   $url = 'group_info.php?id=' . $g->id;
-   
-   echo $H->tr($H->td($g->name) .
-               $H->td($g->semester) .
-               $H->td($g->day_name()) .
-               $H->td('' . $g->hour . ':00') . 
-               $H->td($g->week_parity_long()) .
-               $H->td($uu) .
-               $H->link_td("Edit",$url));
+   $g->teachers_string = implode(', ',$uu);
+   $g->info_url = 'group_info.php?id=' . $g->id;
   }
   
-  echo $H->edged_table_end();
+  echo $H->tab_start('Tutorial groups');
+
+  if ($m->online_tutorials) {
+   echo "<br/><span class=\"group_table_header\">Online tutorials</span><br/>";
+   echo $H->edged_table_start();
+   echo $H->spacer_row(60,90,60,60,60,300,60);
+   echo $H->row('Group','Semester','Day','Time','Weeks','Teachers','');
+   foreach($m->online_tutorials as $g) {
+   
+    echo $H->tr($H->td($g->name) .
+                $H->td($g->semester) .
+                $H->td($g->day_name()) .
+                $H->td('' . $g->hour . ':00') . 
+                $H->td($g->week_parity_long()) .
+                $H->td($g->teachers_string) .
+                $H->link_td("Edit",$g->info_url));
+   }
+  
+   echo $H->edged_table_end();
+  }
+  
+  if ($m->offline_tutorials) {
+   echo "<br/><span class=\"group_table_header\">Offline tutorials</span><br/>";
+   echo $H->edged_table_start();
+   echo $H->spacer_row(60,60,90,60,60,60,300,60);
+   echo $H->row('Group','Room','Semester','Day','Time','Weeks','Teachers','');
+   foreach($m->offline_tutorials as $g) {
+   
+    echo $H->tr($H->td($g->name) .
+                $H->td($g->room_code) . 
+                $H->td($g->semester) .
+                $H->td($g->day_name()) .
+                $H->td('' . $g->hour . ':00') . 
+                $H->td($g->week_parity_long()) .
+                $H->td($g->teachers_string) .
+                $H->link_td("Edit",$g->info_url));
+   }
+  
+   echo $H->edged_table_end();
+  }
+
+  if ($m->online_lectures) {
+   echo "<br/><span class=\"group_table_header\">Online lectures</span><br/>";
+   echo $H->edged_table_start();
+   echo $H->spacer_row(90,60,60,60,300,60);
+   echo $H->row('Semester','Day','Time','Weeks','Teachers','');
+   foreach($m->online_lectures as $g) {
+   
+    echo $H->tr($H->td($g->semester) .
+                $H->td($g->day_name()) .
+                $H->td('' . $g->hour . ':00') . 
+                $H->td($g->week_parity_long()) .
+                $H->td($g->teachers_string) .
+                $H->link_td("Edit",$g->info_url));
+   }
+  
+   echo $H->edged_table_end();
+  }
+
+  if ($m->offline_lectures) {
+   echo "<br/><span class=\"group_table_header\">Offline lectures</span><br/>";
+   echo $H->edged_table_start();
+   echo $H->spacer_row(60,90,60,60,60,300,60);
+   echo $H->row('Room','Semester','Day','Time','Weeks','Teachers','');
+   foreach($m->offline_lectures as $g) {
+   
+    echo $H->tr($H->td($g->room_code) . 
+                $H->td($g->semester) .
+                $H->td($g->day_name()) .
+                $H->td('' . $g->hour . ':00') . 
+                $H->td($g->week_parity_long()) .
+                $H->td($g->teachers_string) .
+                $H->link_td("Edit",$g->info_url));
+   }
+  
+   echo $H->edged_table_end();
+  }
 
   $url0 = "group_info.php?module_id={$m->id}&command=new";
   $url1 = "assign_groups.php?module_id={$m->id}";
@@ -199,6 +267,39 @@ HTML;
   echo $H->tab_end();
  }
  
+ function polls_tab() {
+  global $sangaku;
+ 
+  $N = $sangaku->nav;
+  $H = $sangaku->html;
+  $m = $this->object;
+ 
+  echo $H->tab_start('Polls');
+  echo $H->edged_table_start();
+  echo $H->spacer_row(60,120,120,300,60,60);
+ 
+  echo $H->row('ID','Problem sheet','Code','Title','','');
+  foreach ($m->polls as $p) {
+   $sheet = $p->problem_sheet_code;
+   if (! $sheet) { $sheet = $p->problem_sheet_title; }
+   echo $H->tr($H->td($p->id) .
+               $H->td($sheet) .
+               $H->td($p->code).
+               $H->td($p->title) .
+               $H->link_td("Preview","poll_info.php?command=display&id={$p->id}") .
+               $H->link_td("Edit","poll_info.php?id={$p->id}")
+   );
+  }
+  
+  echo $H->edged_table_end();
+ 
+  $url = "poll_info.php?module_id={$m->id}&command=new";
+  
+  echo "<br/>" . $H->button_link('Create new poll',$url);
+
+  echo $H->tab_end();
+ }
+ 
  function sessions_tab() {
   if ($this->object->is_regular) {
    $this->regular_sessions_tab();
@@ -235,8 +336,15 @@ HTML;
 HTML;
       foreach($m->sessions_by_week[$i][$j] as $s) {
        $url = 'session_monitor.php?session_id=' . $s->id;
-       echo $H->tr($H->td($s->tutorial_group_name) . 
-                   $H->td($s->problem_sheet_title) .
+       $group = $s->tutorial_group_name;
+       $title = $s->problem_sheet_title;
+       if ($s->is_lecture) {
+        $title = 'Lecture';
+        if (! $group) { $group = 'All'; }
+       }
+       
+       echo $H->tr($H->td($group) . 
+                   $H->td($title) .
                    $H->td($s->friendly_start_time()) .
                    $H->link_td("Monitor",$url) . 
                    $H->td($H->checkbox(
@@ -251,6 +359,16 @@ HTML;
  
     echo $H->edged_table_end();
    }
+  }
+
+  if ($m->lectures) {
+   echo <<<HTML
+<br/>
+<button type="button" onclick="sangaku.do_command('create_lecture_sessions')">
+Create sessions for all lectures
+</button>
+<br/>
+HTML;
   }
   
   echo $H->tab_end();
@@ -328,6 +446,15 @@ HTML;
   
   echo $H->edged_table_end();
   echo $H->tab_end();
+ }
+
+ function handle_command() {
+  if ($this->command == 'create_lecture_sessions') {
+   $this->object->create_lecture_sessions();
+
+   $url = 'module_info.php?id=' . $this->object->id;
+   header('Location: ' . $url);
+  }
  }
 }
 
