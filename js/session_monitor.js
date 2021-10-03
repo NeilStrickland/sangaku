@@ -157,20 +157,23 @@ sangaku.session_monitor.init_data = function(x) {
   }
 
   var last_poll = null;
+  var one_open = false;
   
   for (var inst of poll_instances) {
    inst.create_dom(this.polls_tab);
+   inst.show_counts();
    inst.add_toggler();
    inst.add_stepper();
    inst.set_dom_opts(opts);
    inst.next_poll = null;
    if (last_poll) {
     last_poll.next_poll = inst;
-   } else {
-    // First poll
+   }
+   if (inst.state != 'after' && ! one_open) {
     inst.toggled = 1;
     inst.toggler.src = '/sangaku/icons/contract.png';
     inst.content_div.style.display = 'block';
+    one_open = true;
    }
 
    last_poll = inst;
@@ -187,6 +190,7 @@ sangaku.session_monitor.set_mode = function(mode) {
 
  for (var inst of this.session.poll_instances) {
   inst.mode = mode;
+  inst.set_monitor_state();
  }
 
  for (m in this.mode_button) {
@@ -462,15 +466,6 @@ sangaku.session_monitor.update = function() {
  )
 };
 
-sangaku.session_monitor.poll = {
- poll : null,
- instance : null
-};
-
-sangaku.session_monitor.poll.create_dom = function() {
-
-};
-
 sangaku.session_monitor.update_data = function(x) {
  var session = this.session;
  var sheet = session.problem_sheet;
@@ -512,6 +507,30 @@ sangaku.session_monitor.update_data = function(x) {
     student.tr.style.display =
      student.last_seen ? 'table-row' : 'none';
    }
+  }
+ }
+
+ if (this.polls_tab) {
+  var total_count = 0;
+  
+  for (var inst of poll_instances) {
+   if (! inst.id in x.poll_instances_by_id) { continue; }
+   var inst0 = x.poll_instances_by_id[inst.id];
+   inst.state = inst0.state;
+   for (var id in inst.poll.items_by_id) {
+    if (! id in inst0.poll.items_by_id) { continue; }
+    var item = inst.poll.items_by_id[id];
+    var item0 = inst0.poll.items_by_id[id];
+    if ('is_correct' in item0) {
+     item.is_correct = item0.is_correct;
+    }
+    if ('count' in item0) {
+     item.count = item0.count;
+    }
+   }
+
+   inst.show_counts();
+   inst.set_monitor_state();
   }
  }
 }
