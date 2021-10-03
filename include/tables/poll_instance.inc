@@ -154,6 +154,8 @@ class poll_instance extends frog_object {
  }
 
  function for_json() {
+  global $user;
+  
   $x = new stdClass();
 
   $poll = $this->load_link('poll');
@@ -163,7 +165,9 @@ class poll_instance extends frog_object {
    $x->$k = $this->$k;
   }
 
-  if ($this->state == 'count' || $this->state == 'correct') {
+  if ($this->state == 'count' ||
+      $this->state == 'correct' ||
+      $user->status == 'teacher') {
    $this->count_responses();
    $x->total_count = isset($this->total_count) ? $this->total_count : 0;
   }
