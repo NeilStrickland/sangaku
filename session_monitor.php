@@ -29,7 +29,8 @@ function show_status_page($session) {
  
  $b = $sangaku->nav->top_session_menu($session->id);
  $m = $sangaku->nav->mathjax_script();
- $u = 'https://' . $_SERVER['HTTP_HOST'] . '/sangaku/' . $session->id;
+ $student_login_url =
+   'https://' . $_SERVER['HTTP_HOST'] . '/sangaku/' . $session->id;
 
  $bb = '';
  $u = $session->effective_video_url();
@@ -74,7 +75,7 @@ $b<br/><br/>
     <br/><br/>
     <div style="width:700px">
      Student login URL:
-     <code id="login_url" style="color: blue; font-size: 150%">{$u}</code>
+     <code id="login_url" style="color: blue; font-size: 150%">{$student_login_url}</code>
      <button type="button" onclick="copy_login_url()">Copy</button>
      <br/><br/>
      Share this URL in Blackboard Collaborate chat.  Remember that students
