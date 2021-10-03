@@ -98,7 +98,8 @@ SELECT
  x.id AS somas_moid,
  x.module_code AS code,
  x.semester,
- m.title AS title
+ m.title AS title,
+ x.blackboard_url AS video_url
 FROM tbl_module_occurrences x
  LEFT JOIN tbl_modules m ON x.module_code=m.code
 WHERE x.session=$session
@@ -118,7 +119,7 @@ SQL;
     $needs_update = true;
    }
 
-   foreach (array('somas_moid','semester','title') as $k) {
+   foreach (array('somas_moid','semester','title','video_url') as $k) {
     if ($m->$k != $x->$k) {
      $m->$k = $x->$k;
      $needs_update = true;
