@@ -166,7 +166,7 @@ FROM `tbl_teaching_events` g
   LEFT JOIN tbl_modules m ON o.module_code=m.code
    LEFT JOIN tbl_teaching_rooms r ON g.room_id=r.id
 WHERE o.session=$session
-AND m.credit_level <= 2
+AND m.credit_level <= 4
 AND (o.semester = '$semester' OR (o.semester = 'Year' AND (g.semester = '$semester' OR g.semester = 'Year')))
 ORDER BY m.code,g.tutorial_group
 SQL;
