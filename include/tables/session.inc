@@ -22,7 +22,9 @@ $sangaku->add_table(
   'semester' => array('type' => 'text'),
   'module_code' => array('type' => 'text'),
   'module_video_url' => array('type' => 'text'),
-  'video_url_description' => array('type' => 'text')
+  'video_url_description' => array('type' => 'text'),
+  'is_lecture' => array('type' => 'boolean'),
+  'is_online' => array('type' => 'boolean')
  ),
  <<<SQL
 SELECT
@@ -32,6 +34,8 @@ SELECT
  x.tutorial_group_id,
  g.name AS tutorial_group_name,
  g.semester,
+ g.is_lecture,
+ g.is_online,
  m.code AS module_code,
  m.title AS module_title, 
  x.date,
@@ -204,6 +208,7 @@ class session extends frog_object {
   foreach($this->poll_instances as $inst) {
    $poll = $inst->load_link('poll');
    $poll->load_items();
+   $inst->count_responses();
   }
  }
 
@@ -338,6 +343,8 @@ HTML
   $x->end_timestamp   = $this->end_timestamp();
   $x->duration        = $this->duration;
   $x->is_confirmed    = $this->is_confirmed;
+  $x->is_lecture      = $this->is_lecture;
+  $x->is_online       = $this->is_online;
   $sols = $this->solutions_shown;
   if (! $sols) { $sols = '[]'; }
   $sols_array = json_decode($sols);
@@ -368,8 +375,11 @@ HTML
    }
   }
 
-  $x->has_snapshots = isset($this->snapshots) && $this->snapshots;
-
+  $x->has_problem_sheet  = isset($this->problem_sheet)  && $this->problem_sheet;
+  $x->has_snapshots      = isset($this->snapshots)      && $this->snapshots;
+  $x->has_tutorial_group = isset($this->tutorial_group) && $this->tutorial_group; 
+  $x->has_poll_instances = isset($this->poll_instances) && $this->poll_instances;
+  
   return ($x);
  }
 
