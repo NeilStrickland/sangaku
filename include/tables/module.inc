@@ -153,6 +153,7 @@ class module extends frog_object {
 
    foreach($this->tutorial_groups as $x) {
     $x->sessions = array();
+    $x->sessions_by_datetime = array();
     $x->confirmed_sessions = array();
    }
 
@@ -166,8 +167,7 @@ class module extends frog_object {
     $w .= " AND g.semester='$semester'";
    }
    
-   $this->sessions =
-     $sangaku->load_where('sessions',$w);
+   $this->sessions = $sangaku->load_where('sessions',$w);
 
    $this->confirmed_sessions = array();
    
@@ -179,6 +179,7 @@ class module extends frog_object {
     if (isset($this->tutorial_groups[$s->tutorial_group_id])) {
      $g = $this->tutorial_groups[$s->tutorial_group_id];
      $g->sessions[] = $s;
+     $g->sessions_by_datetime[$s->date . ' ' . $s->time] = $s;
      if ($s->is_confirmed) {
       $g->confirmed_sessions[] = $s;
      }
@@ -217,6 +218,54 @@ class module extends frog_object {
   return $this->sessions;
  }
 
+ function create_lecture_sessions($semester = '') {
+  global $sangaku;
+
+  $new_sessions = array();
+  
+  if (! $semester) {
+   $ns1 = $this->create_lecture_sessions('1');
+   $ns2 = $this->create_lecture_sessions('2');
+   return array_merge($ns1,$ns2);
+  }
+
+  $t = $sangaku->load('module',$this->id);
+  $t->load_tutorial_groups($semester);
+  $t->load_sessions($semester);
+  
+  if ($semester == '1') {
+   $weeks = array(1,2,3,4,5,6,8,9,10,11,12);
+  } else {
+   $weeks = array(1,2,3,4,5,6,7,8,9,10,11);
+  }
+
+  $lecture_sessions = array();
+  
+  foreach ($t->lectures as $g) {
+   if (! ($g->day_number && $g->hour)) { continue; }
+   
+   foreach($weeks as $w) {
+    $ts = $sangaku->academic_timestamp(
+     $semester,$w,$g->day_number,$g->hour
+    );
+    $dt = date('Y-m-d H:i:s',$ts);
+    if (! array_key_exists($dt,$g->sessions_by_datetime)) {
+     $s = $sangaku->new_object('session');
+     $s->tutorial_group_id = $g->id;
+     $s->date = date('Y-m-d',$ts);
+     $s->time = date('H:i:s',$ts);
+     $s->duration = 50;
+     $s->save();
+     $s->load();
+     $g->sessions_by_datetime[$dt] = $s;
+     $new_sessions[] = $s;
+    }
+   }
+  }
+
+  return $new_sessions;
+ }
+ 
  function load_students() {
   global $sangaku;
   
