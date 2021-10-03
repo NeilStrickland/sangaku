@@ -474,6 +474,14 @@ td.poll_item_box {
     width : 20px;
 }
 
+td.poll_item_box.correct {
+    background : #33A532;
+}
+
+td.poll_item_box.incorrect {
+    background : #BB1E10;
+}
+
 td.poll_item_text {
     width : 605px;
 }
@@ -506,14 +514,14 @@ button.poll_submitted:hover {
 }
 
 button.poll_state {
-    width : 50px;
+    width : 60px;
     font-weight: normal;
     color : #888888;
     background: #EEEEFF;
 }
 
 button.poll_state_active {
-    width : 50px;
+    width : 60px;
     font-weight: bold;
     color : #000000;
     background: #DDDDEE;
@@ -533,8 +541,13 @@ button.poll_mode_active {
     background: #DDDDEE;
 }
 
-td.poll_result {
+div.poll_items td.poll_result {
     position : relative;
+    border-bottom : 2px solid black;
+}
+
+div.poll_items td.poll_mark {
+    border-bottom : 2px solid black;
 }
 
 div.poll_count_bar {
