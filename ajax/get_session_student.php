@@ -12,10 +12,18 @@ if (! ($session && $student)) {
  exit;
 }
 
-$session->load_link('problem_sheet');
-$session->load_link('tutorial_group');
-$session->problem_sheet->load_question_items();
+if ($session->problem_sheet_id && $session->is_online) {
+ $session->load_link('problem_sheet');
+ $session->problem_sheet->load_question_items();
+}
+
+if ($session->tutorial_group_id) {
+ $session->load_link('tutorial_group');
+}
+
 $session->load_snapshots();
+$session->load_poll_instances();
+
 $student->load_status($session);
 
 if ($user->status == 'teacher') {
