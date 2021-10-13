@@ -152,6 +152,7 @@ sangaku.session_monitor.init_data = function(x) {
    show_results     : 0,
    show_correctness : 0,
    show_state       : 0,
+   show_solution    : 0,
    show_button      : 0,
    enable           : 0   
   }
@@ -286,6 +287,7 @@ sangaku.poll_instance.set_monitor_state = function() {
   show_results     : 0,
   show_correctness : 0,
   show_state       : 0,
+  show_solution    : 0,
   show_button      : 0,
   enable           : 0
  };
@@ -296,6 +298,7 @@ sangaku.poll_instance.set_monitor_state = function() {
    opts.show_count = 1;
    opts.show_results = 1;
    opts.show_correctness = 1;
+   opts.show_solution = 1;
   }
  } else {
   if (this.state == 'count' || this.state == 'correct') {
@@ -305,6 +308,7 @@ sangaku.poll_instance.set_monitor_state = function() {
 
   if (this.state == 'correct') {
    opts.show_correctness = 1;
+   opts.show_solution = 1;
   }
  }
 
