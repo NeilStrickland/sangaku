@@ -42,9 +42,18 @@ function choose_student_page($params) {
 
  echo $N->top_menu();
  
- $h = $session->module_code .
-    '(' . $group->name . '): ' . $sheet->title .
-    ' ' . date('D j/n H:i',$session->start_timestamp());
+ $h = $session->module_code;
+ if ($group->name) {
+  $h .= '(' . $group->name . ') ';
+ } elseif ($session->is_lecture) {
+  $h .= ' lecture';
+ }
+
+ if ($sheet && $sheet->title) {
+  $h .= $sheet->title;
+ }
+
+ $h .= ' ' . date('D j/n H:i',$session->start_timestamp());
  
  echo <<<HTML
 <h1>$h</h1>
