@@ -97,12 +97,30 @@ HTML
                              array(
                               'id' => 'session_confirmed_' . $s->id,
                               'onclick' => "sangaku.toggle_session_confirmed({$s->id})")));
-   
+
+    if ($s->tutorial_group_name) {
+     $gn = $s->tutorial_group_name . ' [' . $s->tutorial_group_id . ']';
+    } elseif ($s->is_lecture) {
+     $gn = 'Lecture';
+    } else {
+     $gn = '';
+    }
+
+    if ($s->problem_sheet_id) {
+     $sheet_td = <<<HTML
+  <td class="command" class="sheet_name" onclick="location='{$edit_sheet_url}'">
+   {$s->problem_sheet_title}
+  </td>
+HTML;
+    } else {
+     $sheet_td = '<td></td>';
+    }
+    
     echo <<<HTML
  <tr>
   <td class="module_code">{$s->module_code}</td>
-  <td class="group_name">{$s->tutorial_group_name} [{$s->tutorial_group_id}]</td>
-  <td class="command" class="sheet_name" onclick="location='{$edit_sheet_url}'">{$s->problem_sheet_title}</td>
+  <td class="group_name">$gn</td>
+  $sheet_td
 $x
 $y
  </tr>
