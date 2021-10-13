@@ -127,16 +127,26 @@ HTML;
  $student_login_url =
    'https://' . $_SERVER['HTTP_HOST'] . '/sangaku/' . $session->id;
 
+ $title = '';
+ 
+ if ($session->problem_sheet_id) {
+  $title .= $session->problem_sheet_title . '<br/>';
+ }
+ 
+ if ($session->is_lecture) {
+  $title .= $session->module_code . ' Lecture';
+ } elseif ($session->tutorial_group_name) {
+  $title .= 'Group ' . $session->module_code . ' (' .
+         $session->tutorial_group_name . ')';
+ } else {
+  $title .= $session->module_code;
+ }
+ 
  echo <<<HTML
    <div class="tabbertab" id="session_tab">
     <h2>Session</h2>
     <br/><br/>
-    <div id="session_header">
-     {$session->problem_sheet->title} 
-     <br/>
-     Group {$session->tutorial_group->module_code} 
-     ({$session->tutorial_group->name})
-    </div>
+    <div id="session_header">$title</div>
     <br/><br/>
     <div style="width:700px">
      Student login URL:
@@ -148,6 +158,7 @@ $bb
    </div>
 
 HTML;
+
 }
 
 //////////////////////////////////////////////////////////////////////
