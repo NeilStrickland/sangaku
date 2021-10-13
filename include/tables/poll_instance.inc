@@ -37,7 +37,7 @@ SELECT
  x.state,
  x.start_timestamp,
  x.end_timestamp,
- s.tutorial_group_id,
+ s.tutorial_group_id AS session_tutorial_group_id,
  s.date AS session_date,
  s.time AS session_time,
  s.duration AS session_duration,
