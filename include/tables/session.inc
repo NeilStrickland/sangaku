@@ -49,7 +49,7 @@ SELECT
 FROM tbl_sessions x
  LEFT JOIN tbl_problem_sheets p ON x.problem_sheet_id = p.id 
   LEFT JOIN tbl_tutorial_groups g ON x.tutorial_group_id = g.id
-   LEFT JOIN tbl_modules m ON p.module_id = m.id
+   LEFT JOIN tbl_modules m ON g.module_id = m.id
 WHERE %s
  ORDER BY x.date,x.time,m.code,g.name
  
@@ -215,11 +215,16 @@ class session extends frog_object {
  function load_associated() {
   global $sangaku;
   
-  $p = $this->load_link('problem_sheet');
-  $g = $this->load_link('tutorial_group');
-  $p->load_question_items();
-  $g->load_students();
-  $g->load_teachers();
+  if ($this->problem_sheet_id) {
+   $p = $this->load_link('problem_sheet');
+   $p->load_question_items();
+  }
+
+  if ($this->tutorial_group_id) {
+   $g = $this->load_link('tutorial_group');
+   $g->load_students();
+   $g->load_teachers();
+  }
 
   $this->students = make_index($g->students,'id');
 
