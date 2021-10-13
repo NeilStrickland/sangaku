@@ -459,6 +459,14 @@ div.poll_intro {
     margin_bottom: 10px;
 }
 
+div.poll_solution {
+    width : 650px;
+    border : 1px solid black;
+    border-radius : 4px;
+    padding : 5px;
+    margin_bottom: 10px;
+}
+
 div.poll_items table { 
     border-collapse: collapse;
 }
