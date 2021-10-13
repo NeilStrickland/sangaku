@@ -215,6 +215,13 @@ class module extends frog_object {
    }
   }
 
+  $this->lecture_sessions = array();
+  foreach($this->sessions as $s) {
+   if ($s->is_lecture) {
+    $this->lecture_sessions[] = $s;
+   }
+  }
+  
   return $this->sessions;
  }
 
@@ -365,6 +372,92 @@ SQL;
 
   return $H->selector($field_name,
 		      $groups,
+		      $id,
+		      $opts0
+  );
+ }
+
+ function problem_sheet_selector($field_name,$id='',$opts=null) {
+  global $sangaku;
+  $H = $sangaku->html;
+
+  $semester = '';
+  if (isset($opts['semester'])) {
+   $semester = $opts['semester'];
+  }
+
+  $sheets = $this->load_problem_sheets($semester);
+
+  foreach($sheets as $s) {
+   if ($s->title) {
+    $s->desc = $s->title;
+   } else {
+    $s->desc = $s->code;
+   }
+  }
+  
+  $opts0 = array(
+   'onchange' => '',
+   'onfocus' => '',
+   'onblur' => '',
+   'width' => '',
+   'mode' => 'indirect',
+   'index' => 'id',
+   'display' => 'desc',
+   'empty_option' => true,
+   'disabled' => '',
+   'style' => ''
+  );
+
+  foreach($opts0 as $k => $v) {
+   if (isset($opts[$k])) {
+    $opts0[$k] = $opts[$k];
+   }
+  }
+
+  return $H->selector($field_name,
+		      $sheets,
+		      $id,
+		      $opts0
+  );
+ }
+
+ function lecture_session_selector($field_name,$id='',$opts=null) {
+  global $sangaku;
+  $H = $sangaku->html;
+
+  $semester = '';
+  if (isset($opts['semester'])) {
+   $semester = $opts['semester'];
+  }
+
+  $this->load_sessions($semester);
+
+  foreach($this->lecture_sessions as $s) {
+   $s->desc = $s->friendly_start_time();
+  }
+  
+  $opts0 = array(
+   'onchange' => '',
+   'onfocus' => '',
+   'onblur' => '',
+   'width' => '',
+   'mode' => 'indirect',
+   'index' => 'id',
+   'display' => 'desc',
+   'empty_option' => true,
+   'disabled' => '',
+   'style' => ''
+  );
+
+  foreach($opts0 as $k => $v) {
+   if (isset($opts[$k])) {
+    $opts0[$k] = $opts[$k];
+   }
+  }
+
+  return $H->selector($field_name,
+		      $this->lecture_sessions,
 		      $id,
 		      $opts0
   );
