@@ -12,6 +12,7 @@ $sangaku->add_table(
   'code' => array('type' => 'text'),
   'title' => array('type' => 'text'),
   'intro' => array('type' => 'text'),
+  'solution' => array('type' => 'text'),
   'is_judgemental' => array('type' => 'boolean','default' => 0),
   'is_multiple' => array('type' => 'boolean','default' => 0)
  ),
@@ -56,6 +57,7 @@ SELECT
  x.code,
  x.title,
  x.intro,
+ x.solution,
  x.is_judgemental,
  x.is_multiple
 FROM tbl_polls x
@@ -109,16 +111,22 @@ class poll extends frog_object {
 
  function create_instances() {
   global $sangaku;
-  
-  $sheet = $this->load_link('problem_sheet');
 
-  if (! $sheet) { return false; }
-  if (! $this->id) { return false; }
-  
   $this->load_instances();
+
+  if ($this->problem_sheet_id) {
+   $sheet = $this->load_link('problem_sheet');
+
+   if (! $sheet) { return false; }
+   if (! $this->id) { return false; }
   
-  $sheet->load_sessions();
-  foreach ($sheet->sessions as $s) {
+   $sheet->load_sessions();
+   $sessions = $sheet->sessions;
+  } elseif ($this->session_id) {
+   $sessions  = array($this->load_link('session'));
+  }
+  
+  foreach ($sessions as $s) {
    if (! array_key_exists($s->id,$this->instances_by_session_id)) {
     $inst = $sangaku->new_object('poll_instance');
     $inst->poll_id = $this->id;
@@ -177,7 +185,7 @@ HTML
  function for_json($state = 'before') {
   $x = new stdClass();
   foreach (array('id','module_id','problem_sheet_id','session_id',
-                 'title','intro','is_judgemental','is_multiple') as $k) {
+                 'title','intro','solution','is_judgemental','is_multiple') as $k) {
    $x->$k = $this->$k;
   }
 
