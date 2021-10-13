@@ -16,7 +16,7 @@ echo $N->header($module->code,array('widgets' => array('mathjax')));
 echo $N->top_menu();
 
 echo <<<HTML
-<h1>Problem sheets for {$module->code} ({$module->title})</h1>
+<h1>Polls for {$module->code} ({$module->title})</h1>
 <br/>
 <form name="control_form" action="poll_list.php">
 <input type="hidden" name="module_id" value="{$module->id}"/>
@@ -30,7 +30,7 @@ HTML
 echo $H->edged_table_start();
 echo $H->spacer_row(60,120,120,300,60,60);
  
-echo $H->row('ID','Problem sheet','Code','Title','','');
+echo $H->row('ID','Poll','Code','Title','','');
 foreach ($module->polls as $p) {
  $sheet = $p->problem_sheet_code;
  if (! $sheet) { $sheet = $p->problem_sheet_title; }
