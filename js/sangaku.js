@@ -318,7 +318,7 @@ sangaku.question_item.header_tag = function() {
 
 sangaku.poll.munch = function(x) {
  for (var k of ['id','module_id','problem_sheet_id','session_id',
-                'title','intro','is_judgemental','is_multiple']) {
+                'title','intro','solution','is_judgemental','is_multiple']) {
   if (k in x) { this[k] = x[k]; }
  }
 
@@ -468,7 +468,7 @@ sangaku.poll_instance.create_dom = function(parent) {
  this.items_table.appendChild(this.items_tbody);
 
  for (item of this.poll.items) {
-  item.create_dom();
+  item.create_dom(this.poll.is_multiple);
   this.items_tbody.appendChild(item.tr);
   this.items_tbody.appendChild(item.result_tr);
  }
@@ -477,6 +477,11 @@ sangaku.poll_instance.create_dom = function(parent) {
  this.state_div.className = 'poll_state';
  this.state_div.innerHTML = this.message_for_state[this.state];
  this.content_div.appendChild(this.state_div);
+
+ this.solution_div = document.createElement('div');
+ this.solution_div.className = 'poll_solution';
+ this.solution_div.innerHTML = this.poll.solution;
+ this.content_div.appendChild(this.solution_div);
 
  this.submit_button = document.createElement('button');
  this.submit_button.type = 'button';
@@ -499,6 +504,7 @@ sangaku.poll_instance.set_dom_opts = function(opts) {
   show_count       : 0,
   show_results     : 0,
   show_correctness : 0,
+  show_solution    : 0,
   show_state       : 0,
   show_button      : 0,
   enable           : 0
@@ -532,9 +538,12 @@ sangaku.poll_instance.set_dom_opts = function(opts) {
  
  this.title.style.display = opts0.show_title ? 'block' : 'none';
  this.content_div.style.display = opts0.show_content ? 'block' : 'none';
- this.intro_div.style.display = opts0.show_intro ? 'block' : 'none';
+ this.intro_div.style.display =
+  (this.poll.intro.trim() && opts0.show_intro) ? 'block' : 'none';
  this.items_div.style.display = opts0.show_items ? 'block' : 'none';
  this.state_div.style.display = opts0.show_state ? 'block' : 'none';
+ this.solution_div.style.display =
+  (this.poll.solution.trim() && opts0.show_solution) ? 'block' : 'none';
  this.submit_button.style.display = opts0.show_button ? 'block' : 'none';
 
  this.div.style.display = opts0.show ? 'block' : 'none';
@@ -558,6 +567,7 @@ sangaku.poll_instance.set_state = function(state = null) {
   show_count       : 0,
   show_results     : 0,
   show_correctness : 0,
+  show_solution    : 0,
   show_state       : 0,
   show_button      : 0,
   enable           : 0
@@ -574,6 +584,7 @@ sangaku.poll_instance.set_state = function(state = null) {
   opts.show_button = (this.state == 'open') ? 1 : 0;
   opts.show_results = (this.state == 'count' || this.state == 'correct') ? 1 : 0;
   opts.show_correctness = (this.state == 'correct') ? 1 : 0;
+  opts.show_solution = (this.state == 'correct') ? 1 : 0;
  }
 
  this.set_dom_opts(opts);
