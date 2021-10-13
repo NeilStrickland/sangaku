@@ -33,15 +33,35 @@ sangaku.sheet_viewer.init_data = function(x) {
  
  this.session = x;
  this.student = x.student;
- this.problem_sheet = x.problem_sheet;
- this.tutorial_group = x.tutorial_group;
+   
+ this.problem_sheet = null;
+ this.tutorial_group = null;
 
+ if ('problem_sheet' in x) {
+  this.problem_sheet = x.problem_sheet;
+ }
+
+ if ('tutorial_group' in x) {
+  this.tutorial_group = x.tutorial_group;
+ }
+ 
  this.h1 = document.createElement('h1');
- this.h1.innerHTML =
-  this.problem_sheet.title + '<br/>' +
-  'Group ' + this.tutorial_group.module_code +
-  '(' + this.tutorial_group.name + ')' + 
-  ': ' + this.student.forename + ' ' + this.student.surname;
+
+ var t = '';
+ if (this.problem_sheet && this.problem_sheet.title) {
+  t = t + this.problem_sheet.title + '<br/>';
+ }
+
+ t = t + this.tutorial_group.module_code;
+ if (this.tutorial_group.name) {
+  t = t + 'Group ' +  this.tutorial_group.module_code +
+   '(' + this.tutorial_group.name + ') ';
+ } else if (this.tutorial_group.is_lecture) {
+  t = t + this.tutorial_group.module_code + ' lecture';
+ }
+ 
+ this.h1.innerHTML = t + ': ' +
+  this.student.forename + ' ' + this.student.surname;
  document.body.appendChild(this.h1);
  MathJax.typeset([this.h1]);
 
@@ -724,6 +744,9 @@ sangaku.sheet_viewer.update_data = function(x) {
     }
     if ('count' in item0) {
      item.count = item0.count;
+    }
+    if ('solution' in item0) {
+     item.solution = item0.solution;
     }
     if (inst.state != 'before' && inst.state != 'after') {
      this.has_visible_poll = 1;
