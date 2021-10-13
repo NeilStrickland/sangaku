@@ -150,6 +150,7 @@ HTML
   $N = $sangaku->nav;
   $s = $this->object;
   $m = $s->load_link('module');
+  if ($m) { $m->load_associated(); }
 
   $modules = $sangaku->load_all('modules');
   $module_opts = array();
@@ -190,7 +191,17 @@ HTML;
   echo $H->edged_table_start();
   echo $H->spacer_row(160,440);
   echo $H->row($H->bold('Module:'),$module_selector);
-  echo $H->row($H->bold('Problem sheet:'),$sheet_selector);
+
+  if ($m->problem_sheets) {
+   echo $H->row($H->bold('Problem sheet:'),
+                $m->problem_sheet_selector('problem_sheet_id',$s->problem_sheet_id));
+  }
+
+  if ($m->lecture_sessions) {
+   echo $H->row($H->bold('Lecture:'),
+                $m->lecture_session_selector('session_id',$s->session_id));
+  }
+  
   echo $H->row($H->bold('Code:'),
                $H->text_input('code',$s->code,array('size' => 10)));
   echo $H->row('',$explain_code);
@@ -219,11 +230,34 @@ HTML
 
   echo <<<HTML
 <br/>
-<button type="button" id="preview_button">Preview</button>
+<button type="button" id="intro_preview_button">Preview</button>
 <br/><br/>
 <div id="intro_display">
 {$s->intro}
 </div>
+
+HTML;
+
+  echo <<<HTML
+<h2>Solution</h2>
+<br/>
+
+HTML
+   ;
+
+  echo $H->textarea('solution',$s->solution,array('cols' => 95));
+
+  echo <<<HTML
+<br/>
+<button type="button" id="solution_preview_button">Preview</button>
+<br/><br/>
+<div id="solution_display">
+{$s->solution}
+</div>
+
+HTML;
+
+  echo <<<HTML
 <br/>
 <input type="hidden" name="items" value=""/>
 <input type="hidden" name="deletions" value=""/>
