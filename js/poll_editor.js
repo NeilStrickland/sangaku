@@ -5,10 +5,19 @@ sangaku.poll_editor.init = function(id) {
  
  this.intro_textarea = document.main_form.intro;
  this.intro_display_div = document.getElementById('intro_display');
- this.preview_button = document.getElementById('preview_button');
- this.preview_button.onclick = function() {
+ this.intro_preview_button = document.getElementById('intro_preview_button');
+ this.intro_preview_button.onclick = function() {
   me.intro_display_div.innerHTML = me.intro_textarea.value;
   MathJax.typeset([me.intro_display_div]);
+  return 0;
+ }
+
+ this.solution_textarea = document.main_form.solution;
+ this.solution_display_div = document.getElementById('solution_display');
+ this.solution_preview_button = document.getElementById('solution_preview_button');
+ this.solution_preview_button.onclick = function() {
+  me.solution_display_div.innerHTML = me.solution_textarea.value;
+  MathJax.typeset([me.solution_display_div]);
   return 0;
  }
 
