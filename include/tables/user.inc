@@ -85,64 +85,66 @@ class user extends frog_object {
  function load_status($session) {
   global $sangaku;
 
-  if (! isset($session->problem_sheet)) {
-   $session->load_link('problem_sheet');
-  }
+  if ($session->problem_sheet_id) {
+   if (! isset($session->problem_sheet)) {
+    $session->load_link('problem_sheet');
+   }
 
-  $problem_sheet = $session->problem_sheet;
-  if (! isset($problem_sheet->question_items)) {
-   $problem_sheet->load_question_items();
-  }
+   $problem_sheet = $session->problem_sheet;
+   if (! isset($problem_sheet->question_items)) {
+    $problem_sheet->load_question_items();
+   }
   
-  $w = "x.session_id={$session->id} AND x.student_id={$this->id}";
+   $w = "x.session_id={$session->id} AND x.student_id={$this->id}";
   
-  $this->status_reports = $sangaku->load_where('status_reports',$w);
-  $this->uploads = $sangaku->load_where('uploads',$w);
-  $this->last_seen = 0;
-  $this->last_response_time = 0;
-  foreach($this->status_reports as $x) {
-   $t = strtotime($x->timestamp);
-   $this->last_seen = max($this->last_seen,$t);
-  }
-  foreach($this->uploads as $x) {
-   $t = strtotime($x->timestamp);
-   if ($x->teacher_id) {
-    $this->last_response_time = max($this->last_response_time,$t);    
-   } else {
+   $this->status_reports = $sangaku->load_where('status_reports',$w);
+   $this->uploads = $sangaku->load_where('uploads',$w);
+   $this->last_seen = 0;
+   $this->last_response_time = 0;
+   foreach($this->status_reports as $x) {
+    $t = strtotime($x->timestamp);
     $this->last_seen = max($this->last_seen,$t);
    }
-  }
+   foreach($this->uploads as $x) {
+    $t = strtotime($x->timestamp);
+    if ($x->teacher_id) {
+     $this->last_response_time = max($this->last_response_time,$t);    
+    } else {
+     $this->last_seen = max($this->last_seen,$t);
+    }
+   }
 
-  $this->item_status = array();
-  $this->item_status_by_id = array();
-  foreach($problem_sheet->question_items as $item) {
-   $x = new student_item_status();
-   $this->item_status_by_id[$item->id] = $x;
-  }
+   $this->item_status = array();
+   $this->item_status_by_id = array();
+   foreach($problem_sheet->question_items as $item) {
+    $x = new student_item_status();
+    $this->item_status_by_id[$item->id] = $x;
+   }
 
-  foreach($this->uploads as $x) {
-   $this->item_status_by_id[$x->item_id]->append_upload($x);
-  }
+   foreach($this->uploads as $x) {
+    $this->item_status_by_id[$x->item_id]->append_upload($x);
+   }
 
-  foreach($this->status_reports as $x) {
-   $this->item_status_by_id[$x->item_id]->append_status_report($x);
-  }
+   foreach($this->status_reports as $x) {
+    $this->item_status_by_id[$x->item_id]->append_status_report($x);
+   }
 
-  $this->needs_response = false;
+   $this->needs_response = false;
 
-  foreach($problem_sheet->question_items as $item) {
-   $x = $this->item_status_by_id[$item->id];
-   $x->needs_response = false;
-   $y = $x->latest_report;
-   
-   if ($x->last_access_time > $x->last_response_time &&
-       $y &&
-       ($y->code == 'to_check' ||
-        $y->code == 'stuck' ||
-        $y->code == 'move')) {
-    $x->needs_response = true;
-    $this->needs_response = true;
-   }   
+   foreach($problem_sheet->question_items as $item) {
+    $x = $this->item_status_by_id[$item->id];
+    $x->needs_response = false;
+    $y = $x->latest_report;
+    
+    if ($x->last_access_time > $x->last_response_time &&
+        $y &&
+        ($y->code == 'to_check' ||
+         $y->code == 'stuck' ||
+         $y->code == 'move')) {
+     $x->needs_response = true;
+     $this->needs_response = true;
+    }   
+   }
   }
  }
 
