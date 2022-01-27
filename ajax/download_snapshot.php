@@ -1,5 +1,6 @@
 <?php
 
+$allow_bot = 1;
 $debug = 0;
 
 require_once('../include/sangaku.inc');
