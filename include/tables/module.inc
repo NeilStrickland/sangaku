@@ -225,6 +225,23 @@ class module extends frog_object {
   return $this->sessions;
  }
 
+ function active_sessions($t = null,$t1 = 0) {
+  $sessions = $this->load_sessions();
+  $t0 = $t ? $t : time();
+  $this->active_sessions = array();
+  foreach($sessions as $s) {
+   $ta = $s->start_timestamp() - $t1;
+   $tb = $s->end_timestamp() + $t1;
+   if ($s->start_timestamp() - $t1 < $t0 &&
+       $t0 < $s->end_timestamp() + $t1) {
+    $this->active_sessions[] = $s;
+   } else {
+   }
+  }
+
+  return $this->active_sessions;
+ }
+ 
  function create_lecture_sessions($semester = '') {
   global $sangaku;
 
