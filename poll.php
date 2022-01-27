@@ -17,6 +17,8 @@ exit;
 function get_params() {
  global $sangaku;
  
+ $params = new stdClass();
+ 
  // $params = $sangaku->get_session_student_params();
 
  $params->instance_id = (int) get_optional_parameter('instance_id',0);
