@@ -29,7 +29,9 @@ autosuggest.setup = function(type,hidden,display,key,value) {
   hidden.value = key;
   display.value = value;
   size = this.default_size[type];
-  if (size) { display.setAttribute('size',size); }
+  if (size && ! display.getAttribute('size')) {
+   display.setAttribute('size',size);
+  }
   return(this.setup_ajax(hidden,display,url));
  } else if (window[type + '_keys'] && window[type_ + 'vals']) {
   keys = window[type + '_keys'];
@@ -602,7 +604,9 @@ autosuggest.setup_all = function() {
     }
        
     size = this.default_size[s];
-    if (size) { d.setAttribute('size',size); }
+    if (size && ! d.getAttribute('size') ) {
+     d.setAttribute('size',size);
+    }
 
     this.setup_ajax(ip,d,url);
    }
