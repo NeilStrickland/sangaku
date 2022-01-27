@@ -1,5 +1,7 @@
 <?php
 
+$allow_bot = 1;
+
 require_once('../include/sangaku.inc');
 
 $session = $sangaku->get_object_parameter('session');
