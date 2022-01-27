@@ -158,4 +158,36 @@ class sangaku_class extends frog {
   $t = $this->academic_timestamp($semester,$week_number,$day_number,$hour);
   return $t ? date('Y-m-d H:i:s',$t) : '';
  }
+
+ function get_module_parameter() {
+  $module = null;
+  $mid = (int) get_optional_parameter('module_id',0);
+  if ($mid) {
+   $module = $this->load('module',$mid);
+   return $module;
+  }
+
+  $module_code = $this->sanitise(get_optional_parameter('module_code',''));
+  $mm = $this->load_where('modules',"x.code='{$module_code}'");
+  if ($mm) {
+   $module = $mm[0];
+   return $module;
+  }
+
+  return null;
+ }
+
+ function get_session_parameter() {
+  $session = $this->get_object_parameter('session');
+
+  if (! $session) {
+   $module = $this->get_module_parameter();
+   if ($module) {
+    $ss = $module->active_sessions();
+   }
+   if ($ss) { $session = $ss[0]; }
+  }
+
+  return $session;
+ }
 }
