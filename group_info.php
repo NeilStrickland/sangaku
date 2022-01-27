@@ -101,8 +101,19 @@ HTML
  </tr>
  
 HTML;
+  echo $H->row($H->bold('Lecture:'),$H->checkbox('is_lecture',$g->is_lecture));
+  echo <<<HTML
+ <tr>
+  <td colspan="2">
+   You should tick the box above if this is really a lecture rather than
+   a tutorial group.
+  </td>
+ </tr>
+ 
+HTML;
   echo $H->row($H->bold('Semester:'),$H->semester_selector('semester',$g->semester));
   echo $H->row($H->bold('Day:'),$H->day_selector('day_number',$g->day_number));
+  echo $H->row($H->bold('Hour:'),$H->text_input('hour',$g->hour,array('size' => 3)));
   echo $H->row($H->bold('Weeks:'),$H->week_parity_selector('week_parity',$g->week_parity));
 
   echo <<<HTML
@@ -174,12 +185,12 @@ HTML;
    $p = $s->set_prefix();
    $url = 'session_monitor.php?session_id=' . $s->id;
    $h = "<table class=\"plain\"><tr>" .
-	$H->td($H->date_box($p . '_date',$s->date)) .
-	$H->td($H->time_box($p . '_time',$s->time)) .
-	$H->td($H->text_input($p . '_duration',$s->duration,array('size' => 2))) .
-	$H->td($H->problem_sheet_selector($p . '_problem_sheet_id',
+      $H->td($H->date_box($p . '_date',$s->date)) .
+      $H->td($H->time_box($p . '_time',$s->time)) .
+      $H->td($H->text_input($p . '_duration',$s->duration,array('size' => 2))) .
+      $H->td($H->problem_sheet_selector($p . '_problem_sheet_id',
 					  $s->problem_sheet_id,
-					  array('size' => 20)) .
+					  array('size' => 35)) .
 	       $s->new_object_marker) .
 	$H->link_td("Monitor",$url) .
 	"</tr></table>";
