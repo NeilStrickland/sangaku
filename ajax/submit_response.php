@@ -35,9 +35,7 @@ if ($xx) {
  $x->user_id = $student->id;
 }
 
-echo "Setting response text={$response_text}<br/>";
 $x->set_response_text($response_text);
-echo "Response text={$x->response_text}<br/>";
-
 $x->response_timestamp = time();
 $x->save();
+

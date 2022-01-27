@@ -53,121 +53,147 @@ sangaku.sheet_viewer.init_data = function(x) {
  this.countdown_div.style.display = 'none';
  document.body.appendChild(this.countdown_div);
 
- // The main div with the questions etc
- this.sheet_div = document.createElement('div');
- this.sheet_div.style.display = 'none';
- document.body.appendChild(this.sheet_div);
+ if (this.session.is_online) {
+  // The main div with the questions etc
+  this.sheet_div = document.createElement('div');
+  this.sheet_div.style.display = 'none';
+  document.body.appendChild(this.sheet_div);
 
- // Button to show visualiser snapshots
- this.snapshots_button = document.createElement('button');
- this.snapshots_button.className = 'snapshots';
- this.snapshots_button.innerHTML = 'Show visualiser snapshots';
- this.snapshots_button.onclick = function() {
-  window.open('/sangaku/show_snapshots.php?session_id=' + me.session.id,
+  // Button to show visualiser snapshots
+  this.snapshots_button = document.createElement('button');
+  this.snapshots_button.className = 'snapshots';
+  this.snapshots_button.innerHTML = 'Show visualiser snapshots';
+  this.snapshots_button.onclick = function() {
+   window.open('/sangaku/show_snapshots.php?session_id=' + me.session.id,
 	      'snapshots_' + me.session.id);
- }
- this.snapshots_button.style.display =
-  this.session.has_snapshots ? 'block' : 'none';
- this.sheet_div.appendChild(this.snapshots_button);
+  }
+  this.snapshots_button.style.display =
+   this.session.has_snapshots ? 'block' : 'none';
+  this.sheet_div.appendChild(this.snapshots_button);
  
- // Introduction to the problem sheet
- this.intro_div = document.createElement('div');
- this.intro_div.className = 'sheet_intro';
- this.intro_div.innerHTML = this.problem_sheet.intro;
- this.sheet_div.appendChild(this.intro_div);
- MathJax.typeset([this.intro_div]);
+  // Introduction to the problem sheet
+  this.intro_div = document.createElement('div');
+  this.intro_div.className = 'sheet_intro';
+  this.intro_div.innerHTML = this.problem_sheet.intro;
+  this.sheet_div.appendChild(this.intro_div);
+  MathJax.typeset([this.intro_div]);
 
- // The system is that question items may have subitems or they may
- // have things that directly require student response but not both.
- // The bottom_items array contains the items with no subitems.
- this.question_items = [];
- this.question_items_by_id = {};
- this.bottom_items = [];
- this.bottom_items_by_id = {};
+  // The system is that question items may have subitems or they may
+  // have things that directly require student response but not both.
+  // The bottom_items array contains the items with no subitems.
+  this.question_items = [];
+  this.question_items_by_id = {};
+  this.bottom_items = [];
+  this.bottom_items_by_id = {};
 
- // The stage is an index for the bottom_items array.  It points to
- // the latest bottom item that is expanded.  
- var stage = 0;
+  // The stage is an index for the bottom_items array.  It points to
+  // the latest bottom item that is expanded.  
+  var stage = 0;
 
- // The entries in this.problem_sheet.question_items are instances of
- // sangaku.question_item.  We promote them to instances of
- // sangaku.sheet_viewer.question_item before putting them in
- // this.question_items and similar arrays.
- for (item0 of this.problem_sheet.question_items) {
-  var item = this.question_item.create(item0);
-  item.session_id = this.session.id;
-  item.student_id = this.student.id;
-  this.question_items.push(item);
-  this.question_items_by_id[item.id] = item;
-  this.sheet_div.appendChild(item.create_dom(this));
+  // The entries in this.problem_sheet.question_items are instances of
+  // sangaku.question_item.  We promote them to instances of
+  // sangaku.sheet_viewer.question_item before putting them in
+  // this.question_items and similar arrays.
+  for (item0 of this.problem_sheet.question_items) {
+   var item = this.question_item.create(item0);
+   item.session_id = this.session.id;
+   item.student_id = this.student.id;
+   this.question_items.push(item);
+   this.question_items_by_id[item.id] = item;
+   this.sheet_div.appendChild(item.create_dom(this));
 
-  if (item.is_bottom) {
-   this.bottom_items.push(item);
-   this.bottom_items_by_id[item.id] = item;
-   item.status_reports = [];
-   item.uploads = [];
-   item.uploads_by_id = {};
-   item.latest_report = null;
-   item.latest_status = sangaku.statuses[0];
-   item.notify = false;
+   if (item.is_bottom) {
+    this.bottom_items.push(item);
+    this.bottom_items_by_id[item.id] = item;
+    item.status_reports = [];
+    item.uploads = [];
+    item.uploads_by_id = {};
+    item.latest_report = null;
+    item.latest_status = sangaku.statuses[0];
+    item.notify = false;
+   }
   }
+
+  // The server sends the full list of status reports for each question
+  // item.  This is a bit redundant; it should probably be refactored
+  // so that we only send the latest report.
+  for (var r of this.student.status_reports) {
+   var item = this.bottom_items_by_id[r.item_id];
+   item.status_reports.push(r);
+   item.latest_report = r;
+   item.latest_status = sangaku.statuses[r.status_id];
+   item.stepper.set_status_id(r.status_id);
+   if (stage < item.bottom_index) {
+    stage = item.bottom_index;
+   }
+  }
+ 
+  for (var u of this.student.uploads) {
+   var item = this.bottom_items_by_id[u.item_id];
+   item.add_upload(u);
+   if (stage < item.bottom_index) {
+    stage = item.bottom_index;
+   }
+  }
+
+  this.check_responded();
+
+  for(item of this.bottom_items) {
+   if (item.uploads) {
+    item.upload_block.open();
+   }
+  }
+ 
+  // We need to create some space at the bottom, to avoid various
+  // pathologies.  There is a doubtless a better solution using
+  // CSS styles without adding a spurious div.
+  this.bottom_spacer = document.createElement('div');
+  this.bottom_spacer.innerHTML = '&nbsp;';
+  this.bottom_spacer.style['min-height'] = '50px';
+  this.sheet_div.appendChild(this.bottom_spacer);
+
+  // This div is used to display a notification to the student whenever
+  // a teacher uploads a response to something that they have done.
+  this.notifier = document.createElement('div');
+  this.notifier.className = 'notifier';
+  document.body.appendChild(this.notifier);
+  this.notify_items = [];
+
+  // The above code set the local variable stage to correspond to the
+  // last item that has an associated status report or upload.  We now
+  // record this local variable as a property, and adjust the DOM
+  // accordingly.
+  this.set_stage(stage);
+
+  // Make the notification go away when clicked.
+  this.notifier.onclick = function() { me.clear_notifier(); };
  }
 
- // The server sends the full list of status reports for each question
- // item.  This is a bit redundant; it should probably be refactored
- // so that we only send the latest report.
- for (var r of this.student.status_reports) {
-  var item = this.bottom_items_by_id[r.item_id];
-  item.status_reports.push(r);
-  item.latest_report = r;
-  item.latest_status = sangaku.statuses[r.status_id];
-  item.stepper.set_status_id(r.status_id);
-  if (stage < item.bottom_index) {
-   stage = item.bottom_index;
+ if (this.session.has_poll_instances && ! this.session.is_online) {
+  this.polls_div = document.createElement('div');
+  document.body.appendChild(this.polls_div);
+  this.polls_h2 = document.createElement('h2');
+  this.polls_h2.innerHTML = 'Polls';
+  this.polls_div.appendChild(this.polls_h2);
+
+  this.has_visible_poll = 0;
+  
+  for (var inst of this.session.poll_instances) {
+   inst.create_dom(this.polls_div);
+   inst.set_state();
+   this.set_poll_handler(inst);
+   if (inst.state != 'before' && inst.state != 'after') {
+    this.has_visible_poll = 1;
+   }
   }
+
+  this.no_polls_div = document.createElement('div');
+  this.no_polls_div.innerHTML =
+   "No polls are currently open.";
+  this.no_polls_div.style.display = this.has_visible_poll ? 'none' : 'block';
+  this.polls_div.appendChild(this.no_polls_div);
  }
  
- for (var u of this.student.uploads) {
-  var item = this.bottom_items_by_id[u.item_id];
-  item.add_upload(u);
-  if (stage < item.bottom_index) {
-   stage = item.bottom_index;
-  }
- }
-
- this.check_responded();
-
- for(item of this.bottom_items) {
-  if (item.uploads) {
-   item.upload_block.open();
-  }
- }
- 
- // We need to create some space at the bottom, to avoid various
- // pathologies.  There is a doubtless a better solution using
- // CSS styles without adding a spurious div.
- this.bottom_spacer = document.createElement('div');
- this.bottom_spacer.innerHTML = '&nbsp;';
- this.bottom_spacer.style['min-height'] = '50px';
- this.sheet_div.appendChild(this.bottom_spacer);
-
- // This div is used to display a notification to the student whenever
- // a teacher uploads a response to something that they have done.
- this.notifier = document.createElement('div');
- this.notifier.className = 'notifier';
- document.body.appendChild(this.notifier);
- this.notify_items = [];
-
- // The above code set the local variable stage to correspond to the
- // last item that has an associated status report or upload.  We now
- // record this local variable as a property, and adjust the DOM
- // accordingly.
- this.set_stage(stage);
-
- var me = this;
- // Make the notification go away when clicked.
- this.notifier.onclick = function() { me.clear_notifier(); };
-
  // Update the data after a five seconds (or the time specified by
  // this.interval, if that has been changed from five seconds).
  setTimeout(function() { me.update(); },me.interval);
@@ -178,6 +204,8 @@ sangaku.sheet_viewer.init_data = function(x) {
 };
 
 sangaku.sheet_viewer.check_responded = function() {
+ if (! this.session.is_online) { return; }
+ 
  for (item of this.bottom_items) {
   item.last_access_time = 0;
   item.last_response_time = 0;
@@ -517,6 +545,43 @@ sangaku.sheet_viewer.set_stage = function(s) {
  }
 };
 
+sangaku.sheet_viewer.set_poll_handler = function(inst) {
+ var me = this;
+ 
+ inst.submit_button.onclick = function() {
+  me.submit_poll_response(inst);
+ }
+}
+
+sangaku.sheet_viewer.submit_poll_response = function(inst) {
+ var me = this;
+ var response = null;
+ 
+ if (inst.poll.is_multiple) {
+  response = [];
+  for (var item of inst.poll.items) {
+   if (item.box.checked) { response.push(item.id); }
+  }
+  response = JSON.stringify(response);
+ } else {
+  response = 0;
+  for (var item of inst.poll.items) {
+   if (item.box.checked) { response = item.id; }
+  }
+ }
+ 
+ var url = '/sangaku/ajax/submit_response.php' +
+     '?instance_id=' + inst.id +
+     '&student_id=' + this.student.id +
+     '&response=' + response;
+ 
+ fetch(url).then(
+  function(x) {
+   inst.submit_button.className = 'poll_submitted';
+  }
+ ); 
+};
+
 sangaku.sheet_viewer.update = function() {
  var me = this;
  
@@ -541,105 +606,135 @@ sangaku.sheet_viewer.update = function() {
 };
 
 sangaku.sheet_viewer.update_data = function(x) {
- this.new_stage = this.stage;
+ if (this.session.is_online) {
+  this.new_stage = this.stage;
 
- if (x.has_snapshots) {
-  this.session.has_snapshots = 1;
-  this.snapshots_button.style.display = 'block';
- }
+  if (x.has_snapshots) {
+   this.session.has_snapshots = 1;
+   this.snapshots_button.style.display = 'block';
+  }
 
- for (var item0 of x.problem_sheet.question_items) {
-  if (item0.solution) {
-   var item = this.question_items_by_id[item0.id];
-   item.solution = item0.solution;
-   item.solution_div.innerHTML = '<b>Solution:</b> ' + item.solution;
-   MathJax.typeset([item.solution_div]);
-   if (item.solution_div.style.display == 'none') {
-    item.show_solution_div.style.display = 'block';  
+  for (var item0 of x.problem_sheet.question_items) {
+   if (item0.solution) {
+    var item = this.question_items_by_id[item0.id];
+    item.solution = item0.solution;
+    item.solution_div.innerHTML = '<b>Solution:</b> ' + item.solution;
+    MathJax.typeset([item.solution_div]);
+    if (item.solution_div.style.display == 'none') {
+     item.show_solution_div.style.display = 'block';  
+    }
    }
   }
- }
 
- for (var item of this.bottom_items) {
-  item.new_report = null;
-  item.new_uploads = [];
-  item.modified_uploads = [];
-  item.notify_uploads = [];
-  for (u of item.uploads) { u.seen = false; }
- }
-
- for (var r of x.student.status_reports) {
-  var item = this.bottom_items_by_id[r.item_id];
-  this.new_stage = Math.max(this.new_stage,item.bottom_index);
-  if (! item.latest_report || Date.parse(r.timestamp) > Date.parse(item.latest_report.timestamp)) {
-   item.new_report = r;
-   item.latest_report = r;
+  for (var item of this.bottom_items) {
+   item.new_report = null;
+   item.new_uploads = [];
+   item.modified_uploads = [];
+   item.notify_uploads = [];
+   for (u of item.uploads) { u.seen = false; }
   }
- }
 
- for (u0 of x.student.uploads) {
-  var item = this.bottom_items_by_id[u0.item_id];
-  this.new_stage = Math.max(this.new_stage,item.bottom_index);
-  var u1 = item.uploads_by_id[u0.id];
-  if (u1) {
-   u1.seen = true;
-   if (Date.parse(u0.timestamp) > Date.parse(u1.timestamp)) {
-    item.modified_uploads.push(u0);
+  for (var r of x.student.status_reports) {
+   var item = this.bottom_items_by_id[r.item_id];
+   this.new_stage = Math.max(this.new_stage,item.bottom_index);
+   if (! item.latest_report || Date.parse(r.timestamp) > Date.parse(item.latest_report.timestamp)) {
+    item.new_report = r;
+    item.latest_report = r;
+   }
+  }
+
+  for (u0 of x.student.uploads) {
+   var item = this.bottom_items_by_id[u0.item_id];
+   this.new_stage = Math.max(this.new_stage,item.bottom_index);
+   var u1 = item.uploads_by_id[u0.id];
+   if (u1) {
+    u1.seen = true;
+    if (Date.parse(u0.timestamp) > Date.parse(u1.timestamp)) {
+     item.modified_uploads.push(u0);
+     if (u0.teacher_id) {
+      item.notify = true;
+     }
+    }
+   } else {
+    item.new_uploads.push(u0);
+    u0.seen = true;
     if (u0.teacher_id) {
      item.notify = true;
     }
    }
-  } else {
-   item.new_uploads.push(u0);
-   u0.seen = true;
-   if (u0.teacher_id) {
-    item.notify = true;
-   }
   }
- }
 
- this.notify_items = [];
+  this.notify_items = [];
  
- for (item of this.bottom_items) {
-  if (item.new_report) {
-   item.stepper.set_status_id(item.new_report.status_id);
-  }
+  for (item of this.bottom_items) {
+   if (item.new_report) {
+    item.stepper.set_status_id(item.new_report.status_id);
+   }
 
-  for (u of item.new_uploads) {
-   item.add_upload(u);
-  }
+   for (u of item.new_uploads) {
+    item.add_upload(u);
+   }
 
-  for (u of item.modified_uploads) {
-   item.modify_upload(u);
-  }
+   for (u of item.modified_uploads) {
+    item.modify_upload(u);
+   }
 
-  for (u of item.uploads) {
-   if (! u.seen) {
-    item.remove_upload(u.id);
+   for (u of item.uploads) {
+    if (! u.seen) {
+     item.remove_upload(u.id);
+    }
+   }
+   
+   if (item.notify) {
+    this.notify_items.push(item);
    }
   }
 
-  if (item.notify) {
-   this.notify_items.push(item);
+  if (this.notify_items.length) {
+   var msg = 'New responses for ';
+   var c = '';
+   for (item of this.notify_items) {
+    msg = msg + c + item.full_header;
+    c = ',';
+   }
+   msg = msg + '.';
+   this.notifier.innerHTML = msg;
+   this.notifier.style.display = 'block';
+  } else {
+   this.notifier.innerHTML = '';
+   this.notifier.style.display = 'none';
   }
+
+  this.check_responded();
  }
 
- if (this.notify_items.length) {
-  var msg = 'New responses for ';
-  var c = '';
-  for (item of this.notify_items) {
-   msg = msg + c + item.full_header;
-   c = ',';
-  }
-  msg = msg + '.';
-  this.notifier.innerHTML = msg;
-  this.notifier.style.display = 'block';
- } else {
-  this.notifier.innerHTML = '';
-  this.notifier.style.display = 'none';
- }
+ if (this.session.has_poll_instances && ! this.session.is_online) {
+  this.has_visible_poll = 0;
+  
+  for (var inst of this.session.poll_instances) {
+   if (! inst.id in x.poll_instances_by_id) { continue; }
+   var inst0 = x.poll_instances_by_id[inst.id];
+   inst.state = inst0.state;
+   for (var id in inst.poll.items_by_id) {
+    if (! id in inst0.poll.items_by_id) { continue; }
+    var item = inst.poll.items_by_id[id];
+    var item0 = inst0.poll.items_by_id[id];
+    if ('is_correct' in item0) {
+     item.is_correct = item0.is_correct;
+    }
+    if ('count' in item0) {
+     item.count = item0.count;
+    }
+    if (inst.state != 'before' && inst.state != 'after') {
+     this.has_visible_poll = 1;
+    }
+   }
 
- this.check_responded();
+   inst.show_counts();
+   inst.set_state();
+   this.no_polls_div.style.display = this.has_visible_poll ? 'none' : 'block';
+  }
+ }
 };
 
 sangaku.sheet_viewer.clear_notifier = function() {
@@ -660,10 +755,12 @@ sangaku.sheet_viewer.countdown = function() {
  var me = this;
  var cd = this.countdown_div;
  var sd = this.sheet_div;
+ var pd = this.polls_div;
  
  if (w < 0 || (this.student.username.length >= 4 && this.student.username.substr(0,4) == 'fake')) {
   cd.style.display = 'none';
-  sd.style.display = 'block';
+  if (sd) { sd.style.display = 'block'; }
+  if (pd) { pd.style.display = 'block'; }
  } else if (w < 10 * 60 * 1000) {
   var min = Math.floor(w / (60 * 1000));
   var sec = Math.floor((w - 60 * 1000 * min) / 1000);
@@ -672,7 +769,8 @@ sangaku.sheet_viewer.countdown = function() {
   if (sec < 10) { sec0 = '0' + sec; } else { sec0 = '' + sec; }
   cd.innerHTML = "This session will start in " + min0 + ':' + sec0;
   cd.style.display = 'block';
-  sd.style.display = 'none';
+  if (sd) { sd.style.display = 'none'; }
+  if (pd) { pd.style.display = 'none'; }
 
   setTimeout(function() {me.countdown(),1000} );
  } else if (w < 24 * 3600 * 1000) {
@@ -685,12 +783,14 @@ sangaku.sheet_viewer.countdown = function() {
 
   cd.innerHTML = "This session will start at " + h0 + ":" + m0;
   cd.style.display = 'block';
-  sd.style.display = 'none';
+  if (sd) { sd.style.display = 'none'; }
+  if (pd) { pd.style.display = 'none'; }
   
   setTimeout(function() {me.countdown(),10000} );
  } else {
   cd.innerHTML = "This session does not open today. ";
   cd.style.display = 'block';
-  sd.style.display = 'none';
+  if (sd) { sd.style.display = 'none'; }
+  if (pd) { pd.style.display = 'none'; }
  }
 }

@@ -37,16 +37,21 @@ class poll_item extends frog_object {
  }
 
  function for_json($state = 'before') {
+  global $user;
+  
   $x = new stdClass();
   foreach(array('id','poll_id','sequence_number','code','text','is_correct') as $k) {
    $x->$k = $this->$k;
   }
 
-  if ($state == 'count' || $state == 'correct') {
+  if ($state == 'count' ||
+      $state == 'correct' ||
+      $user->status == 'teacher') {
    $x->count = isset($this->count) ? $this->count : 0;
   }
 
-  if ($state == 'correct') {
+  if ($state == 'correct' ||
+      $user->status == 'teacher') {
    $x->is_correct = $this->is_correct;
   }
   

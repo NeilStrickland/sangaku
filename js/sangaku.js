@@ -323,10 +323,13 @@ sangaku.poll.munch = function(x) {
  }
 
  this.items = [];
+ this.items_by_id = {};
 
  if ('items' in x) {
-  for (i of x.items) {
-   this.items.push(sangaku.poll_item.scrunch(i));
+  for (var i of x.items) {
+   var i0 = sangaku.poll_item.scrunch(i);
+   this.items.push(i0);
+   this.items_by_id[i0.id] = i0;
   }
  }
 };
@@ -344,6 +347,10 @@ sangaku.poll_instance.munch = function(x) {
 
  if ('poll' in x) {
   this.poll = sangaku.poll.scrunch(x.poll);
+ }
+
+ if ('student' in x) {
+  this.student = sangaku.student.scrunch(x.student);
  }
 };
 
@@ -383,7 +390,9 @@ sangaku.poll_item.create_dom = function(is_multiple) {
  this.result_tr = document.createElement('tr');
  this.result_tr.className = 'poll_item_result';
  this.result_tr.style.display = 'none';
- this.result_tr.appendChild(document.createElement('td'));
+ this.mark_td = document.createElement('td');
+ this.mark_td.className = 'poll_mark';
+ this.result_tr.appendChild(this.mark_td);
  this.result_td = document.createElement('td');
  this.result_td.className = 'poll_result';
  this.result_tr.appendChild(this.result_td);
@@ -503,11 +512,17 @@ sangaku.poll_instance.set_dom_opts = function(opts) {
   if (this.poll.is_judgemental && opts0.show_correctness) {
    if (item.is_correct) {
     item.result_tr.className = 'poll_item_result correct';
+    item.box_td.className = 'poll_item_box correct';
+    item.mark_td.innerHTML = '&#x2713;';
    } else {
     item.result_tr.className = 'poll_item_result incorrect';
+    item.box_td.className = 'poll_item_box incorrect'; 
+    item.mark_td.innerHTML = '&#x2717;';
    }
   } else {
    item.result_tr.className = 'poll_item_result';
+   item.box_td.className = 'poll_item_box'; 
+   item.mark_td.innerHTML = '';
   }
 
   item.box.disabled = opts0.enable ? 0 : 1;
@@ -532,6 +547,8 @@ sangaku.poll_instance.set_state = function(state = null) {
   this.state = state;
  }
 
+ this.state_div.innerHTML = this.message_for_state[this.state];
+
  var opts = {
   show             : 0,
   show_title       : 0,
@@ -555,7 +572,7 @@ sangaku.poll_instance.set_state = function(state = null) {
   opts.show_state = 1;
   opts.enable = (this.state == 'reveal' || this.state == 'open') ? 1 : 0;
   opts.show_button = (this.state == 'open') ? 1 : 0;
-  opts.show_results = (this.state == 'results' || this.state == 'correct') ? 1 : 0;
+  opts.show_results = (this.state == 'count' || this.state == 'correct') ? 1 : 0;
   opts.show_correctness = (this.state == 'correct') ? 1 : 0;
  }
 
@@ -564,11 +581,39 @@ sangaku.poll_instance.set_state = function(state = null) {
 
 //////////////////////////////////////////////////////////////////////
 
+sangaku.poll_instance.show_counts = function() {
+ var total_count = 0;
+ 
+ for (var item of this.poll.items) {
+  total_count += item.count;
+ }
+
+ this.total_count = total_count;
+ 
+ for (var item of this.poll.items) {
+  if (! (item.count_bar && item.count_box)) { continue; }
+  if (total_count > 0) {
+   w = Math.round(400 * item.count / total_count);
+   item.count_bar.style.width = '' + w + 'px';
+   item.count_box.innerHTML = '' + item.count + '/' + total_count;
+  } else {
+   item.count_bar.style.width = '1px';
+   item.count_box.innerHTML = '0/0';
+  }
+ }
+}
+
+//////////////////////////////////////////////////////////////////////
+
 sangaku.session.munch = function(x) {
- for (var k of ['id','problem_sheet_id','tutorial_group_id',
+ for (var k of ['id','problem_sheet_id',
+                'tutorial_group_id','is_lecture','is_online',
                 'start_time','end_time',
                 'start_timestamp','end_timestamp',
-                'duration','has_snapshots','solutions_shown']) {
+                'duration',
+                'has_problem_sheet','has_snapshots',
+                'has_tutorial_group','has_poll_instances',
+                'solutions_shown']) {
   if (k in x) { this[k] = x[k]; }
  }
 
@@ -598,22 +643,26 @@ sangaku.session.munch = function(x) {
 
  if ('students' in x) {
   this.students = [];
-  for (s of x.students) {
+  for (var s of x.students) {
    this.students.push(sangaku.student.scrunch(s));
   }
  }
 
  if ('snapshots' in x) {
   this.snapshots = [];
-  for (s of x.snapshots) {
+  for (var s of x.snapshots) {
    this.snapshots.push(sangaku.snapshot.scrunch(s));
   }
  }
 
  if ('poll_instances' in x) {
   this.poll_instances = [];
-  for (i of x.poll_instances) {
-   this.poll_instances.push(sangaku.poll_instance.scrunch(i));
+  this.poll_instances_by_id = {};
+  
+  for (var i of x.poll_instances) {
+   var i0 = sangaku.poll_instance.scrunch(i);
+   this.poll_instances.push(i0);
+   this.poll_instances_by_id[i0.id] = i0;
   }
  }
 };
