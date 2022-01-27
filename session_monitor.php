@@ -53,7 +53,7 @@ HTML;
 
  session_tab($session);
 
- if ($session->is_online) {
+ if ($session->is_online && $session->problem_sheet) {
   monitor_tab($session);
  }
 
