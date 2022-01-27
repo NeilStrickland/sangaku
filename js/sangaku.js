@@ -539,11 +539,11 @@ sangaku.poll_instance.set_dom_opts = function(opts) {
  this.title.style.display = opts0.show_title ? 'block' : 'none';
  this.content_div.style.display = opts0.show_content ? 'block' : 'none';
  this.intro_div.style.display =
-  (this.poll.intro.trim() && opts0.show_intro) ? 'block' : 'none';
+  (this.poll.intro && this.poll.intro.trim() && opts0.show_intro) ? 'block' : 'none';
  this.items_div.style.display = opts0.show_items ? 'block' : 'none';
  this.state_div.style.display = opts0.show_state ? 'block' : 'none';
  this.solution_div.style.display =
-  (this.poll.solution.trim() && opts0.show_solution) ? 'block' : 'none';
+  (this.poll.solution && this.poll.solution.trim() && opts0.show_solution) ? 'block' : 'none';
  this.submit_button.style.display = opts0.show_button ? 'block' : 'none';
 
  this.div.style.display = opts0.show ? 'block' : 'none';
