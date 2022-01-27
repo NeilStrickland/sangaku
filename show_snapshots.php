@@ -1,36 +1,44 @@
 <?php
 
+$allow_bot = 1;
+
 require_once('include/sangaku.inc');
 
-$session = $sangaku->get_object_parameter('session');
+$session = $sangaku->get_session_parameter();
 
-if (! $session) { exit; }
+if (! $session) {
+ error_page('Session not found');
+ exit;
+}
 
 $N = $sangaku->nav;
 $H = $sangaku->html;
 $m = $N->mathjax_script();
 
+$O = array(
+ 'scripts' => array('snapshot_gallery'),
+ 'styles' => array('snapshot_gallery')
+);
+   
+$title = '';
+ 
+if ($session->problem_sheet_id) {
+ $title .= $session->problem_sheet_title . '<br/>';
+}
+ 
+if ($session->is_lecture) {
+ $title .= $session->module_code . ' Lecture';
+} elseif ($session->tutorial_group_name) {
+ $title .= 'Group ' . $session->module_code . ' (' .
+        $session->tutorial_group_name . ')';
+} else {
+ $title .= $session->module_code;
+}
+
+echo $N->header('Snapshots',$O);
+
 echo <<<HTML
-<!DOCTYPE HTML>
-<html>
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Snapshots</title>
-<script type="text/javascript" src="/sangaku/js/frog.js"></script>
-<script type="text/javascript" src="/sangaku/js/objects_auto.js?1602487999"></script>
-<script type="text/javascript" src="/sangaku/js/sangaku.js?1602123019"></script>
-<style type="text/css" media="screen">
-  @import url(/sangaku/css/sangaku.css?1602508506);
-</style>
-$m
-<script type="text/javascript" src="/sangaku/js/snapshot_gallery.js?1602489216"></script>
-<style type="text/css" media="screen">
-  @import url(/sangaku/css/snapshot_gallery.css?1602488992);
-</style>
-</head>
-<body >
-<h1>General logarithms and hyperbolic functions Group EngL1(7a)</h1>
+<h1>Live snapshots: $title</h1>
 <span id="intro">Visualiser snapshots will appear below.</span>
 <div id="gallery">
 <a id="prev">&#10094;</a>
@@ -42,8 +50,6 @@ $m
  var v = Object.create(sangaku.snapshot_gallery);
  v.init({$session->id});
 </script>
-</body>
-</html>
 HTML
  ;
 
