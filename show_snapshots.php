@@ -7,7 +7,12 @@ require_once('include/sangaku.inc');
 $session = $sangaku->get_session_parameter();
 
 if (! $session) {
- error_page('Session not found');
+ $module = $sangaku->get_module_parameter();
+ if ($module) {
+  echo "No active session for {$module->code}";
+ } else {
+  error_page('Session not found');
+ }
  exit;
 }
 
