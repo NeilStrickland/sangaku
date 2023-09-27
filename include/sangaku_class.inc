@@ -177,13 +177,13 @@ class sangaku_class extends frog {
   return null;
  }
 
- function get_session_parameter() {
+ function get_session_parameter($leeway = 300) {
   $session = $this->get_object_parameter('session');
 
   if (! $session) {
    $module = $this->get_module_parameter();
    if ($module) {
-    $ss = $module->active_sessions();
+    $ss = $module->active_sessions(null,$leeway);
    }
    if ($ss) { $session = $ss[0]; }
   }
