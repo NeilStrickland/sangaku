@@ -36,6 +36,11 @@ sangaku.session_monitor.init_data = function(x) {
  var students = this.session.students;
  var poll_instances = this.session.poll_instances;
  
+ var login_url = document.getElementById('login_url');
+ var login_qr = document.getElementById('login_qr');
+
+ new QRCode(login_qr,{text : login_url.innerText, width: 512, height : 512});
+ 
  this.students_by_id = {};
 
  if (this.monitor_tab) {
