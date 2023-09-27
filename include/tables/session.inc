@@ -14,7 +14,8 @@ $sangaku->add_table(
   'is_confirmed' => array('type' => 'boolean','default' => 0,'notnull' => true),
   'solutions_shown' => array('type' => 'text'),
   'video_url' => array('type' => 'text'),
-  'is_online' => array('type' => 'boolean')
+  'is_online' => array('type' => 'boolean'),
+  'check_in_code' => array('type' => 'text')
  ),
  array(
   'problem_sheet_title' => array('type' => 'text'),
@@ -45,7 +46,8 @@ SELECT
  x.solutions_shown,
  x.video_url,
  m.video_url AS module_video_url,
- m.video_url_description
+ m.video_url_description,
+ x.check_in_code
 FROM tbl_sessions x
  LEFT JOIN tbl_problem_sheets p ON x.problem_sheet_id = p.id 
   LEFT JOIN tbl_tutorial_groups g ON x.tutorial_group_id = g.id
