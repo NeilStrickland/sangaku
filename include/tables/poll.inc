@@ -66,7 +66,7 @@ FROM tbl_polls x
    LEFT JOIN tbl_sessions s ON x.session_id=s.id
     LEFT JOIN tbl_tutorial_groups g ON s.tutorial_group_id=g.id
 WHERE %s
- ORDER BY m.code,p.week_number,s.date,s.time,x.code,x.id
+ ORDER BY m.code,x.code,p.week_number,s.date,s.time,x.id
  
 SQL
 );
