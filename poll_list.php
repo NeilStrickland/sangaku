@@ -30,7 +30,7 @@ HTML
 echo $H->edged_table_start();
 echo $H->spacer_row(60,120,120,300,60,60);
  
-echo $H->row('ID','Poll','Code','Title','','');
+echo $H->row('ID','Sheet','Code','Title','','');
 foreach ($module->polls as $p) {
  $sheet = $p->problem_sheet_code;
  if (! $sheet) { $sheet = $p->problem_sheet_title; }
