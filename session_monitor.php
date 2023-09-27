@@ -141,6 +141,8 @@ HTML;
  } else {
   $title .= $session->module_code;
  }
+
+ $u = 'show_login_page.php?session_id=' . $session->id;
  
  echo <<<HTML
    <div class="tabbertab" id="session_tab">
@@ -152,9 +154,12 @@ HTML;
      Student login URL:
      <code id="login_url" style="color: blue; font-size: 150%">{$student_login_url}</code>
      <button type="button" onclick="copy_login_url()">Copy</button>
+     <button type="button" onclick="window.open('$u')">Show</button>
      $bb_msg
     </div>
 $bb
+    <br/>
+    <div id="login_qr" style="text-align:center"></div>
    </div>
 
 HTML;
